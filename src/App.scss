@@ -1,0 +1,37 @@
+@import 'styles/component';
+@import 'styles/mui';
+
+body {
+  font-family: Nunito, Roboto, sans-serif !important;
+  font-size: 1rem;
+  background-color: ghostwhite;
+}
+
+code,
+pre,
+input[type='code'],
+textarea[type='code'] {
+  font-family: 'Inconsolata', monospace !important;
+}
+
+* {
+  outline: none !important;
+}
+
+a:hover {
+  text-decoration: none !important;
+}
+
+iframe {
+  display: none !important;
+}
+
+:root {
+  --color-primary-light: #8bc34a;
+  --color-primary-main: #8bc34a;
+  --color-primary-dark: #9ccc65;
+
+  --color-secondary-light: #9575cd;
+  --color-secondary-main: #7e57c2;
+  --color-secondary-dark: #673ab7;
+}
