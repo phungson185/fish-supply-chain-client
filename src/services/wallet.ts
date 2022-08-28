@@ -11,7 +11,7 @@ const connectProvider = async () => {
     walletconnect: {
       package: WalletConnectProvider,
       options: {
-        rpc: [].reduce((sum, item: any) => ({ ...sum, [item.chainId]: item.rpcUrl }), {}),
+        rpc: [],
       },
     },
   };
@@ -39,18 +39,12 @@ const connectWallet = async () => {
     }
     address = address.toLowerCase();
 
-    const { nonce } = await authService.getNonce({ address });
-    const signature = await web3.eth.personal.sign(nonce.toString(), address, '');
-    const { accessToken } = await authService.getToken({ address, signature });
-    store.dispatch(signIn({ accessToken, address }));
-
-    authService.getProfile({ address }).then((profile) => {
-      if (profile.isAdmin) {
-        store.dispatch(signIn(profile));
-      } else {
-        store.dispatch(signOut());
-      }
-    });
+    const isAdmin = await authService.getProfile(address);
+    if (isAdmin) {
+      store.dispatch(signIn({ address }));
+    } else {
+      store.dispatch(signOut());
+    }
   } catch (error) {
     console.log(error);
   }

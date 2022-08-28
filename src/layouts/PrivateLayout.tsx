@@ -16,11 +16,11 @@ const PrivateLayout = () => {
   const { isMobile } = useWindowSize();
   const { isLoggedIn } = useSelector(profileSelector);
 
-  useQuery('dashboardService.fetchSystem', () => dashboardService.fetchSystem(), {
-    onSuccess: (data) => {
-      dispatch(saveSystem(data));
-    },
-  });
+  // useQuery('dashboardService.fetchSystem', () => dashboardService.fetchSystem(), {
+  //   onSuccess: (data) => {
+  //     dispatch(saveSystem(data));
+  //   },
+  // });
 
   return (
     <div className='App'>

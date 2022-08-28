@@ -33,12 +33,10 @@ export const getTimeFormat = (time) => {
   return DateTime.fromISO(time).toFormat('MM/dd/yyyy, HH:mm');
 };
 
-export const getTimeFromNumber = (time) => {
-  return new Date(time).toISOString();
-};
-
 export const randomTokenID = () => {
   const mils = Date.now() % (1e9 + 7);
   const rand = Math.floor(Math.random() * 9e3) + 1e3;
   return `${mils}${rand}`;
 };
+
+export { default as merge } from './merge';

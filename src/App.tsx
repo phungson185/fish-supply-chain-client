@@ -1,5 +1,4 @@
 import { AppContainer } from 'containers';
-import { default as jwtDecode } from 'jwt-decode';
 import { PrivateLayout } from 'layouts';
 import { useEffect, useState } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
@@ -14,9 +13,10 @@ const App = () => {
   useEffect(() => {
     try {
       const profile = JSON.parse(localStorage.getItem('profile')!);
-      jwtDecode(profile.accessToken);
-      store.dispatch(signIn(profile));
-      walletService.connectProvider();
+      if (profile) {
+        store.dispatch(signIn(profile));
+        walletService.connectProvider();
+      }
     } catch {
     } finally {
       setIsReady(true);

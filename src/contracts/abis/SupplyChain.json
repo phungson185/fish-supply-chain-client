@@ -1,0 +1,832 @@
+{
+	"compiler": {
+		"version": "0.8.2+commit.661d1103"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "payable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "uid",
+						"type": "uint256"
+					}
+				],
+				"name": "Manufactured",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "ManufacturerAdded",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "uid",
+						"type": "uint256"
+					}
+				],
+				"name": "PurchasedByCustomer",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "uid",
+						"type": "uint256"
+					}
+				],
+				"name": "PurchasedByThirdParty",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "uid",
+						"type": "uint256"
+					}
+				],
+				"name": "ReceivedByCustomer",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "uid",
+						"type": "uint256"
+					}
+				],
+				"name": "ReceivedByDeliveryHub",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "uid",
+						"type": "uint256"
+					}
+				],
+				"name": "ReceivedByThirdParty",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "uid",
+						"type": "uint256"
+					}
+				],
+				"name": "ShippedByDeliveryHub",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "uid",
+						"type": "uint256"
+					}
+				],
+				"name": "ShippedByManufacturer",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "uid",
+						"type": "uint256"
+					}
+				],
+				"name": "ShippedByThirdParty",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "addAdminRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "addCustomerRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "addDeliveryHubRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "addManufacturerRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "addThirdPartyRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "fetchProductCount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					}
+				],
+				"name": "fetchProductHistoryLength",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "_type",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "i",
+						"type": "uint256"
+					}
+				],
+				"name": "fetchProductPart1",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "_type",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "i",
+						"type": "uint256"
+					}
+				],
+				"name": "fetchProductPart2",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "enum Structure.State",
+						"name": "",
+						"type": "uint8"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "_type",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "i",
+						"type": "uint256"
+					}
+				],
+				"name": "fetchProductPart3",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					}
+				],
+				"name": "fetchProductState",
+				"outputs": [
+					{
+						"internalType": "enum Structure.State",
+						"name": "",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "hasAdminRole",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "hasCustomerRole",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "hasDeliveryHubRole",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "hasManufacturerRole",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "hasThirdPartyRole",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "manufacturerName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "manufacturerDetails",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "manufacturerLongitude",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "manufacturerLatitude",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "productName",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "productCode",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "productPrice",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "productCategory",
+						"type": "string"
+					}
+				],
+				"name": "manufactureProduct",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					}
+				],
+				"name": "purchaseByCustomer",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					}
+				],
+				"name": "purchaseByThirdParty",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					}
+				],
+				"name": "receiveByCustomer",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "deliveryHubLongitude",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "deliveryHubLatitude",
+						"type": "string"
+					}
+				],
+				"name": "receiveByDeliveryHub",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "thirdPartyLongitude",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "thirdPartyLatitude",
+						"type": "string"
+					}
+				],
+				"name": "receiveByThirdParty",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "tran",
+						"type": "string"
+					}
+				],
+				"name": "setTransactionHash",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "tran",
+						"type": "string"
+					}
+				],
+				"name": "setTransactionHashOnManufacture",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					}
+				],
+				"name": "shipByDeliveryHub",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					}
+				],
+				"name": "shipByThirdParty",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_uid",
+						"type": "uint256"
+					}
+				],
+				"name": "shipToThirdParty",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "uid",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {
+				"fetchProductPart1(uint256,string,uint256)": {
+					"details": "Fetch product"
+				},
+				"fetchProductPart2(uint256,string,uint256)": {
+					"details": "Fetch product"
+				},
+				"manufactureProduct(string,string,string,string,string,uint256,uint256,string)": {
+					"details": "STEP 1 : Manufactured a product."
+				},
+				"purchaseByCustomer(uint256)": {
+					"details": "STEP 5 : Purchase of a product at third party by Customer."
+				},
+				"purchaseByThirdParty(uint256)": {
+					"details": "STEP 2 : Purchase of manufactured product by Third Party."
+				},
+				"receiveByCustomer(uint256)": {
+					"details": "STEP 10 : Shipping of product by delivery hub purchased by customer."
+				},
+				"receiveByDeliveryHub(uint256,string,string)": {
+					"details": "STEP 8 : Receiveing of product by delivery hub purchased by customer."
+				},
+				"receiveByThirdParty(uint256,string,string)": {
+					"details": "STEP 4 : Received the purchased product shipped by Manufacturer."
+				},
+				"shipByDeliveryHub(uint256)": {
+					"details": "STEP 9 : Shipping of product by delivery hub purchased by customer."
+				},
+				"shipByThirdParty(uint256)": {
+					"details": "STEP 7 : Shipping of product by third party purchased by customer."
+				},
+				"shipToThirdParty(uint256)": {
+					"details": "STEP 3 : Shipping of purchased product to Third Party."
+				}
+			},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/SupplyChain.sol": "SupplyChain"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/Structure.sol": {
+			"keccak256": "0x7308f1b73da33d9213a5f6ebd6f08641fae6df34be8c6c48ad4add39b59b8e71",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://57f803e2d2b5dd25c38ae4ebac32c628b37f47b4c80a99339e15308c8fd209ad",
+				"dweb:/ipfs/QmT4XhjkDtdZEDUbKMLymGscsqLu6fvqG6FRiMM3NERMpb"
+			]
+		},
+		"contracts/SupplyChain.sol": {
+			"keccak256": "0x226693ef397abae10c3dd69e01544a458cd0a986b2bb5b7908bcec201be6927f",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1d2e1a823894927529866a88c08bb67de8b4111971f71b681aea777d6e78ccad",
+				"dweb:/ipfs/QmV53LnGd8tJjLVNmwthfcKEFp4bRxwdYLPmD5mKVTC4a9"
+			]
+		}
+	},
+	"version": 1
+}
