@@ -14,8 +14,13 @@ export type PaginateType = {
 export type PopupController = {
   onSuccess?: () => void;
   onClose: () => void;
+  refetch: () => void;
 };
 
 export type SearchController = {
   onChange: (search: any) => void;
 };
+
+export type Address = {
+  address: string;
+}

@@ -35,8 +35,8 @@ const UploadLabel = ({ htmlFor, variant, image, width, height, loading, error }:
     <div className='flex items-center justify-center h-full'>
       {image ? (
         <Avatar src={image} className='w-full h-full' variant={variant} />
-      ) : (
-        <img src={require('assets/images/placeholder_4_4.png').default.src} style={{ height: height - 30 }} />
+        ) : (
+          <img src={require('assets/icons/Metafarm.png').default.src} style={{ height: height - 30 }} />
       )}
     </div>
   </label>

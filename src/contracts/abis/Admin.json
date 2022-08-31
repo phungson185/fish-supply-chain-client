@@ -1,0 +1,173 @@
+{
+	"compiler": {
+		"version": "0.8.2+commit.661d1103"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "payable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "addAdminRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "manufacturerAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "manufacturerName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "manufacturerDescription",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "logoImage",
+						"type": "string"
+					}
+				],
+				"name": "addManufacturer",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "fetchManufacturer",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "address",
+								"name": "manufacturerAddress",
+								"type": "address"
+							},
+							{
+								"internalType": "string",
+								"name": "manufacturerName",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "manufacturerDescription",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "logoImage",
+								"type": "string"
+							}
+						],
+						"internalType": "struct Structure.Manufacturer[]",
+						"name": "",
+						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "hasAdminRole",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_account",
+						"type": "address"
+					}
+				],
+				"name": "hasManufacturerRole",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/Admin.sol": "Admin"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/Admin.sol": {
+			"keccak256": "0x06246fce02004d620494ecd7caa7993af0471b66647280c9c61a79403bdc3061",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0182b5ab5ffb8ad76c1393c108c4e77c298e4125b5eda3871d5dfb6ef6fa0f99",
+				"dweb:/ipfs/QmfKbveRuWe8HV8xCUdKEXCBryWScUK9LkgYkuCFixsUH2"
+			]
+		},
+		"contracts/Structure.sol": {
+			"keccak256": "0x59118d3c8fec32916d75fd9d658a9c653c2cec29b523492a656fc0e8059bceea",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://58d91605789bf160db173cd6777901def452f54a7c2886544f8e3e6b7c94f7f9",
+				"dweb:/ipfs/QmdkVQRDNuR5wMTrz8W7uVgjnGCpyyfq7859Qra8w4Ajm3"
+			]
+		}
+	},
+	"version": 1
+}

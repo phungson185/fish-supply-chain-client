@@ -2,10 +2,8 @@ import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from 'reducers';
 
 export type ProfileState = {
-  id?: number;
-  address?: string;
+  address: string;
   isLoggedIn?: boolean;
-  accessToken?: string;
 };
 
 export const profileSlice = createSlice({
@@ -21,7 +19,7 @@ export const profileSlice = createSlice({
     },
     signOut: () => {
       localStorage.removeItem('profile');
-      return { isLoggedIn: false };
+      return { address: '', isLoggedIn: false };
     },
   },
 });

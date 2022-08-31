@@ -1,6 +1,6 @@
-import { supplyChainContract } from 'contracts';
+import { adminContract } from 'contracts';
 
-const getProfile = (address: string) => supplyChainContract().methods.hasAdminRole(address).call();
+const getProfile = (address: string) => adminContract().methods.hasAdminRole(address).call();
 export default {
   getProfile,
 };

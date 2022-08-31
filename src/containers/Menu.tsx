@@ -33,14 +33,14 @@ const MenuItem = ({ name, path }: MenuItemProps) => {
 };
 
 const Menu = () => {
-  const { home } = privateRoute;
+  const { manufacturer } = privateRoute;
 
   const { isLoggedIn } = useSelector(profileSelector);
 
   return (
     <>
       <List className='flex flex-col gap-1'>
-        <MenuItem {...home} />
+        <MenuItem {...manufacturer} /> 
       </List>
     </>
   );

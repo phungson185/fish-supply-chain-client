@@ -26,10 +26,10 @@ const Header = () => {
         PaperProps={{ style: { width: '280px', padding: '8px 16px' } }}
       >
         <div className='flex justify-center items-center h-12 gap-3'>
-          <Link to='/'>
+          {/* <Link to='/'>
             <img src={require('assets/icons/Metafarm.png').default} className='h-10' />
-          </Link>
-          <span className='font-medium text-2xl text-primary-main'>MyMetaFarm</span>
+          </Link> */}
+          <span className='font-me text-lg text-primary-main'>Supply Chain Admin</span>
         </div>
         <Divider className='my-2' />
         <AppMenu />

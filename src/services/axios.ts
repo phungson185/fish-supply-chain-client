@@ -6,16 +6,16 @@ import { ProfileState, signOut } from 'reducers/profile';
 import { openAlert } from 'reducers/notification';
 import { camelizeKeys } from 'humps';
 
-const beforeRequest = (config: AxiosRequestConfig) => {
-  const { isLoggedIn, accessToken }: ProfileState = store.getState().profile;
-  if (isLoggedIn) {
-    Object.assign(config.headers as any, { Authorization: `Bearer ${accessToken}` });
-  }
-  if (config.data instanceof FormData) {
-    Object.assign(config.headers as any, { 'Content-Type': 'multipart/form-data' });
-  }
-  return config;
-};
+// const beforeRequest = (config: AxiosRequestConfig) => {
+//   const { isLoggedIn, accessToken }: ProfileState = store.getState().profile;
+//   if (isLoggedIn) {
+//     Object.assign(config.headers as any, { Authorization: `Bearer ${accessToken}` });
+//   }
+//   if (config.data instanceof FormData) {
+//     Object.assign(config.headers as any, { 'Content-Type': 'multipart/form-data' });
+//   }
+//   return config;
+// };
 
 const onError = async (error: AxiosError) => {
   const { response } = error;
@@ -38,7 +38,6 @@ client.defaults.paramsSerializer = (params) =>
       .filter((key) => String(params[key]).trim())
       .reduce((trim, key) => ({ ...trim, [key]: params[key] }), {}),
   );
-client.interceptors.request.use(beforeRequest);
 client.interceptors.response.use((response) => {
   if (['POST', 'PUT', 'DELETE'].includes(response.config.method?.toUpperCase()!)) {
     store.dispatch(openAlert({ message: 'Successfully' }));

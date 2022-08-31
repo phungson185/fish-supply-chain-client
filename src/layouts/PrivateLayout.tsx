@@ -1,27 +1,18 @@
-import { AppHeader } from 'containers';
-import { useQuery } from 'react-query';
-import { useDispatch, useSelector } from 'react-redux';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { saveSystem } from 'reducers/system';
-import { privateRoute } from 'routes';
-import { dashboardService, walletService } from 'services';
-import { useNotification, useWindowSize } from 'hooks';
-import { profileSelector } from 'reducers/profile';
 import { Button } from '@mui/material';
 import { ScrollButton } from 'components';
+import { AppHeader } from 'containers';
+import { useNotification, useWindowSize } from 'hooks';
+import { useDispatch, useSelector } from 'react-redux';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { profileSelector } from 'reducers/profile';
+import { privateRoute } from 'routes';
+import { walletService } from 'services';
 
 const PrivateLayout = () => {
   useNotification();
   const dispatch = useDispatch();
   const { isMobile } = useWindowSize();
   const { isLoggedIn } = useSelector(profileSelector);
-
-  // useQuery('dashboardService.fetchSystem', () => dashboardService.fetchSystem(), {
-  //   onSuccess: (data) => {
-  //     dispatch(saveSystem(data));
-  //   },
-  // });
-
   return (
     <div className='App'>
       <main style={{ marginLeft: isMobile ? '0' : '280px' }}>
