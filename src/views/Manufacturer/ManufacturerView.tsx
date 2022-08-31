@@ -9,19 +9,34 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
 } from '@mui/material';
-import { Spinner } from 'components';
+import { Spinner, TableRowEmpty } from 'components';
+import { useSnackbar } from 'notistack';
 import { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
+import { useSelector } from 'react-redux';
+import { profileSelector } from 'reducers/profile';
 import { manufacturerService } from 'services';
 import ManufacturerPopup from './Popups/ManufacturerPopup';
 const ManufacturerView = () => {
+  const { address } = useSelector(profileSelector);
   const [openCreatePopup, setOpenCreatePopup] = useState(false);
-
+  const { enqueueSnackbar } = useSnackbar();
   const { data, isFetching, refetch, isError } = useQuery(['manufacturerService.fetchManufacturers'], () =>
     manufacturerService.fetchManufacturers(),
   );
+
+  const { mutate: deleteManufacturer, isLoading } = useMutation(manufacturerService.deleteManufacturer, {
+    onSuccess: () => {
+      enqueueSnackbar('Delete manufacturer successfully', { variant: 'success' });
+      refetch();
+    },
+  });
+
+  const handleDeleteManufacturer = (index: string) => {
+    deleteManufacturer({ address, index });
+  };
 
   return (
     <>
@@ -36,6 +51,7 @@ const ManufacturerView = () => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>Id</TableCell>
                 <TableCell>Manufacturer name</TableCell>
                 <TableCell>Logo</TableCell>
                 <TableCell>Address</TableCell>
@@ -45,26 +61,37 @@ const ManufacturerView = () => {
             </TableHead>
             <TableBody>
               {data &&
-                data.map((manufacturer: any) => (
-                  <TableRow key={manufacturer.manufacturerAddress}>
-                    <TableCell className='text-center'>{manufacturer.manufacturerName}</TableCell>
-                    <TableCell className='text-center'>
-                      <Avatar src={manufacturer.logoImage} className='w-24 h-24' variant='circular' />
-                    </TableCell>
-                    <TableCell className='text-center'>{manufacturer.manufacturerAddress}</TableCell>
-                    <TableCell className='text-center'>
-                      <div
-                        dangerouslySetInnerHTML={{ __html: manufacturer.manufacturerDescription! }}
-                        className='text-editor'
-                      />
-                    </TableCell>
-                    <TableCell className='text-center'>
-                      <LoadingButton variant='contained' color='error'>
-                        Delete
-                      </LoadingButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                data.map(
+                  (manufacturer: any) =>
+                    manufacturer.manufacturerId !== '0' &&
+                    manufacturer.manufacturerId !== undefined && (
+                      <TableRow key={manufacturer.manufacturerId}>
+                        <TableCell className='text-center'>{manufacturer.manufacturerId}</TableCell>
+                        <TableCell className='text-center'>{manufacturer.manufacturerName}</TableCell>
+                        <TableCell className='text-center'>
+                          <Avatar src={manufacturer.logoImage} className='w-24 h-24' variant='circular' />
+                        </TableCell>
+                        <TableCell className='text-center'>{manufacturer.manufacturerAddress}</TableCell>
+                        <TableCell className='text-center'>
+                          <div
+                            dangerouslySetInnerHTML={{ __html: manufacturer.manufacturerDescription! }}
+                            className='text-editor'
+                          />
+                        </TableCell>
+                        <TableCell className='text-center'>
+                          <LoadingButton
+                            variant='contained'
+                            color='error'
+                            loading={isLoading}
+                            onClick={() => handleDeleteManufacturer(manufacturer.manufacturerId)}
+                          >
+                            Delete
+                          </LoadingButton>
+                        </TableCell>
+                      </TableRow>
+                    ),
+                )}
+              <TableRowEmpty visible={!isFetching && data.length === 0} />
             </TableBody>
           </Table>
         </Spinner>

@@ -11,9 +11,12 @@ const addManufacturer = ({ address, ...params }: ManufacturerType): Promise<any>
     )
     .send({ from: address });
 
-const fetchManufacturers = (): Promise<any> => adminContract().methods.fetchManufacturer().call();
+const fetchManufacturers = (): Promise<any> => adminContract().methods.fetchManufacturers().call();
+const deleteManufacturer = ({ address, index }: { address: string; index: string }): Promise<any> =>
+  adminContract().methods.deleteManufacturer(index).send({ from: address });
 
 export default {
   addManufacturer,
   fetchManufacturers,
+  deleteManufacturer,
 };

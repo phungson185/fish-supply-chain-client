@@ -45,11 +45,11 @@ const ManufacturerPopup = ({ onClose, refetch }: PopupProps) => {
   };
 
   const { mutate: addManufacturer, isLoading } = useMutation(manufacturerService.addManufacturer, {
-    onSuccess: (data) => {
+    onSuccess: () => {
       enqueueSnackbar('Add manufacturer successfully', { variant: 'success' });
       onClose();
       refetch();
-    },
+    }
   });
 
   const handleSubmitManufacturer = async () => {
