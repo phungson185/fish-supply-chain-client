@@ -1,8 +1,8 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { API_URL } from 'env';
 import { stringify } from 'querystring';
 import { store } from 'reducers';
-import { ProfileState, signOut } from 'reducers/profile';
+import { signOut } from 'reducers/profile';
 import { openAlert } from 'reducers/notification';
 import { camelizeKeys } from 'humps';
 
@@ -40,7 +40,7 @@ client.defaults.paramsSerializer = (params) =>
   );
 client.interceptors.response.use((response) => {
   if (['POST', 'PUT', 'DELETE'].includes(response.config.method?.toUpperCase()!)) {
-    store.dispatch(openAlert({ message: 'Successfully' }));
+    store.dispatch(openAlert({ message: 'Upload logo successfully' }));
   }
 
   const { success = 1, data, errors } = response.data;

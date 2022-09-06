@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import { ScrollButton } from 'components';
 import { AppHeader } from 'containers';
 import { useNotification, useWindowSize } from 'hooks';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { privateRoute } from 'routes';
@@ -10,7 +10,6 @@ import { walletService } from 'services';
 
 const PrivateLayout = () => {
   useNotification();
-  const dispatch = useDispatch();
   const { isMobile } = useWindowSize();
   const { isLoggedIn } = useSelector(profileSelector);
   return (

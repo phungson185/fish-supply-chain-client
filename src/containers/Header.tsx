@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { profileSelector, signOut } from 'reducers/profile';
 import { walletService } from 'services';
 import { shorten } from 'utils/common';
-import { Link } from 'react-router-dom';
 
 const Header = () => {
   const dispatch = useDispatch();

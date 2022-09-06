@@ -23,11 +23,11 @@ const ManufacturerView = () => {
   const { address } = useSelector(profileSelector);
   const [openCreatePopup, setOpenCreatePopup] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const { data, isFetching, refetch, isError } = useQuery(['manufacturerService.fetchManufacturers'], () =>
+  const { data, isFetching, refetch } = useQuery(['manufacturerService.fetchManufacturers'], () =>
     manufacturerService.fetchManufacturers(),
   );
 
-  const { mutate: deleteManufacturer, isLoading } = useMutation(manufacturerService.deleteManufacturer, {
+  const { mutate: deleteManufacturer } = useMutation(manufacturerService.deleteManufacturer, {
     onSuccess: () => {
       enqueueSnackbar('Delete manufacturer successfully', { variant: 'success' });
       refetch();
@@ -82,7 +82,6 @@ const ManufacturerView = () => {
                           <LoadingButton
                             variant='contained'
                             color='error'
-                            loading={isLoading}
                             onClick={() => handleDeleteManufacturer(manufacturer.manufacturerId)}
                           >
                             Delete
