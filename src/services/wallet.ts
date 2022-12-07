@@ -39,7 +39,7 @@ const connectWallet = async () => {
     }
     address = address.toLowerCase();
 
-    const isAdmin = await authService.getProfile(address);
+    const isAdmin = await authService.isFDA(address);
     if (isAdmin) {
       store.dispatch(signIn({ address }));
     } else {

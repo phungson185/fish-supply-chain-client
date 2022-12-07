@@ -1,4 +1,4 @@
-import { ManufacturerView } from 'views/Manufacturer';
+import { RegistrationView } from 'views/Registration';
 type RouteType = {
   path: string;
   url?: (query: any) => string;
@@ -17,9 +17,9 @@ const privateRoute: PrivateRouteType = {
     element: <></>,
   },
   manufacturer: {
-    path: '/manufacturer',
-    name: 'Manufacturer',
-    element: <ManufacturerView />,
+    path: '/registration',
+    name: 'Registration',
+    element: <RegistrationView />,
   },
 };
 
