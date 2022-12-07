@@ -28,7 +28,7 @@ const Header = () => {
           {/* <Link to='/'>
             <img src={require('assets/icons/Metafarm.png').default} className='h-10' />
           </Link> */}
-          <span className='font-me text-lg text-primary-main'>Supply Chain Admin</span>
+          <span className='font-me text-lg text-primary-main'>Supply Chain FDA</span>
         </div>
         <Divider className='my-2' />
         <AppMenu />

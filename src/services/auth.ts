@@ -1,6 +1,6 @@
-import { adminContract } from 'contracts';
+import { registrationContract } from 'contracts';
 
-const getProfile = (address: string) => adminContract().methods.hasAdminRole(address).call();
+const isFDA = (address: string) => registrationContract().methods.isFDA(address).call();
 export default {
-  getProfile,
+  isFDA,
 };
