@@ -1,6 +1,6 @@
 import { registrationContract } from 'contracts';
 
-const isFDA = (address: string) => registrationContract().methods.isFDA(address).call();
+const getRole = (address: string) => registrationContract().methods.GetRole(address).call();
 export default {
-  isFDA,
+  getRole,
 };

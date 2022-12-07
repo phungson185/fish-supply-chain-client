@@ -109,6 +109,25 @@
 				"inputs": [
 					{
 						"internalType": "address",
+						"name": "r",
+						"type": "address"
+					}
+				],
+				"name": "GetRole",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
 						"name": "c",
 						"type": "address"
 					}
@@ -278,10 +297,10 @@
 	},
 	"sources": {
 		"contracts/fish-supply-chain.sol": {
-			"keccak256": "0x4a0dfefe0713a38c603dc366b066fddd0db10431a200010ee10a3ad9cfe409a2",
+			"keccak256": "0x1db8cedc5a1453349f1bd0a8406d32cc5dcae98f4a96b24a372eb4a228b041a9",
 			"urls": [
-				"bzz-raw://f9daf8254464391aac80cff9d3acbbd0bf7a08394cae4e21b22c3abb5a34568b",
-				"dweb:/ipfs/QmbkEuTWQoryXCTA8UQBn73x7zGc51LwYfWZ4ZN9hRPrKn"
+				"bzz-raw://738383328b2f9ffa4f043532740e2074b49e35256bb5459a00c1426779d374a0",
+				"dweb:/ipfs/QmcGQzJqUTDtAZjBpjNP3XSxdXjqR4gjHNpJCUnRnDHGR5"
 			]
 		}
 	},

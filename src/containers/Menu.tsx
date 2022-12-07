@@ -1,7 +1,9 @@
 import { List, ListItemButton, ListItemText } from '@mui/material';
 import { styled } from '@mui/styles';
+import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
-import { privateRoute } from 'routes';
+import { profileSelector } from 'reducers/profile';
+import { getRoute } from 'routes';
 
 const StyledListItem = styled(ListItemButton)({
   borderRadius: 8,
@@ -31,13 +33,18 @@ const MenuItem = ({ name, path }: MenuItemProps) => {
 };
 
 const Menu = () => {
-  const { manufacturer } = privateRoute;
+  const { isLoggedIn, role } = useSelector(profileSelector);
+  const privateRoute = getRoute(role);
 
   return (
     <>
-      <List className='flex flex-col gap-1'>
-        <MenuItem {...manufacturer} /> 
-      </List>
+      {isLoggedIn ? (
+        <List className='flex flex-col gap-1'>
+          {Object.values(privateRoute).filter((item) => item.name).map(({ name, path }) => (
+            <MenuItem key={path} name={name} path={path} />
+          ))}
+        </List>
+      ) : null}
     </>
   );
 };
