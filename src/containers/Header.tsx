@@ -1,9 +1,10 @@
 import { Logout, Menu as MenuIcon } from '@mui/icons-material';
 import { AppBar, Button, Divider, Drawer, IconButton, Toolbar } from '@mui/material';
-import { AppBreadcrumb, AppMenu } from 'containers';
+import { AppMenu } from 'containers';
 import { useWindowSize } from 'hooks';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { profileSelector, signOut } from 'reducers/profile';
 import { walletService } from 'services';
 import { shorten } from 'utils/common';
@@ -11,7 +12,7 @@ import { shorten } from 'utils/common';
 const Header = () => {
   const dispatch = useDispatch();
   const { isMobile } = useWindowSize();
-  const { isLoggedIn, address } = useSelector(profileSelector);
+  const { isLoggedIn, role, address } = useSelector(profileSelector);
 
   const [openDrawer, setOpenDrawer] = useState(false);
 
@@ -25,10 +26,9 @@ const Header = () => {
         PaperProps={{ style: { width: '280px', padding: '8px 16px' } }}
       >
         <div className='flex justify-center items-center h-12 gap-3'>
-          {/* <Link to='/'>
-            <img src={require('assets/icons/Metafarm.png').default} className='h-10' />
-          </Link> */}
-          <span className='font-me text-lg text-primary-main'>Supply Chain FDA</span>
+          <Link to='/'>
+            <span className='font-me text-lg text-primary-main'>{`Supply Chain ${role}`}</span>
+          </Link>
         </div>
         <Divider className='my-2' />
         <AppMenu />
@@ -41,7 +41,7 @@ const Header = () => {
               <MenuIcon />
             </IconButton>
           )}
-          <AppBreadcrumb />
+          {/* <AppBreadcrumb /> */}
           <div className='flex-1' />
           {isLoggedIn ? (
             <div className='flex'>

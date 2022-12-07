@@ -1,10 +1,15 @@
 import { Breadcrumbs, Typography } from '@mui/material';
 import { useLocation } from 'react-router-dom';
-import { privateRoute } from 'routes';
+import { getRoute } from 'routes';
 import { NavigateNext } from '@mui/icons-material';
+import { profileSelector } from 'reducers/profile';
+import { useSelector } from 'react-redux';
 
 const Breadcrumb = () => {
+  const { role } = useSelector(profileSelector);
   const location = useLocation();
+  const privateRoute = getRoute(role);
+
   const routes = (location.pathname.match(/\/[\w-]+/g) ?? [])
     .map((_, index, array) => array.slice(0, index + 1).join(''))
     .map((item) => Object.values(privateRoute).find((route) => item === route.path))

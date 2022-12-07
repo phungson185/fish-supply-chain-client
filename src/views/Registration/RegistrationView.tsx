@@ -1,11 +1,8 @@
 import { useSnackbar } from 'notistack';
 import { useMutation } from 'react-query';
-import { useSelector } from 'react-redux';
-import { profileSelector } from 'reducers/profile';
 import { registrationService } from 'services';
 import Registration from './components/Registration';
 const RegistrationView = () => {
-  const { address } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
 
   const { mutate: registerConsumer } = useMutation(registrationService.registerConsumer, {

@@ -3,6 +3,7 @@ import { RootState } from 'reducers';
 
 export type ProfileState = {
   address: string;
+  role: string;
   isLoggedIn?: boolean;
 };
 
@@ -19,7 +20,7 @@ export const profileSlice = createSlice({
     },
     signOut: () => {
       localStorage.removeItem('profile');
-      return { address: '', isLoggedIn: false };
+      return { address: '', role: '', isLoggedIn: false };
     },
   },
 });
