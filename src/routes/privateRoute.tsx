@@ -1,3 +1,4 @@
+import { ContractForm } from 'views/FarmedFish';
 import { RegistrationView } from 'views/Registration';
 type RouteType = {
   path: string;
@@ -23,7 +24,7 @@ const fdaRoute: PrivateRouteType = {
   },
 };
 
-const fishFarmerRoute: PrivateRouteType = {
+const fishSeedCompanyRoute: PrivateRouteType = {
   home: {
     path: '/',
     name: '',
@@ -32,11 +33,11 @@ const fishFarmerRoute: PrivateRouteType = {
   contract: {
     path: '/contract',
     name: 'Contract',
-    element: <></>,
+    element: <ContractForm />,
   },
 };
 
-const fishSeedCompanyRoute: PrivateRouteType = {
+const fishFarmerRoute: PrivateRouteType = {
   home: {
     path: '/',
     name: '',
@@ -85,7 +86,6 @@ const wildCaughtFisherRoute: PrivateRouteType = {
 };
 
 export const getRoute = (role: string) => {
-  console.log(role)
   if (role === 'FDA') {
     return fdaRoute;
   } else if (role === 'Fish Farmer') {

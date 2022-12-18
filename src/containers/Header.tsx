@@ -27,7 +27,7 @@ const Header = () => {
       >
         <div className='flex justify-center items-center h-12 gap-3'>
           <Link to='/'>
-            <span className='font-me text-lg text-primary-main'>{`Supply Chain ${role}`}</span>
+            <span className='font-me text-lg text-primary-main'>{`Supply Chain ${role ?? ''}`}</span>
           </Link>
         </div>
         <Divider className='my-2' />

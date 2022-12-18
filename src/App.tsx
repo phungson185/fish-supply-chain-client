@@ -12,11 +12,11 @@ const App = () => {
 
   useEffect(() => {
     try {
-      const profile = JSON.parse(localStorage.getItem('profile')!);
-      if (profile) {
-        store.dispatch(signIn(profile));
-        walletService.connectProvider();
-      }
+      // const profile = JSON.parse(localStorage.getItem('profile')!);
+      // if (profile) {
+      //   store.dispatch(signIn(profile));
+      // }
+      walletService.connectProvider();
     } catch {
     } finally {
       setIsReady(true);

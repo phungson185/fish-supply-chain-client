@@ -38,6 +38,7 @@
     "react-scripts": "^4.0.3",
     "recharts": "^2.1.9",
     "sass": "^1.45.1",
+    "solc": "^0.8.17",
     "tailwind-merge": "^1.6.0",
     "web3": "^1.7.1",
     "web3modal": "^1.9.5"

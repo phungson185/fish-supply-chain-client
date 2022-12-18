@@ -29,7 +29,6 @@ const Registration = ({ title, handle }: RegistrationProps) => {
             fullWidth
             id='outlined-basic'
             variant='outlined'
-            required
             onChange={(e) => handleAddressChange(e.target.value)}
           />
         </Grid>
