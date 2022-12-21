@@ -5,6 +5,7 @@ export type ProfileState = {
   address: string;
   role: string;
   isLoggedIn?: boolean;
+  accessToken?: string;
 };
 
 export const profileSlice = createSlice({

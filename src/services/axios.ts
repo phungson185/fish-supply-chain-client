@@ -1,21 +1,21 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { API_URL } from 'env';
 import { stringify } from 'querystring';
 import { store } from 'reducers';
-import { signOut } from 'reducers/profile';
+import { ProfileState, signOut } from 'reducers/profile';
 import { openAlert } from 'reducers/notification';
 import { camelizeKeys } from 'humps';
 
-// const beforeRequest = (config: AxiosRequestConfig) => {
-//   const { isLoggedIn, accessToken }: ProfileState = store.getState().profile;
-//   if (isLoggedIn) {
-//     Object.assign(config.headers as any, { Authorization: `Bearer ${accessToken}` });
-//   }
-//   if (config.data instanceof FormData) {
-//     Object.assign(config.headers as any, { 'Content-Type': 'multipart/form-data' });
-//   }
-//   return config;
-// };
+const beforeRequest = (config: AxiosRequestConfig) => {
+  const { isLoggedIn, accessToken }: ProfileState = store.getState().profile;
+  if (isLoggedIn) {
+    Object.assign(config.headers as any, { Authorization: `Bearer ${accessToken}` });
+  }
+  if (config.data instanceof FormData) {
+    Object.assign(config.headers as any, { 'Content-Type': 'multipart/form-data' });
+  }
+  return config;
+};
 
 const onError = async (error: AxiosError) => {
   const { response } = error;
@@ -38,11 +38,8 @@ client.defaults.paramsSerializer = (params) =>
       .filter((key) => String(params[key]).trim())
       .reduce((trim, key) => ({ ...trim, [key]: params[key] }), {}),
   );
+client.interceptors.request.use(beforeRequest);
 client.interceptors.response.use((response) => {
-  if (['POST', 'PUT', 'DELETE'].includes(response.config.method?.toUpperCase()!)) {
-    store.dispatch(openAlert({ message: 'Upload logo successfully' }));
-  }
-
   const { success = 1, data, errors } = response.data;
   if (success) {
     return data;
@@ -54,4 +51,8 @@ client.interceptors.response.use((response) => {
 
 client.defaults.transformResponse = [...(axios.defaults.transformResponse as []), (data) => camelizeKeys(data)];
 
-export { client };
+const clientDownload = axios.create({ baseURL: API_URL });
+clientDownload.interceptors.request.use(beforeRequest);
+clientDownload.interceptors.response.use(({ data }) => data, onError);
+
+export { client, clientDownload };

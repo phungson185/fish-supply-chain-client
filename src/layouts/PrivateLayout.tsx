@@ -13,7 +13,6 @@ const PrivateLayout = () => {
   useNotification();
   const { isMobile } = useWindowSize();
   const { isLoggedIn, role } = useSelector(profileSelector);
-  const { enqueueSnackbar } = useSnackbar();
   const privateRoute = getRoute(role);
   return (
     <div className='App'>
@@ -29,14 +28,7 @@ const PrivateLayout = () => {
             </Routes>
           ) : (
             <div className='flex justify-center p-10'>
-              <Button
-                variant='contained'
-                size='large'
-                onClick={async () => {
-                  const isSuccess = await walletService.connectWallet();
-                  if (!isSuccess) enqueueSnackbar('The address does not exist in the system', { variant: 'error' });
-                }}
-              >
+              <Button variant='contained' size='large' onClick={() => walletService.connectWallet()}>
                 Connect Wallet
               </Button>
             </div>

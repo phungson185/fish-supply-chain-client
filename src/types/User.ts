@@ -3,11 +3,12 @@ import { PaginateParamsType, PaginateType } from './Common';
 export type UserType = {
   id: string;
   nonce: number;
-  username: string;
   address: string;
-  isAdmin: boolean;
+  role: string;
   emailVerfied: boolean;
   email: string;
+  bio: string;
+  phone: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -40,9 +41,4 @@ export type AccountParamsType = PaginateParamsType;
 
 export type AccountPaginateType = PaginateType & {
   items: AccountType[];
-};
-
-export type AccountSetWhiteList = {
-  address: string;
-  isWhitelisted: boolean;
 };

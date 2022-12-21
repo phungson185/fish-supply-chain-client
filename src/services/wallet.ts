@@ -3,6 +3,7 @@ import { web3 } from 'contracts';
 import { store } from 'reducers';
 import { signIn, signOut } from 'reducers/profile';
 import { authService } from 'services';
+import { SyncRoleType } from 'types/Auth';
 import Web3 from 'web3';
 import Web3Modal from 'web3modal';
 
@@ -38,14 +39,16 @@ const connectWallet = async () => {
       [address] = await web3.eth.getAccounts();
     }
     address = address.toLowerCase();
-
+    const { nonce } = await authService.getNonce({ address });
+    const signature = await web3.eth.personal.sign(nonce.toString(), address, '');
+    const accessToken = await authService.getToken({ address, signature });
     const role = await authService.getRole(address);
+
     if (role === 'Unknown') {
       store.dispatch(signOut());
-      return false;
     } else {
-      store.dispatch(signIn({ address, role }));
-      return true;
+      store.dispatch(signIn({ accessToken, address, role }));
+      const syncdata = await authService.syncRole({ address, role } as SyncRoleType);
     }
   } catch (error) {
     console.log(error);

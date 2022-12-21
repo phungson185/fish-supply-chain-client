@@ -76,7 +76,7 @@ const RegistrationView = () => {
       <Registration title='Register fish processor' handle={registerFishProcessor}></Registration>
       <Registration title='Register fish seed company' handle={registerFishSeedCompany}></Registration>
       <Registration title='Register retailer' handle={registerRetailer}></Registration>
-      <Registration title='Register wild-caught fisher' handle={registerWildCaughtFisher}></Registration>
+      <Registration title='Register wild caught fisher' handle={registerWildCaughtFisher}></Registration>
     </>
   );
 };
