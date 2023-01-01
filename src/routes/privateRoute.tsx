@@ -1,4 +1,4 @@
-import { ContractForm } from 'views/FarmedFish';
+import { ChainList } from 'views/FishSeedCompany';
 import { RegistrationView } from 'views/Registration';
 type RouteType = {
   path: string;
@@ -33,7 +33,7 @@ const fishSeedCompanyRoute: PrivateRouteType = {
   contract: {
     path: '/contract',
     name: 'Contract',
-    element: <ContractForm />,
+    element: <ChainList />,
   },
 };
 

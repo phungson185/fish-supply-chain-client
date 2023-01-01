@@ -1,7 +1,8 @@
-import { FarmedFishContractType } from 'types/FarmedFish';
+import { CreateFarmedFishContractType, FarmedFishContractPaginateType, FarmedFishContractParamsType, FarmedFishContractType } from 'types/FishSeedCompany';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import FarmedFish from '../contracts/abis/FarmedFish.json';
+import { client } from './axios';
 
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
@@ -13,15 +14,8 @@ const deployFarmedFishContract = async ({
   contract: FarmedFishContractType;
 }) => {
   const farmedFishContract = new web3.eth.Contract(FarmedFish.abi as AbiItem[], address);
-  const {
-    registration,
-    AquacultureWatertype,
-    Geographicorigin,
-    NumberOfFishSeedsavailable,
-    Speciesname,
-    FishSeedsPCRResultreportId,
-    IPFShash,
-  } = contract;
+  const { registration, AquacultureWatertype, Geographicorigin, NumberOfFishSeedsavailable, Speciesname, IPFShash } =
+    contract;
   const result = await farmedFishContract
     .deploy({
       data: FarmedFish.data.bytecode.object,
@@ -30,18 +24,22 @@ const deployFarmedFishContract = async ({
         Speciesname,
         Geographicorigin,
         NumberOfFishSeedsavailable,
-        FishSeedsPCRResultreportId,
         AquacultureWatertype,
         IPFShash,
       ],
     })
     .send({
       from: address,
-      gas: 3000000,
+      gas: 3500000,
     });
   return result;
 };
 
+const createFarmedFishContract = async (body: CreateFarmedFishContractType) => client.post('/fishseedcompany/createFarmedFishContract', body);
+const getFarmedFishContracts = async (params?: FarmedFishContractParamsType): Promise<FarmedFishContractPaginateType>  => client.get('/fishSeedCompany/contracts');
+
 export default {
   deployFarmedFishContract,
+  createFarmedFishContract,
+  getFarmedFishContracts,
 };

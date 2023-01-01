@@ -111,9 +111,8 @@ contract FarmedFish {
     string public SpeciesName;
     string public GeographicOrigin;
     uint256 public NumberOfFishSeedsAvailable;
-    address FishSeedsPCRResultReportID;
     string public AquacultureWaterType;
-    address IPFS_Hash;
+    string IPFS_Hash;
     address registrationContract;
     address public FishSeedCompany;
 
@@ -123,9 +122,8 @@ contract FarmedFish {
         string SpeciesName,
         string GeographicOrigin,
         uint256 NumberOfFishSeedsAvailable,
-        address FishSeedsPCRResultReportID,
         string AquacultureWaterType,
-        address IPFS_Hash
+        string IPFS_Hash
     );
 
     constructor(
@@ -133,9 +131,8 @@ contract FarmedFish {
         string memory Speciesname,
         string memory Geographicorigin,
         uint256 NumberOfFishSeedsavailable,
-        address FishSeedsPCRResultreportId,
         string memory AquacultureWatertype,
-        address IPFShash
+        string memory IPFShash
     ) public {
         RegistrationContract = Registration(registration);
 
@@ -147,7 +144,6 @@ contract FarmedFish {
         SpeciesName = Speciesname;
         GeographicOrigin = Geographicorigin;
         NumberOfFishSeedsAvailable = NumberOfFishSeedsavailable;
-        FishSeedsPCRResultReportID = FishSeedsPCRResultreportId;
         AquacultureWaterType = AquacultureWatertype;
         IPFS_Hash = IPFShash;
 
@@ -155,7 +151,6 @@ contract FarmedFish {
             SpeciesName,
             GeographicOrigin,
             NumberOfFishSeedsAvailable,
-            FishSeedsPCRResultReportID,
             AquacultureWaterType,
             IPFS_Hash
         );
@@ -305,7 +300,7 @@ contract FarmedFish {
         uint256 FishWeight;
         uint256 TotalNumberOfFish;
         string speciesname;
-        address IPFShash;
+        string IPFShash;
         status FarmedFishGrowthDetailsStatus;
     }
 
@@ -331,7 +326,7 @@ contract FarmedFish {
         uint256 FishWeight,
         uint256 TotalNumberOfFish,
         string memory speciesname,
-        address IPFShash
+        string memory IPFShash
     ) public onlyFarmedFishGrowthDetailsUploader {
         require(
             RegistrationContract.FishFarmerExists(
@@ -677,7 +672,7 @@ contract WildCaughtFish {
 contract FishProcessing {
     string public ProcessedSpeciesName;
     address public UnprocessedFishID;
-    address public IPFS_Hash;
+    string public IPFS_Hash;
     uint256 public DateOfProcessing;
     address registrationContract;
     address public FishProcessor;
@@ -689,7 +684,7 @@ contract FishProcessing {
     event ProcessedFishDetailsUpdated(
         string ProcessedSpeciesName,
         address UnprocessedFishID,
-        address IPFS_Hash,
+        string IPFS_Hash,
         uint256 DateOfProcessing
     );
 
@@ -697,7 +692,7 @@ contract FishProcessing {
         address registration,
         string memory ProcessedSpeciesname,
         address UnprocessedFishId,
-        address IPFS_hash,
+        string memory IPFS_hash,
         uint256 DateofProcessing
     ) public {
         RegistrationContract = Registration(registration);
