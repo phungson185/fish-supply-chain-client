@@ -4,7 +4,6 @@ import { stringify } from 'querystring';
 import { store } from 'reducers';
 import { ProfileState, signOut } from 'reducers/profile';
 import { openAlert } from 'reducers/notification';
-import { camelizeKeys } from 'humps';
 
 const beforeRequest = (config: AxiosRequestConfig) => {
   const { isLoggedIn, accessToken }: ProfileState = store.getState().profile;
@@ -49,7 +48,7 @@ client.interceptors.response.use((response) => {
   }
 }, onError);
 
-client.defaults.transformResponse = [...(axios.defaults.transformResponse as []), (data) => camelizeKeys(data)];
+// client.defaults.transformResponse = [...(axios.defaults.transformResponse as []), (data) => camelizeKeys(data)];
 
 const clientDownload = axios.create({ baseURL: API_URL });
 clientDownload.interceptors.request.use(beforeRequest);

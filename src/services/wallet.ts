@@ -48,7 +48,7 @@ const connectWallet = async () => {
       store.dispatch(signOut());
     } else {
       store.dispatch(signIn({ accessToken, address, role }));
-      const syncdata = await authService.syncRole({ address, role } as SyncRoleType);
+      await authService.syncRole({ address, role } as SyncRoleType);
     }
   } catch (error) {
     console.log(error);

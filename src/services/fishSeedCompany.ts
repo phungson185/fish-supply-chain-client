@@ -1,4 +1,10 @@
-import { CreateFarmedFishContractType, FarmedFishContractPaginateType, FarmedFishContractParamsType, FarmedFishContractType } from 'types/FishSeedCompany';
+import {
+  CreateFarmedFishContractType,
+  FarmedFishContractPaginateType,
+  FarmedFishContractParamsType,
+  FarmedFishContractType,
+  FarmedFishType,
+} from 'types/FishSeedCompany';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import FarmedFish from '../contracts/abis/FarmedFish.json';
@@ -35,8 +41,10 @@ const deployFarmedFishContract = async ({
   return result;
 };
 
-const createFarmedFishContract = async (body: CreateFarmedFishContractType) => client.post('/fishseedcompany/createFarmedFishContract', body);
-const getFarmedFishContracts = async (params?: FarmedFishContractParamsType): Promise<FarmedFishContractPaginateType>  => client.get('/fishSeedCompany/contracts');
+const createFarmedFishContract = async (body: CreateFarmedFishContractType): Promise<FarmedFishType> =>
+  client.post('/fishseedcompany/createFarmedFishContract', body);
+const getFarmedFishContracts = async (params?: FarmedFishContractParamsType): Promise<FarmedFishContractPaginateType> =>
+  client.get('/fishSeedCompany/contracts', { params });
 
 export default {
   deployFarmedFishContract,

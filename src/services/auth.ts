@@ -1,5 +1,5 @@
 import { registrationContract } from 'contracts';
-import { GetNonceData, GetNonceType, GetTokenData, GetTokenType, SyncRoleType } from 'types/Auth';
+import { GetNonceData, GetNonceType, GetTokenType, SyncRoleType } from 'types/Auth';
 import { UserType } from 'types/User';
 import { client } from './axios';
 

@@ -1,7 +1,6 @@
 import { LoadingButton } from '@mui/lab';
 import { DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
@@ -15,47 +14,32 @@ type PopupProps = PopupController & {};
 
 const FarmedFishContractPopup = ({ onClose }: PopupProps) => {
   const systemConfig = useSelector(systemSelector);
-  const { control, handleSubmit, clearErrors, setValue, watch } = useForm({ mode: 'onChange' });
+  const { control, handleSubmit } = useForm({ mode: 'onChange' });
   const { address } = useSelector(profileSelector);
-  const [farmedFishContract, setFarmedFishContract] = useState('');
   const { enqueueSnackbar } = useSnackbar();
-
-  const { mutate: deployFarmedFishContract, isLoading: deployLoading } = useMutation(
-    fishSeedCompanyService.deployFarmedFishContract,
-    {
-      onSuccess: (data) => {
-        console.log(data.options.address);
-        setFarmedFishContract(data.options.address);
-      },
-      onError: (error: any) => {
-        enqueueSnackbar(error, { variant: 'error' });
-      }
-    },
-  );
 
   const { mutate: createFarmedFishContract, isLoading: createLoading } = useMutation(
     fishSeedCompanyService.createFarmedFishContract,
     {
       onSuccess: (data) => {
-        enqueueSnackbar('Deploy contract successfully, your contract address is ' + farmedFishContract, {
+        enqueueSnackbar('Deploy contract successfully, your contract address is ' + data.farmedFishContract, {
           variant: 'success',
         });
       },
       onError: (error: any) => {
         enqueueSnackbar(error, { variant: 'error' });
-      }
+      },
     },
   );
 
   const handleDeployContract = () => {
     handleSubmit(async (values) => {
-      await deployFarmedFishContract({
+      const res = await fishSeedCompanyService.deployFarmedFishContract({
         address,
         contract: { registration: systemConfig?.registrationContract, ...values } as FarmedFishContractType,
       });
-      console.log(farmedFishContract)
       await createFarmedFishContract({
-        farmedFishContract,
+        farmedFishContract: res.options.address,
         speciesName: values.Speciesname,
         geographicOrigin: values.Geographicorigin,
         numberOfFishSeedsAvailable: values.NumberOfFishSeedsavailable,
@@ -149,7 +133,7 @@ const FarmedFishContractPopup = ({ onClose }: PopupProps) => {
         <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
           Cancel
         </LoadingButton>
-        <LoadingButton variant='contained' onClick={handleDeployContract} loading={deployLoading && createLoading}>
+        <LoadingButton variant='contained' onClick={handleDeployContract} loading={createLoading}>
           Deploy
         </LoadingButton>
       </DialogActions>

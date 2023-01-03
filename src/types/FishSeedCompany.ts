@@ -26,7 +26,7 @@ export type FarmedFishType = {
   numberOfFishSeedsAvailable: number;
   aquacultureWaterType: string;
   IPFSHash: string;
-  enabled: boolean;
+  enable: boolean;
 };
 
 export type FarmedFishContractParamsType = PaginateParamsType & {

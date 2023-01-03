@@ -7,7 +7,6 @@ import {
   MenuItem,
   Pagination,
   Paper,
-  Switch,
   Table,
   TableBody,
   TableCell,
@@ -20,7 +19,6 @@ import { Spinner, TableRowEmpty } from 'components';
 import { useAnchor, useSearch } from 'hooks';
 import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
 import { fishSeedCompanyService } from 'services';
@@ -34,8 +32,8 @@ const FILTERS = [
 ];
 
 const SORT_TYPES = [
-  { label: 'Low to High', desc: 'true' },
-  { label: 'High to Low', desc: 'false' },
+  { label: 'Low to High', desc: 'false' },
+  { label: 'High to Low', desc: 'true' },
 ];
 
 const ChainList = () => {
@@ -55,86 +53,90 @@ const ChainList = () => {
   const [params, setParams] = useState({ search, page });
   const [openCreatePopup, setOpenCreatePopup] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceChangeParams = useCallback(
     debounce((values) => {
       setParams((prev) => ({ ...prev, ...values }));
     }, 300),
     [],
   );
-  //   useEffect(() => {
-  //     onSearchChange({ orderBy, desc, ...params });
-  //   }, [onSearchChange, orderBy, desc, params]);
+  useEffect(() => {
+    console.log(orderBy, desc, params);
+    onSearchChange({ orderBy, desc, ...params });
+  }, [onSearchChange, orderBy, desc, params]);
 
   return (
     <>
       <div className='flex items-center justify-between'>
-        {/* <Button
-          variant='text'
-          color='inherit'
-          classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
-          startIcon={<CategoryOutlined />}
-          onClick={onOpenFilter}
-        >
-          {FILTERS.find((item) => item.orderBy === orderBy ?? FILTERS[0].label)}
-        </Button>
-        <Menu
-          transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-          anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-          anchorEl={anchorFilter}
-          open={openFilter}
-          onClose={onCloseFilter}
-          onClick={onCloseFilter}
-        >
-          {FILTERS.map((item, index) => (
-            <MenuItem
-              key={index}
-              classes={{ selected: 'bg-info-light' }}
-              selected={item.orderBy === orderBy}
-              onClick={() => {
-                setOrderBy(item.orderBy);
-                // setDesc(item.desc);
-              }}
-            >
-              {item.label}
-            </MenuItem>
-          ))}
-        </Menu> */}
+        <div className='flex justify-between gap-2'>
+          <Button
+            variant='text'
+            color='inherit'
+            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
+            startIcon={<CategoryOutlined />}
+            onClick={onOpenFilter}
+          >
+            {FILTERS.find((item) => item.orderBy === orderBy)?.label ?? FILTERS[0].label}
+          </Button>
+          <Menu
+            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            anchorEl={anchorFilter}
+            open={openFilter}
+            onClose={onCloseFilter}
+            onClick={onCloseFilter}
+          >
+            {FILTERS.map((item, index) => (
+              <MenuItem
+                key={index}
+                classes={{ selected: 'bg-info-light' }}
+                selected={item.orderBy === orderBy}
+                onClick={() => {
+                  setOrderBy(item.orderBy);
+                }}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
+          </Menu>
 
-        <Button
-          variant='text'
-          color='inherit'
-          classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
-          startIcon={<CategoryOutlined />}
-          onClick={onOpenSort}
-        >
-          {SORT_TYPES.find((item) => item.desc === desc ?? SORT_TYPES[0].label)}
-        </Button>
-        <Menu
-          transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-          anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-          anchorEl={anchorSort}
-          open={openSort}
-          onClose={onCloseSort}
-          onClick={onCloseSort}
-        >
-          {SORT_TYPES.map((item, index) => (
-            <MenuItem
-              key={index}
-              classes={{ selected: 'bg-info-light' }}
-              selected={item.desc === desc}
-            //   onClick={() => {
-            //     setDesc(item.desc);
-            //   }}
-            >
-              {item.label}
-            </MenuItem>
-          ))}
-        </Menu>
+          <Button
+            variant='text'
+            color='inherit'
+            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
+            startIcon={<CategoryOutlined />}
+            onClick={onOpenSort}
+          >
+            {SORT_TYPES.find((item) => item.desc === desc)?.label ?? SORT_TYPES[0].label}
+          </Button>
+          <Menu
+            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            anchorEl={anchorSort}
+            open={openSort}
+            onClose={onCloseSort}
+            onClick={onCloseSort}
+          >
+            {SORT_TYPES.map((item, index) => (
+              <MenuItem
+                key={index}
+                classes={{ selected: 'bg-info-light' }}
+                selected={item.desc === desc}
+                onClick={() => {
+                  setDesc(item.desc);
+                }}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
+          </Menu>
+        </div>
 
         <TextField
           placeholder='Search...'
           InputProps={{ className: 'bg-white text-black' }}
           value={search}
+          sx={{ width: '30%' }}
           onChange={(event) => {
             const { value } = event.target;
             setSearch(value);
@@ -159,10 +161,9 @@ const ChainList = () => {
                 <TableCell>Contract address</TableCell>
                 <TableCell>Species name</TableCell>
                 <TableCell>Geographic origin</TableCell>
-                <TableCell>Number of fish seeds available</TableCell>
+                <TableCell>Number of fish seeds available (kg)</TableCell>
                 <TableCell>Aquaculture water type</TableCell>
                 <TableCell>IPFS hash</TableCell>
-                <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -174,15 +175,6 @@ const ChainList = () => {
                   <TableCell align='center'>{item.numberOfFishSeedsAvailable}</TableCell>
                   <TableCell align='center'>{item.aquacultureWaterType}</TableCell>
                   <TableCell align='center'>{item.IPFSHash}</TableCell>
-                  <TableCell className='text-center'>
-                    <Switch
-                      color='error'
-                      checked={item.enabled}
-                      onClick={() => {
-                        // TODO: update status
-                      }}
-                    />
-                  </TableCell>
                 </TableRow>
               ))}
               <TableRowEmpty visible={!isFetching && items.length === 0} />
