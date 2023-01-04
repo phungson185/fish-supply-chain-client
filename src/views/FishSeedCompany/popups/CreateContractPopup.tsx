@@ -12,39 +12,42 @@ import { FarmedFishContractType } from 'types/FishSeedCompany';
 
 type PopupProps = PopupController & {};
 
-const FarmedFishContractPopup = ({ onClose }: PopupProps) => {
+const CreateContractPopup = ({ onClose }: PopupProps) => {
   const systemConfig = useSelector(systemSelector);
   const { control, handleSubmit } = useForm({ mode: 'onChange' });
   const { address } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
 
-  const { mutate: createFarmedFishContract, isLoading: createLoading } = useMutation(
-    fishSeedCompanyService.createFarmedFishContract,
-    {
-      onSuccess: (data) => {
-        enqueueSnackbar('Deploy contract successfully, your contract address is ' + data.farmedFishContract, {
-          variant: 'success',
-        });
-      },
-      onError: (error: any) => {
-        enqueueSnackbar(error, { variant: 'error' });
-      },
+  const { mutate: createBatch, isLoading } = useMutation(fishSeedCompanyService.createBatch, {
+    onSuccess: () => {
+      enqueueSnackbar('Deploy contract successfully', {
+        variant: 'success',
+      });
     },
-  );
+    onError: (error: any) => {
+      enqueueSnackbar(error, { variant: 'error' });
+    },
+  });
 
   const handleDeployContract = () => {
     handleSubmit(async (values) => {
-      const res = await fishSeedCompanyService.deployFarmedFishContract({
+      const resChain = await fishSeedCompanyService.deployFarmedFishContract({
         address,
         contract: { registration: systemConfig?.registrationContract, ...values } as FarmedFishContractType,
       });
-      await createFarmedFishContract({
-        farmedFishContract: res.options.address,
+      const restApi = await fishSeedCompanyService.createFarmedFishContract({
+        farmedFishContract: resChain.options.address,
         speciesName: values.Speciesname,
         geographicOrigin: values.Geographicorigin,
         numberOfFishSeedsAvailable: values.NumberOfFishSeedsavailable,
         aquacultureWaterType: values.AquacultureWatertype,
         IPFSHash: values.IPFShash,
+      });
+
+      await createBatch({
+        batchContract: restApi.farmedFishContract,
+        farmedFishId: restApi.id,
+        type: 1,
       });
     })();
   };
@@ -133,7 +136,7 @@ const FarmedFishContractPopup = ({ onClose }: PopupProps) => {
         <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
           Cancel
         </LoadingButton>
-        <LoadingButton variant='contained' onClick={handleDeployContract} loading={createLoading}>
+        <LoadingButton variant='contained' onClick={handleDeployContract} loading={isLoading}>
           Deploy
         </LoadingButton>
       </DialogActions>
@@ -141,4 +144,4 @@ const FarmedFishContractPopup = ({ onClose }: PopupProps) => {
   );
 };
 
-export default FarmedFishContractPopup;
+export default CreateContractPopup;

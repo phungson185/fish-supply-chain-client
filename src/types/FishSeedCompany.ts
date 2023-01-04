@@ -1,4 +1,5 @@
-import { PaginateParamsType, PaginateType } from "./Common";
+import { PaginateParamsType, PaginateType } from './Common';
+import { UserType } from './User';
 
 export type FarmedFishContractType = {
   registration: string;
@@ -26,11 +27,16 @@ export type FarmedFishType = {
   numberOfFishSeedsAvailable: number;
   aquacultureWaterType: string;
   IPFSHash: string;
-  enable: boolean;
+  owner: UserType;
 };
 
-export type FarmedFishContractParamsType = PaginateParamsType & {
+export type CreateBatchType = {
+  batchContract: string;
+  farmedFishId: string;
+  type: number;
 };
+
+export type FarmedFishContractParamsType = PaginateParamsType & {};
 
 export type FarmedFishContractPaginateType = PaginateType & {
   items: FarmedFishType[];

@@ -13,7 +13,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
+  TextField
 } from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
 import { useAnchor, useSearch } from 'hooks';
@@ -22,7 +22,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
 import { fishSeedCompanyService } from 'services';
-import FarmedFishContractPopup from './popups/FarmedFishContractPopup';
+  import CreateContractPopup from './popups/CreateContractPopup';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -46,6 +46,7 @@ const ChainList = () => {
   const { data, isFetching } = useQuery(['fishSeedCompanyService.getFarmedFishContracts', dataSearch], () =>
     fishSeedCompanyService.getFarmedFishContracts(dataSearch),
   );
+
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
   const [desc, setDesc] = useState(query.desc || SORT_TYPES[0].desc);
@@ -61,7 +62,6 @@ const ChainList = () => {
     [],
   );
   useEffect(() => {
-    console.log(orderBy, desc, params);
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
 
@@ -193,7 +193,7 @@ const ChainList = () => {
       </div>
 
       <Dialog open={openCreatePopup} fullWidth maxWidth='sm'>
-        <FarmedFishContractPopup onClose={() => setOpenCreatePopup(false)} />
+        <CreateContractPopup onClose={() => setOpenCreatePopup(false)} />
       </Dialog>
     </>
   );
