@@ -1,4 +1,4 @@
-import { ChainList } from 'views/FishSeedCompany';
+import { Batch, ChainList } from 'views/FishSeedCompany';
 import { RegistrationView } from 'views/Registration';
 type RouteType = {
   path: string;
@@ -34,6 +34,11 @@ const fishSeedCompanyRoute: PrivateRouteType = {
     path: '/contract',
     name: 'Contract',
     element: <ChainList />,
+  },
+  batch: {
+    path: '/batch',
+    name: 'Batch',
+    element: <Batch />,
   },
 };
 

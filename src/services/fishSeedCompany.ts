@@ -1,4 +1,5 @@
 import {
+  CreateBatchType,
   CreateFarmedFishContractType,
   FarmedFishContractPaginateType,
   FarmedFishContractParamsType,
@@ -45,9 +46,11 @@ const createFarmedFishContract = async (body: CreateFarmedFishContractType): Pro
   client.post('/fishseedcompany/createFarmedFishContract', body);
 const getFarmedFishContracts = async (params?: FarmedFishContractParamsType): Promise<FarmedFishContractPaginateType> =>
   client.get('/fishSeedCompany/contracts', { params });
+const createBatch = async (body: CreateBatchType): Promise<any> => client.post('/fishseedcompany/createBatch', body);
 
 export default {
   deployFarmedFishContract,
   createFarmedFishContract,
   getFarmedFishContracts,
+  createBatch
 };
