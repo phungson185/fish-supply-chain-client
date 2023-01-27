@@ -1,3 +1,4 @@
+import { BatchPaginateType, BatchParamsType } from 'types/Batch';
 import {
   CreateBatchType,
   CreateFarmedFishContractType,
@@ -44,13 +45,18 @@ const deployFarmedFishContract = async ({
 
 const createFarmedFishContract = async (body: CreateFarmedFishContractType): Promise<FarmedFishType> =>
   client.post('/fishseedcompany/createFarmedFishContract', body);
+
 const getFarmedFishContracts = async (params?: FarmedFishContractParamsType): Promise<FarmedFishContractPaginateType> =>
   client.get('/fishSeedCompany/contracts', { params });
+
 const createBatch = async (body: CreateBatchType): Promise<any> => client.post('/fishseedcompany/createBatch', body);
+
+const getBatchs = async (params?: BatchParamsType): Promise<BatchPaginateType> => client.get('/batchs');
 
 export default {
   deployFarmedFishContract,
   createFarmedFishContract,
   getFarmedFishContracts,
-  createBatch
+  createBatch,
+  getBatchs,
 };

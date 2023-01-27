@@ -35,6 +35,7 @@ const CreateContractPopup = ({ onClose }: PopupProps) => {
         address,
         contract: { registration: systemConfig?.registrationContract, ...values } as FarmedFishContractType,
       });
+
       const restApi = await fishSeedCompanyService.createFarmedFishContract({
         farmedFishContract: resChain.options.address,
         speciesName: values.Speciesname,
@@ -45,7 +46,6 @@ const CreateContractPopup = ({ onClose }: PopupProps) => {
       });
 
       await createBatch({
-        batchContract: restApi.farmedFishContract,
         farmedFishId: restApi.id,
         type: 1,
       });

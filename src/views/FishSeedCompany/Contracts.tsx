@@ -36,7 +36,7 @@ const SORT_TYPES = [
   { label: 'High to Low', desc: 'true' },
 ];
 
-const ChainList = () => {
+const Contracts = () => {
   const location = useLocation();
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page });
@@ -199,4 +199,4 @@ const ChainList = () => {
   );
 };
 
-export default ChainList;
+export default Contracts;

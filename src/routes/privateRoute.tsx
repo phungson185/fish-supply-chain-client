@@ -1,4 +1,6 @@
-import { Batch, ChainList } from 'views/FishSeedCompany';
+import { Batches } from 'views/Batch';
+import { Contracts } from 'views/FishSeedCompany';
+import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
 import { RegistrationView } from 'views/Registration';
 type RouteType = {
   path: string;
@@ -30,15 +32,20 @@ const fishSeedCompanyRoute: PrivateRouteType = {
     name: '',
     element: <></>,
   },
-  contract: {
-    path: '/contract',
-    name: 'Contract',
-    element: <ChainList />,
-  },
   batch: {
-    path: '/batch',
-    name: 'Batch',
-    element: <Batch />,
+    path: '/batches',
+    name: 'Batches',
+    element: <Batches />,
+  },
+  contracts: {
+    path: '/contracts',
+    name: 'Contracts',
+    element: <Contracts />,
+  },
+  orders: {
+    path: '/orders',
+    name: 'Orders',
+    element: <FishSeedCompanyFishFarmerOrders />,
   },
 };
 
@@ -47,6 +54,16 @@ const fishFarmerRoute: PrivateRouteType = {
     path: '/',
     name: '',
     element: <></>,
+  },
+  batch: {
+    path: '/batches',
+    name: 'Batches',
+    element: <Batches />,
+  },
+  orders: {
+    path: '/orders',
+    name: 'Orders',
+    element: <FishSeedCompanyFishFarmerOrders />,
   },
 };
 

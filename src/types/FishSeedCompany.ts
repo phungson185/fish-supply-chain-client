@@ -31,7 +31,6 @@ export type FarmedFishType = {
 };
 
 export type CreateBatchType = {
-  batchContract: string;
   farmedFishId: string;
   type: number;
 };

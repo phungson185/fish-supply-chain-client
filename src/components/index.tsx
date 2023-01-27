@@ -3,3 +3,4 @@ export { default as Spinner } from './Spinner';
 export { default as TableRowEmpty } from './TableRowEmpty';
 export { default as CountdownTimer } from './CountdownTimer';
 export { default as ScrollButton } from './ScrollButton';
+export { default as StatusButton } from './StatusButton';
