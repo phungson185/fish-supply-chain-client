@@ -13,7 +13,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField
+  TextField,
 } from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
 import { useAnchor, useSearch } from 'hooks';
@@ -22,7 +22,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
 import { fishSeedCompanyService } from 'services';
-  import CreateContractPopup from './popups/CreateContractPopup';
+import CreateContractPopup from './popups/CreateContractPopup';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -43,8 +43,13 @@ const Contracts = () => {
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
 
-  const { data, isFetching } = useQuery(['fishSeedCompanyService.getFarmedFishContracts', dataSearch], () =>
-    fishSeedCompanyService.getFarmedFishContracts(dataSearch),
+  const { data, isFetching, refetch } = useQuery(
+    ['fishSeedCompanyService.getFarmedFishContracts', dataSearch],
+    () => fishSeedCompanyService.getFarmedFishContracts(dataSearch),
+    {
+      keepPreviousData: true,
+      staleTime: 0,
+    },
   );
 
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
@@ -193,7 +198,7 @@ const Contracts = () => {
       </div>
 
       <Dialog open={openCreatePopup} fullWidth maxWidth='sm'>
-        <CreateContractPopup onClose={() => setOpenCreatePopup(false)} />
+        <CreateContractPopup refetch={refetch} onClose={() => setOpenCreatePopup(false)} />
       </Dialog>
     </>
   );

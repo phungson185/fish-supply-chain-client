@@ -39,14 +39,13 @@ const connectWallet = async () => {
       [address] = await web3.eth.getAccounts();
     }
     address = address.toLowerCase();
-    const { nonce } = await authService.getNonce({ address });
-    const signature = await web3.eth.personal.sign(nonce.toString(), address, '');
-    const accessToken = await authService.getToken({ address, signature });
     const role = await authService.getRole(address);
-
     if (role === 'Unknown') {
       store.dispatch(signOut());
     } else {
+      const { nonce } = await authService.getNonce({ address });
+      const signature = await web3.eth.personal.sign(nonce.toString(), address, '');
+      const accessToken = await authService.getToken({ address, signature });
       store.dispatch(signIn({ accessToken, address, role }));
       await authService.syncRole({ address, role } as SyncRoleType);
     }

@@ -4,6 +4,7 @@ import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { fishFarmerService } from 'services';
 import { BatchType } from 'types/Batch';
@@ -17,12 +18,15 @@ const FishSeedsOrderPopup = ({ item, onClose }: PopupProps) => {
   const { control, handleSubmit } = useForm({ mode: 'onChange' });
   const { address } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
   const { mutate: createOder, isLoading } = useMutation(fishFarmerService.createOder, {
     onSuccess: () => {
       enqueueSnackbar('Create order successfully', {
         variant: 'success',
       });
+      onClose();
+      navigate('/orders');
     },
     onError: (error: any) => {
       enqueueSnackbar(error, { variant: 'error' });
@@ -44,7 +48,8 @@ const FishSeedsOrderPopup = ({ item, onClose }: PopupProps) => {
         fishSeedsPurchaser: address,
         fishSeedsSeller: item.farmedFishId.owner.address,
         numberOfFishSeedsOrdered: values.NumberOfFishSeedsOrdered,
-        fishSeedsPurchaseOrderDetailsStatus: resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.FishSeedsPurchaseOrderDetailsStatus
+        fishSeedsPurchaseOrderDetailsStatus:
+          resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.FishSeedsPurchaseOrderDetailsStatus,
       });
     })();
   };

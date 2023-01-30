@@ -1,6 +1,8 @@
 import { PaginateParamsType, PaginateType } from './Common';
+import { FarmedFishType } from './FishSeedCompany';
 import { UserType } from './User';
 
+// contract types
 export type PlaceFishSeedsPurchaseOrderType = {
   farmedFishContractAddress: string;
   FishSeedsPurchaser: string;
@@ -8,6 +10,20 @@ export type PlaceFishSeedsPurchaseOrderType = {
   NumberOfFishSeedsOrdered: number;
 };
 
+export type ConfirmFishSeedsPurchaseOrderType = {
+  sender: string;
+  farmedFishContractAddress: string;
+  FishSeedsPurchaseOrderID: string;
+  accepted: boolean;
+};
+
+export type ReceiveFishSeedsOrderType = {
+  sender: string;
+  farmedFishContractAddress: string;
+  FishSeedsPurchaseOrderID: string;
+}
+
+// api types
 export type CreateOrderType = {
   farmedFishId: string;
   fishSeedPurchaseOrderId: string;
@@ -24,6 +40,12 @@ export type FishSeedCompanyFishFarmerOrderType = {
   fishSeedsSeller: UserType;
   numberOfFishSeedsOrdered: number;
   fishSeedsPurchaseOrderDetailsStatus: number;
+  farmedFishId: FarmedFishType;
+};
+
+export type ConfirmOrderType = {
+  orderId: string;
+  status: number;
 };
 
 export type FishSeedCompanyFishFarmerOrderParamsType = PaginateParamsType & {};

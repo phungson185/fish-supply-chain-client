@@ -1,2 +1,2 @@
-export * from './ProcessStatus';
-export * from './FishSeedsOrderPopup';
+export { default as ProcessStatus } from './ProcessStatus';
+export * from './popups';

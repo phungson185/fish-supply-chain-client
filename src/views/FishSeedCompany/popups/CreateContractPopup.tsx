@@ -2,17 +2,21 @@ import { LoadingButton } from '@mui/lab';
 import { DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
-import { useMutation } from 'react-query';
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
 import { systemSelector } from 'reducers/system';
 import { fishSeedCompanyService } from 'services';
 import { PopupController } from 'types/Common';
-import { FarmedFishContractType } from 'types/FishSeedCompany';
+import { FarmedFishContractPaginateType, FarmedFishContractType } from 'types/FishSeedCompany';
 
-type PopupProps = PopupController & {};
+type PopupProps = PopupController & {
+  refetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined,
+  ) => Promise<QueryObserverResult<FarmedFishContractPaginateType, unknown>>;
+};
 
-const CreateContractPopup = ({ onClose }: PopupProps) => {
+const CreateContractPopup = ({ refetch, onClose }: PopupProps) => {
   const systemConfig = useSelector(systemSelector);
   const { control, handleSubmit } = useForm({ mode: 'onChange' });
   const { address } = useSelector(profileSelector);
@@ -23,6 +27,8 @@ const CreateContractPopup = ({ onClose }: PopupProps) => {
       enqueueSnackbar('Deploy contract successfully', {
         variant: 'success',
       });
+      refetch();
+      onClose();
     },
     onError: (error: any) => {
       enqueueSnackbar(error, { variant: 'error' });

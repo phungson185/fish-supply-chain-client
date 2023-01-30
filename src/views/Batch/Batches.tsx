@@ -10,28 +10,35 @@ import { useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { fishSeedCompanyService } from 'services';
 import { RoleType } from 'types/Auth';
-import FishSeedsOrderPopup from './components/FishSeedsOrderPopup';
-import ProcessStatus from './components/ProcessStatus';
+import { BatchType } from 'types/Batch';
+import { FishSeedsOrderPopup, ProcessStatus } from './components';
 
 const Batches = () => {
   const location = useLocation();
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page });
-  const { data, isFetching } = useQuery(['fishSeedCompanyService.getFarmedFishContracts', dataSearch], () =>
-    fishSeedCompanyService.getBatchs(dataSearch),
+  const { data, isFetching } = useQuery(
+    ['fishSeedCompanyService.getFarmedFishContracts', dataSearch],
+    () => fishSeedCompanyService.getBatchs(dataSearch),
+    {
+      keepPreviousData: true,
+      staleTime: 0,
+    },
   );
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
   const [openPlaceFishSeedsPurchaseOrderPopup, setOpenPlaceFishSeedsPurchaseOrderPopup] = useState(false);
   const { role } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
+  const [selectedBatch, setSelectedBatch] = useState<BatchType>({} as BatchType);
 
-  const handlePlaceFishSeedsPurchaseOrderPopup = (roleType: RoleType) => {
+  const handlePlaceFishSeedsPurchaseOrderPopup = (item: BatchType, roleType: RoleType) => {
     if (role !== roleType) {
       enqueueSnackbar('You are not authorized to access this page', {
         variant: 'error',
       });
       return;
     }
+    setSelectedBatch(item);
     setOpenPlaceFishSeedsPurchaseOrderPopup(true);
   };
 
@@ -43,6 +50,11 @@ const Batches = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Batch Id</TableCell>
+                <TableCell>Species name</TableCell>
+                <TableCell>Geographic origin</TableCell>
+                <TableCell>Number of fish seeds available</TableCell>
+                <TableCell>Aquaculture water type</TableCell>
+                <TableCell>IPFS hash</TableCell>
                 <TableCell>Fish seed company</TableCell>
                 <TableCell>Fish farmer</TableCell>
                 <TableCell>Fish processor</TableCell>
@@ -54,6 +66,11 @@ const Batches = () => {
               {items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell align='center'>{item.id}</TableCell>
+                  <TableCell align='center'>{item.farmedFishId?.speciesName}</TableCell>
+                  <TableCell align='center'>{item.farmedFishId?.geographicOrigin}</TableCell>
+                  <TableCell align='center'>{item.farmedFishId?.numberOfFishSeedsAvailable}</TableCell>
+                  <TableCell align='center'>{item.farmedFishId?.aquacultureWaterType}</TableCell>
+                  <TableCell align='center'>{item.farmedFishId?.IPFSHash}</TableCell>
                   <TableCell align='center'>
                     <ProcessStatus
                       content={`${item.farmedFishId ? 'Completed' : 'Pending'}`}
@@ -62,7 +79,7 @@ const Batches = () => {
                   </TableCell>
                   <TableCell
                     align='center'
-                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(RoleType.fishFarmerRole)}
+                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(item, RoleType.fishFarmerRole)}
                   >
                     <ProcessStatus
                       content={`${item.fishFarmerId ? 'Completed' : 'Pending'}`}
@@ -71,7 +88,7 @@ const Batches = () => {
                   </TableCell>
                   <TableCell
                     align='center'
-                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(RoleType.fishProcessorRole)}
+                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(item, RoleType.fishProcessorRole)}
                   >
                     <ProcessStatus
                       content={`${item.fishProcessorId ? 'Completed' : 'Pending'}`}
@@ -80,7 +97,7 @@ const Batches = () => {
                   </TableCell>
                   <TableCell
                     align='center'
-                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(RoleType.distributorRole)}
+                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(item, RoleType.distributorRole)}
                   >
                     <ProcessStatus
                       content={`${item.distributorId ? 'Completed' : 'Pending'}`}
@@ -89,16 +106,13 @@ const Batches = () => {
                   </TableCell>
                   <TableCell
                     align='center'
-                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(RoleType.distributorRole)}
+                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(item, RoleType.distributorRole)}
                   >
                     <ProcessStatus
                       content={`${item.retailerId ? 'Completed' : 'Pending'}`}
                       backgroundColor={`${item.retailerId ? 'green' : 'gray'}`}
                     />
                   </TableCell>
-                  <Dialog open={openPlaceFishSeedsPurchaseOrderPopup} fullWidth maxWidth='sm'>
-                    <FishSeedsOrderPopup item={item} onClose={() => setOpenPlaceFishSeedsPurchaseOrderPopup(false)} />
-                  </Dialog>
                 </TableRow>
               ))}
               <TableRowEmpty visible={!isFetching && items.length === 0} />
@@ -107,6 +121,10 @@ const Batches = () => {
           </Table>
         </Spinner>
       </TableContainer>
+
+      <Dialog open={openPlaceFishSeedsPurchaseOrderPopup} fullWidth maxWidth='sm'>
+        <FishSeedsOrderPopup item={selectedBatch} onClose={() => setOpenPlaceFishSeedsPurchaseOrderPopup(false)} />
+      </Dialog>
     </>
   );
 };
