@@ -16,6 +16,16 @@ export type UserType = {
   updatedAt: string;
 };
 
+export type UserUpdateType = {
+  userAddress?: string;
+  email?: string;
+  bio?: string;
+  phone?: string;
+  avatar?: string;
+  cover?: string;
+  name?: string;
+};
+
 export type UserParamsType = PaginateParamsType & {
   address?: string;
 };

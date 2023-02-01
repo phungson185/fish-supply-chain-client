@@ -40,7 +40,7 @@ const Menu = () => {
     <>
       {isLoggedIn ? (
         <List className='flex flex-col gap-1'>
-          {Object.values(privateRoute).filter((item) => item.name).map(({ name, path }) => (
+          {Object.values(privateRoute).filter((item) => item.name && !['Profile'].includes(item.name)).map(({ name, path }) => (
             <MenuItem key={path} name={name} path={path} />
           ))}
         </List>

@@ -1,12 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from 'reducers';
+import { UserUpdateType } from 'types/User';
 
 export type ProfileState = {
   address: string;
   role: string;
   isLoggedIn?: boolean;
   accessToken?: string;
-};
+} & UserUpdateType;
 
 export const profileSlice = createSlice({
   name: 'profile',

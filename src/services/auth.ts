@@ -11,12 +11,9 @@ const getToken = (body: GetTokenType) => client.post(`/authentication/token`, bo
 
 const syncRole = (body: SyncRoleType): Promise<UserType> => client.post(`/authentication/sync-role`, body);
 
-const getProfile = ({ address }: { address: string }): Promise<UserType> => client.get(`/profile/${address}`);
-
 export default {
   getNonce,
   getToken,
-  getProfile,
   getRole,
   syncRole,
 };

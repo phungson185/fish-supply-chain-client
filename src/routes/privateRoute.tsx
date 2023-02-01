@@ -2,10 +2,12 @@ import { Batches } from 'views/Batch';
 import { Contracts } from 'views/FishSeedCompany';
 import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
 import { RegistrationView } from 'views/Registration';
+import { ProfileUpdate } from 'views/Profile';
+
 type RouteType = {
   path: string;
   url?: (query: any) => string;
-  name?: string;
+  name: string;
   element: JSX.Element;
 };
 
@@ -13,12 +15,21 @@ type PrivateRouteType = {
   [key: string]: RouteType;
 };
 
-const fdaRoute: PrivateRouteType = {
+const baseRoute: PrivateRouteType = {
   home: {
     path: '/',
     name: '',
     element: <></>,
   },
+  profile: {
+    path: '/profile',
+    name: 'Profile',
+    element: <ProfileUpdate />,
+  },
+};
+
+const fdaRoute: PrivateRouteType = {
+  ...baseRoute,
   registration: {
     path: '/registration',
     name: 'Registration',
@@ -27,11 +38,7 @@ const fdaRoute: PrivateRouteType = {
 };
 
 const fishSeedCompanyRoute: PrivateRouteType = {
-  home: {
-    path: '/',
-    name: '',
-    element: <></>,
-  },
+  ...baseRoute,
   batch: {
     path: '/batches',
     name: 'Batches',
@@ -50,11 +57,7 @@ const fishSeedCompanyRoute: PrivateRouteType = {
 };
 
 const fishFarmerRoute: PrivateRouteType = {
-  home: {
-    path: '/',
-    name: '',
-    element: <></>,
-  },
+  ...baseRoute,
   batch: {
     path: '/batches',
     name: 'Batches',
@@ -68,43 +71,23 @@ const fishFarmerRoute: PrivateRouteType = {
 };
 
 const fishProcessorRoute: PrivateRouteType = {
-  home: {
-    path: '/',
-    name: '',
-    element: <></>,
-  },
+  ...baseRoute,
 };
 
 const distributorRoute: PrivateRouteType = {
-  home: {
-    path: '/',
-    name: '',
-    element: <></>,
-  },
+  ...baseRoute,
 };
 
 const retailerRoute: PrivateRouteType = {
-  home: {
-    path: '/',
-    name: '',
-    element: <></>,
-  },
+  ...baseRoute,
 };
 
 const consumerRoute: PrivateRouteType = {
-  home: {
-    path: '/',
-    name: '',
-    element: <></>,
-  },
+  ...baseRoute,
 };
 
 const wildCaughtFisherRoute: PrivateRouteType = {
-  home: {
-    path: '/',
-    name: '',
-    element: <></>,
-  },
+  ...baseRoute,
 };
 
 export const getRoute = (role: string) => {

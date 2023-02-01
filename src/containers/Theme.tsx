@@ -80,7 +80,7 @@ export const appTheme = createTheme({
 const Theme = ({ children }: any) => {
   return (
     <ThemeProvider theme={appTheme}>
-      <LocalizationProvider dateAdapter={DateAdapter}>{children}</LocalizationProvider>
+      {children}
     </ThemeProvider>
   );
 };

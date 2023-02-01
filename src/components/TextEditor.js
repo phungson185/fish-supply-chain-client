@@ -20,7 +20,7 @@ const TextEditor = ({ name, value, onChange }) => {
         <CKEditor
           name={name}
           editor={ClassicEditor}
-          data={value}
+          data={value || ''}
           onChange={(event, editor) => {
             const data = editor.getData();
             onChange(data);

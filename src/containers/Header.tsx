@@ -1,10 +1,10 @@
 import { Logout, Menu as MenuIcon } from '@mui/icons-material';
-import { AppBar, Button, Divider, Drawer, IconButton, Toolbar } from '@mui/material';
-import { AppMenu } from 'containers';
+import { AppBar, Button, Divider, Drawer, IconButton, MenuItem, Select, Toolbar, Tooltip } from '@mui/material';
+import { AppBreadcrumb, AppMenu } from 'containers';
 import { useWindowSize } from 'hooks';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { profileSelector, signOut } from 'reducers/profile';
 import { walletService } from 'services';
 import { shorten } from 'utils/common';
@@ -13,7 +13,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const { isMobile } = useWindowSize();
   const { isLoggedIn, role, address } = useSelector(profileSelector);
-
+  const navigate = useNavigate();
   const [openDrawer, setOpenDrawer] = useState(false);
 
   return (
@@ -41,14 +41,21 @@ const Header = () => {
               <MenuIcon />
             </IconButton>
           )}
-          {/* <AppBreadcrumb /> */}
+          <AppBreadcrumb />
           <div className='flex-1' />
           {isLoggedIn ? (
             <div className='flex'>
-              <IconButton className='mr-3' onClick={() => dispatch(signOut())}>
-                <Logout />
-              </IconButton>
-              <Button variant='outlined'>{shorten(address)}</Button>
+              <Select value={'Address'} onChange={() => null}>
+                <MenuItem value={'Address'} className='hidden'>
+                  {shorten(address)}
+                </MenuItem>
+                <MenuItem value={'Profile'} onClick={() => navigate('/profile')}>
+                  Profile
+                </MenuItem>
+                <MenuItem value={'Logout'} onClick={() => dispatch(signOut())}>
+                  Logout
+                </MenuItem>
+              </Select>
             </div>
           ) : (
             <Button variant='outlined' onClick={() => walletService.connectWallet()}>
