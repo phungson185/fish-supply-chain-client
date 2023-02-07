@@ -1,4 +1,4 @@
-import { Batches } from 'views/Batch';
+import { Batches, BatchDetail } from 'views/Batch';
 import { Contracts } from 'views/FishSeedCompany';
 import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
 import { RegistrationView } from 'views/Registration';
@@ -26,6 +26,12 @@ const baseRoute: PrivateRouteType = {
     name: 'Profile',
     element: <ProfileUpdate />,
   },
+  batchDetail: {
+    path: '/batch/:id',
+    name: 'Batch detail',
+    url: ({ id }: { id: string }) => `/batch/${id}`,
+    element: <BatchDetail />,
+  }
 };
 
 const fdaRoute: PrivateRouteType = {

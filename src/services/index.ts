@@ -7,3 +7,4 @@ export { default as fishFarmerService } from './fishFarmer';
 export { default as systemService } from './system';
 export { default as fileService } from './file';
 export { default as userService } from './user';
+export { default as batchService } from './batch';

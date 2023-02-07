@@ -8,7 +8,6 @@ import { fileService, queryClient, userService } from 'services';
 import { UserType } from 'types/User';
 
 const UserAvatar = ({ user }: { user: UserType }) => {
-  console.log(user)
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
 

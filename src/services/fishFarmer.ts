@@ -41,7 +41,6 @@ const confirmFishSeedsPurchaseOrder = async (body: ConfirmFishSeedsPurchaseOrder
 
 const receiveFishSeedsOrder = async (body: ReceiveFishSeedsOrderType) => {
   const { sender, FishSeedsPurchaseOrderID, farmedFishContractAddress } = body;
-  console.log(FishSeedsPurchaseOrderID, farmedFishContractAddress);
   const farmedFishContract = new web3.eth.Contract(FarmedFish.abi as AbiItem[], farmedFishContractAddress);
   const result = await farmedFishContract.methods.ReceiveFishSeedsOrder(FishSeedsPurchaseOrderID).send({
     from: sender,

@@ -1,3 +1,4 @@
+import { Visibility } from '@mui/icons-material';
 import { Dialog, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
 import { useSearch } from 'hooks';
@@ -6,8 +7,9 @@ import { parse } from 'qs';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
+import { getRoute } from 'routes';
 import { fishSeedCompanyService } from 'services';
 import { RoleType } from 'types/Auth';
 import { BatchType } from 'types/Batch';
@@ -15,6 +17,8 @@ import { FishSeedsOrderPopup, ProcessStatus } from './components';
 
 const Batches = () => {
   const location = useLocation();
+  const { role } = useSelector(profileSelector);
+  const privateRoute = getRoute(role);
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page });
   const { data, isFetching } = useQuery(
@@ -27,9 +31,9 @@ const Batches = () => {
   );
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
   const [openPlaceFishSeedsPurchaseOrderPopup, setOpenPlaceFishSeedsPurchaseOrderPopup] = useState(false);
-  const { role } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
   const [selectedBatch, setSelectedBatch] = useState<BatchType>({} as BatchType);
+  const [openBatchDetail, setOpenBatchDetail] = useState(false);
 
   const handlePlaceFishSeedsPurchaseOrderPopup = (item: BatchType, roleType: RoleType) => {
     if (role !== roleType) {
@@ -40,6 +44,11 @@ const Batches = () => {
     }
     setSelectedBatch(item);
     setOpenPlaceFishSeedsPurchaseOrderPopup(true);
+  };
+
+  const handleOpenBatchDetail = (item: BatchType) => {
+    setSelectedBatch(item);
+    setOpenBatchDetail(true);
   };
 
   return (
@@ -60,11 +69,12 @@ const Batches = () => {
                 <TableCell>Fish processor</TableCell>
                 <TableCell>Distributor</TableCell>
                 <TableCell>Retailer</TableCell>
+                <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow key={item.id} className='cursor-pointer'>
                   <TableCell align='center'>{item.id}</TableCell>
                   <TableCell align='center'>{item.farmedFishId?.speciesName}</TableCell>
                   <TableCell align='center'>{item.farmedFishId?.geographicOrigin}</TableCell>
@@ -113,11 +123,16 @@ const Batches = () => {
                       backgroundColor={`${item.retailerId ? 'green' : 'gray'}`}
                     />
                   </TableCell>
+                  <TableCell align='center' onClick={() => handleOpenBatchDetail(item)}>
+                    <Link to={privateRoute.batchDetail.url?.(item)!}>
+                      <Visibility />
+                    </Link>
+                  </TableCell>
                 </TableRow>
               ))}
               <TableRowEmpty visible={!isFetching && items.length === 0} />
             </TableBody>
-            <caption className='font-bold border-t'>{total ?? 0} Contracts</caption>
+            <caption className='font-bold border-t'>{total ?? 0} Batchs</caption>
           </Table>
         </Spinner>
       </TableContainer>
