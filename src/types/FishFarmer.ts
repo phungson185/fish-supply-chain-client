@@ -21,7 +21,15 @@ export type ReceiveFishSeedsOrderType = {
   sender: string;
   farmedFishContractAddress: string;
   FishSeedsPurchaseOrderID: string;
-}
+};
+
+export type UpdateFarmedFishGrowthDetailsType = {
+  FarmedFishGrowthDetailsUploader: string;
+  FishWeight: string;
+  TotalNumberOfFish: string;
+  speciesname: string;
+  IPFShash: string;
+};
 
 // api types
 export type CreateOrderType = {
@@ -41,11 +49,25 @@ export type FishSeedCompanyFishFarmerOrderType = {
   numberOfFishSeedsOrdered: number;
   fishSeedsPurchaseOrderDetailsStatus: number;
   farmedFishId: FarmedFishType;
+  totalNumberOfFish: number;
+  fishWeight?: number;
+  speciesName: string;
+  IPFSHash: string;
+  owner: UserType;
+  updater?: UserType;
 };
 
 export type ConfirmOrderType = {
   orderId: string;
   status: number;
+};
+
+export type UpdateGrowthDetailType = {
+  orderId: string;
+  totalNumberOfFish: number;
+  fishWeight: number;
+  speciesName: string;
+  IPFSHash: string;
 };
 
 export type FishSeedCompanyFishFarmerOrderParamsType = PaginateParamsType & {};

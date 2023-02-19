@@ -6,6 +6,8 @@ import {
   FishSeedCompanyFishFarmerOrderParamsType,
   PlaceFishSeedsPurchaseOrderType,
   ReceiveFishSeedsOrderType,
+  UpdateFarmedFishGrowthDetailsType,
+  UpdateGrowthDetailType,
 } from 'types/FishFarmer';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -49,6 +51,24 @@ const receiveFishSeedsOrder = async (body: ReceiveFishSeedsOrderType) => {
   return result;
 };
 
+const updateFarmedFishGrowthDetails = async (body: UpdateFarmedFishGrowthDetailsType) => {
+  const { FarmedFishGrowthDetailsUploader, FishWeight, TotalNumberOfFish, speciesname, IPFShash } = body;
+  const farmedFishContract = new web3.eth.Contract(FarmedFish.abi as AbiItem[], FarmedFishGrowthDetailsUploader);
+  const result = await farmedFishContract.methods
+    .UpdateFarmedFishGrowthDetails(
+      FarmedFishGrowthDetailsUploader,
+      FishWeight,
+      TotalNumberOfFish,
+      speciesname,
+      IPFShash,
+    )
+    .send({
+      from: FarmedFishGrowthDetailsUploader,
+      gas: 3500000,
+    });
+  return result;
+};
+
 // api methods
 const createOder = async (body: CreateOrderType) => client.post('/fishfarmer/order', body);
 
@@ -59,12 +79,17 @@ const getOrders = async (
 const confirmOrder = async ({ orderId, ...body }: ConfirmOrderType) =>
   client.put(`/fishfarmer/orders/${orderId}/confirm`, body);
 
+const updateGrowthDetail = async ({ orderId, ...body }: UpdateGrowthDetailType) =>
+  client.put(`/fishfarmer/updateGrowthDetails/${orderId}`, body);
+
 export default {
   placeFishSeedsPurchaseOrder,
   confirmFishSeedsPurchaseOrder,
   receiveFishSeedsOrder,
+  updateFarmedFishGrowthDetails,
 
   confirmOrder,
   createOder,
   getOrders,
+  updateGrowthDetail,
 };

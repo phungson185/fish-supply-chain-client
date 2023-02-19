@@ -3,6 +3,7 @@ import { Contracts } from 'views/FishSeedCompany';
 import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
 import { RegistrationView } from 'views/Registration';
 import { ProfileUpdate } from 'views/Profile';
+import FishGrowthDetails from 'views/FishFarmer/FishGrowthDetails';
 
 type RouteType = {
   path: string;
@@ -31,7 +32,7 @@ const baseRoute: PrivateRouteType = {
     name: 'Batch detail',
     url: ({ id }: { id: string }) => `/batch/${id}`,
     element: <BatchDetail />,
-  }
+  },
 };
 
 const fdaRoute: PrivateRouteType = {
@@ -73,6 +74,11 @@ const fishFarmerRoute: PrivateRouteType = {
     path: '/orders',
     name: 'Orders',
     element: <FishSeedCompanyFishFarmerOrders />,
+  },
+  growthDetails: {
+    path: '/growthDetails',
+    name: 'Growth Details',
+    element: <FishGrowthDetails />,
   },
 };
 
