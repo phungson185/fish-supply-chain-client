@@ -8,25 +8,25 @@ import { useState } from 'react';
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
-import { fishFarmerService } from 'services';
+import { fishProcessorService } from 'services';
 import { RoleType } from 'types/Auth';
 import { PopupController } from 'types/Common';
-import { FishSeedCompanyFishFarmerOrderPaginateType, FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
+import { FishFarmerFishProcessorOrderPaginateType, FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { shorten } from 'utils/common';
 
 type PopupProps = PopupController & {
-  item: FishSeedCompanyFishFarmerOrderType;
+  item: FishFarmerFishProcessorOrderType;
   refetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined,
-  ) => Promise<QueryObserverResult<FishSeedCompanyFishFarmerOrderPaginateType, unknown>>;
+  ) => Promise<QueryObserverResult<FishFarmerFishProcessorOrderPaginateType, unknown>>;
 };
 
 const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
-  const [orderStatus, setOrderStatus] = useState(item.fishSeedsPurchaseOrderDetailsStatus);
+  const [orderStatus, setOrderStatus] = useState(item.status);
   const { address, role } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
 
-  const { mutate: confirmOrder, isLoading } = useMutation(fishFarmerService.confirmOrder, {
+  const { mutate: confirmOrder, isLoading } = useMutation(fishProcessorService.confirmOrder, {
     onSuccess: () => {
       enqueueSnackbar('Confirm order successfully', {
         variant: 'success',
@@ -40,93 +40,82 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
   });
 
   const handleConfirm = async (accepted: boolean) => {
-    const resChain = await fishFarmerService.confirmFishSeedsPurchaseOrder({
-      accepted,
-      farmedFishContractAddress: item.farmedFishId.farmedFishContract,
+    console.log(accepted, item.fishFarmerId.farmedFishId.farmedFishContract, address, item.farmedFishPurchaseOrderID)
+    await fishProcessorService.confirmFarmedFishPurchaseOrder({
+      Accepted: accepted,
+      farmedFishContractAddress: item.fishFarmerId.farmedFishId.farmedFishContract,
       sender: address,
-      FishSeedsPurchaseOrderID: item.fishSeedPurchaseOrderId,
+      FarmedFishPurchaseOrderID: item.farmedFishPurchaseOrderID,
     });
 
     await confirmOrder({
       orderId: item.id,
-      status: resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NEWSTatus,
+      status: accepted ? 0 : 1,
     });
 
-    setOrderStatus(Number(resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NEWSTatus));
+    setOrderStatus(accepted ? 0 : 1);
   };
 
   const handleRecieve = async () => {
-    const resChain = await fishFarmerService.receiveFishSeedsOrder({
-      farmedFishContractAddress: item.farmedFishId.farmedFishContract,
+    await fishProcessorService.receiveFarmedFishOrder({
+      farmedFishContractAddress: item.fishFarmerId.farmedFishId.farmedFishContract,
       sender: address,
-      FishSeedsPurchaseOrderID: item.fishSeedPurchaseOrderId,
+      FarmedFishPurchaseOrderID: item.farmedFishPurchaseOrderID,
     });
 
     await confirmOrder({
       orderId: item.id,
-      status: resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus,
+      status: 4,
     });
 
-    setOrderStatus(Number(resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus));
+    setOrderStatus(4);
   };
 
   return (
     <>
-      <DialogTitle>Confirm fish seeds order</DialogTitle>
+      <DialogTitle>Confirm fish order</DialogTitle>
       <DialogContent>
         <Grid container>
           <Grid item xs={4}>
             <Grid container spacing={5} border='medium'>
               <Grid item xs={12} className='flex items-center gap-3'>
-                <Avatar src={item.fishSeedsSeller.avatar} sx={{ width: 80, height: 80 }}></Avatar>
+                <Avatar src={item.farmedFishSeller.avatar} sx={{ width: 80, height: 80 }}></Avatar>
                 <div>
                   <div className='flex items-center gap-2'>
                     <AccountBalanceWallet />
                     <div className='font-bold'>Wallet address: </div>
-                    <div>{shorten(item.fishSeedsSeller.address)}</div>
+                    <div>{shorten(item.farmedFishSeller.address)}</div>
                   </div>
                   <div className='flex items-center gap-2'>
                     <Apartment />
                     <div className='font-bold'>Name: </div>
-                    <div>{item.fishSeedsSeller.name}</div>
+                    <div>{item.farmedFishSeller.name}</div>
                   </div>
                   <div className='flex items-center gap-2'>
                     <Home />
                     <div className='font-bold'>Address: </div>
-                    <div>{item.fishSeedsSeller.userAddress}</div>
+                    <div>{item.farmedFishSeller.userAddress}</div>
                   </div>
                   <div className='flex items-center gap-2'>
                     <LocalPhone />
                     <div className='font-bold'>Phone number: </div>
-                    <div>{item.fishSeedsSeller.phone}</div>
+                    <div>{item.farmedFishSeller.phone}</div>
                   </div>
                 </div>
               </Grid>
               <Grid item xs={12}>
                 <div className='flex flex-col items-center gap-4 '>
                   <div className='font-medium text-lg'>Number of fish seeds available</div>
-                  <div className='text-7xl font-semibold'>{item.farmedFishId.numberOfFishSeedsAvailable}</div>
+                  <div className='text-7xl font-semibold'>{item.fishFarmerId.totalNumberOfFish}</div>
                 </div>
               </Grid>
             </Grid>
           </Grid>
           <Grid item xs={4}>
             <div className='flex flex-col items-center gap-10'>
-              <div>
-                <div className='flex justify-between gap-5'>
-                  <div className='font-medium'>Species name: </div>
-                  <div>{item.farmedFishId.speciesName}</div>
-                </div>
-
-                <div className='flex justify-between gap-5'>
-                  <div className='font-medium'>Geographic origin: </div>
-                  <div>{item.farmedFishId.geographicOrigin}</div>
-                </div>
-
-                <div className='flex justify-between gap-5'>
-                  <div className='font-medium'>Aquaculture water type: </div>
-                  <div>{item.farmedFishId.aquacultureWaterType}</div>
-                </div>
+              <div className='flex justify-between gap-5'>
+                <div className='font-medium'>Species name: </div>
+                <div>{item.speciesName}</div>
               </div>
               <ConfirmStatus index={orderStatus} />
             </div>
@@ -134,34 +123,34 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
           <Grid item xs={4}>
             <Grid container spacing={5}>
               <Grid item xs={12} className='flex items-center gap-3'>
-                <Avatar src={item.fishSeedsPurchaser.avatar} sx={{ width: 80, height: 80 }}></Avatar>
+                <Avatar src={item.farmedFishPurchaser.avatar} sx={{ width: 80, height: 80 }}></Avatar>
                 <div>
                   <div className='flex items-center gap-2'>
                     <AccountBalanceWallet />
                     <div className='font-bold'>Wallet address: </div>
-                    <div>{shorten(item.fishSeedsPurchaser.address)}</div>
+                    <div>{shorten(item.farmedFishPurchaser.address)}</div>
                   </div>
                   <div className='flex items-center gap-2'>
                     <Apartment />
                     <div className='font-bold'>Name: </div>
-                    <div>{item.fishSeedsPurchaser.name}</div>
+                    <div>{item.farmedFishPurchaser.name}</div>
                   </div>
                   <div className='flex items-center gap-2'>
                     <Home />
                     <div className='font-bold'>Address: </div>
-                    <div>{item.fishSeedsPurchaser.userAddress}</div>
+                    <div>{item.farmedFishPurchaser.userAddress}</div>
                   </div>
                   <div className='flex items-center gap-2'>
                     <LocalPhone />
                     <div className='font-bold'>Phone number: </div>
-                    <div>{item.fishSeedsPurchaser.phone}</div>
+                    <div>{item.farmedFishPurchaser.phone}</div>
                   </div>
                 </div>
               </Grid>
               <Grid item xs={12}>
                 <div className='flex flex-col items-center gap-4 '>
                   <div className='font-medium text-lg'>Number of fish seeds ordered</div>
-                  <div className='text-7xl font-semibold'>{item.numberOfFishSeedsOrdered}</div>
+                  <div className='text-7xl font-semibold'>{item.numberOfFishOrdered}</div>
                 </div>
               </Grid>
             </Grid>
@@ -169,14 +158,12 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        {role === RoleType.fishSeedCompanyRole && (
+        {role === RoleType.fishFarmerRole && (
           <>
             <LoadingButton
               variant='contained'
               color='success'
-              disabled={['Accepted', 'Rejected', 'Received'].includes(
-                statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
-              )}
+              disabled={['Accepted', 'Rejected', 'Received'].includes(statusStep[item.status].label)}
               onClick={() => handleConfirm(true)}
             >
               Accept
@@ -184,9 +171,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
             <LoadingButton
               variant='contained'
               color='error'
-              disabled={['Accepted', 'Rejected', 'Received'].includes(
-                statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
-              )}
+              disabled={['Accepted', 'Rejected', 'Received'].includes(statusStep[item.status].label)}
               onClick={() => handleConfirm(false)}
             >
               Reject
@@ -194,13 +179,11 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
           </>
         )}
 
-        {role === RoleType.fishFarmerRole && (
+        {role === RoleType.fishProcessorRole && (
           <LoadingButton
             variant='contained'
             color='warning'
-            disabled={['Pending', 'Rejected', 'Received'].includes(
-              statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
-            )}
+            disabled={['Pending', 'Rejected', 'Received'].includes(statusStep[item.status].label)}
             onClick={handleRecieve}
           >
             Received

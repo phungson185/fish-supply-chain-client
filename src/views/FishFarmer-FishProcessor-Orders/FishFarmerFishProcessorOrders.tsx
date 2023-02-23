@@ -1,7 +1,6 @@
 import { CategoryOutlined } from '@mui/icons-material';
 import {
   Button,
-  debounce,
   Dialog,
   Menu,
   MenuItem,
@@ -18,21 +17,24 @@ import { Spinner, TableRowEmpty } from 'components';
 import { statusStep } from 'components/ConfirmStatus';
 import { useAnchor, useSearch } from 'hooks';
 import { parse } from 'qs';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
-import { fishFarmerService } from 'services';
-import { FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
+import { fishProcessorService } from 'services';
+import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { ConfirmPopup } from './popups';
 
-const FILTERS = [{ label: 'Number of fish seeds ordered', orderBy: 'numberOfFishSeedsOrdered' }];
+const FILTERS = [
+  { label: 'Number of fish ordered', orderBy: 'numberOfFishOrdered' },
+  { label: 'Species name', orderBy: 'speciesName' },
+];
 
 const SORT_TYPES = [
   { label: 'Low to High', desc: 'false' },
   { label: 'High to Low', desc: 'true' },
 ];
 
-const FishSeedCompanyFishFarmerOrders = () => {
+const FishFarmerFishProcessorOrders = () => {
   const location = useLocation();
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page });
@@ -40,8 +42,8 @@ const FishSeedCompanyFishFarmerOrders = () => {
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
 
   const { data, isFetching, refetch } = useQuery(
-    ['fishFarmerService.getOrders', dataSearch],
-    () => fishFarmerService.getOrders(dataSearch),
+    ['fishProcessorService.getOrders', dataSearch],
+    () => fishProcessorService.getOrders(dataSearch),
     {
       keepPreviousData: true,
       staleTime: 0,
@@ -54,17 +56,17 @@ const FishSeedCompanyFishFarmerOrders = () => {
   const [search, setSearch] = useState(query.search || '');
   const [params, setParams] = useState({ search, page });
   const [openConfirmPopup, setOpenConfirmPopup] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<FishSeedCompanyFishFarmerOrderType>(
-    {} as FishSeedCompanyFishFarmerOrderType,
+  const [selectedOrder, setSelectedOrder] = useState<FishFarmerFishProcessorOrderType>(
+    {} as FishFarmerFishProcessorOrderType,
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debounceChangeParams = useCallback(
-    debounce((values) => {
-      setParams((prev) => ({ ...prev, ...values }));
-    }, 300),
-    [],
-  );
+  //   const debounceChangeParams = useCallback(
+  //     debounce((values) => {
+  //       setParams((prev) => ({ ...prev, ...values }));
+  //     }, 300),
+  //     [],
+  //   );
   useEffect(() => {
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
@@ -137,16 +139,16 @@ const FishSeedCompanyFishFarmerOrders = () => {
         </div>
 
         {/* <TextField
-          placeholder='Search...'
-          InputProps={{ className: 'bg-white text-black' }}
-          value={search}
-          sx={{ width: '30%' }}
-          onChange={(event) => {
-            const { value } = event.target;
-            setSearch(value);
-            debounceChangeParams({ search: value });
-          }}
-        /> */}
+            placeholder='Search...'
+            InputProps={{ className: 'bg-white text-black' }}
+            value={search}
+            sx={{ width: '30%' }}
+            onChange={(event) => {
+              const { value } = event.target;
+              setSearch(value);
+              debounceChangeParams({ search: value });
+            }}
+          /> */}
       </div>
       <TableContainer component={Paper}>
         <Spinner loading={isFetching}>
@@ -154,10 +156,10 @@ const FishSeedCompanyFishFarmerOrders = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Order ID</TableCell>
-                <TableCell>Contract adress</TableCell>
-                <TableCell>Fish seeds purchaser</TableCell>
-                <TableCell>Fish seeds seller</TableCell>
-                <TableCell>Number of fish seeds ordered (kg)</TableCell>
+                <TableCell>Farmed fish purchaser</TableCell>
+                <TableCell>Farmed fish seller</TableCell>
+                <TableCell>Species name</TableCell>
+                <TableCell>Number of fish ordered (kg)</TableCell>
                 <TableCell>Status</TableCell>
               </TableRow>
             </TableHead>
@@ -165,15 +167,15 @@ const FishSeedCompanyFishFarmerOrders = () => {
               {items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell align='center'>{item.id}</TableCell>
-                  <TableCell align='center'>{item.farmedFishId.farmedFishContract}</TableCell>
-                  <TableCell align='center'>{item.fishSeedsPurchaser.address}</TableCell>
-                  <TableCell align='center'>{item.fishSeedsSeller.address}</TableCell>
-                  <TableCell align='center'>{item.numberOfFishSeedsOrdered}</TableCell>
+                  <TableCell align='center'>{item.farmedFishPurchaser.address}</TableCell>
+                  <TableCell align='center'>{item.farmedFishSeller.address}</TableCell>
+                  <TableCell align='center'>{item.speciesName}</TableCell>
+                  <TableCell align='center'>{item.numberOfFishOrdered}</TableCell>
                   <TableCell align='center'>
                     <Button
                       variant='contained'
                       sx={{
-                        backgroundColor: `${statusStep[item.fishSeedsPurchaseOrderDetailsStatus].color}`,
+                        backgroundColor: `${statusStep[item.status].color}`,
                         color: 'white',
                       }}
                       onClick={() => {
@@ -181,7 +183,7 @@ const FishSeedCompanyFishFarmerOrders = () => {
                         setOpenConfirmPopup(true);
                       }}
                     >
-                      {`${statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label}`}
+                      {`${statusStep[item.status].label}`}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -208,4 +210,4 @@ const FishSeedCompanyFishFarmerOrders = () => {
   );
 };
 
-export default FishSeedCompanyFishFarmerOrders;
+export default FishFarmerFishProcessorOrders;

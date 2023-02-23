@@ -4,6 +4,7 @@ export { default as walletService } from './wallet';
 export { default as registrationService } from './registration';
 export { default as fishSeedCompanyService } from './fishSeedCompany';
 export { default as fishFarmerService } from './fishFarmer';
+export { default as fishProcessorService } from './fishProcessor';
 export { default as systemService } from './system';
 export { default as fileService } from './file';
 export { default as userService } from './user';

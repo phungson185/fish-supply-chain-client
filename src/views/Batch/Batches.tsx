@@ -13,7 +13,7 @@ import { getRoute } from 'routes';
 import { fishSeedCompanyService } from 'services';
 import { RoleType } from 'types/Auth';
 import { BatchType } from 'types/Batch';
-import { FishSeedsOrderPopup, ProcessStatus } from './components';
+import { FarmedFishOrderPopup, FishSeedsOrderPopup, ProcessStatus } from './components';
 
 const Batches = () => {
   const location = useLocation();
@@ -31,11 +31,12 @@ const Batches = () => {
   );
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
   const [openPlaceFishSeedsPurchaseOrderPopup, setOpenPlaceFishSeedsPurchaseOrderPopup] = useState(false);
+  const [openPlaceFarmedFishPurchaseOrderPopup, setOpenPlaceFarmedFishPurchaseOrderPopup] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [selectedBatch, setSelectedBatch] = useState<BatchType>({} as BatchType);
   const [openBatchDetail, setOpenBatchDetail] = useState(false);
 
-  const handlePlaceFishSeedsPurchaseOrderPopup = (item: BatchType, roleType: RoleType) => {
+  const handleOrderPopup = (item: BatchType, roleType: RoleType) => {
     if (role !== roleType) {
       enqueueSnackbar('You are not authorized to access this page', {
         variant: 'error',
@@ -43,7 +44,17 @@ const Batches = () => {
       return;
     }
     setSelectedBatch(item);
-    setOpenPlaceFishSeedsPurchaseOrderPopup(true);
+
+    switch (roleType) {
+      case RoleType.fishFarmerRole:
+        setOpenPlaceFishSeedsPurchaseOrderPopup(true);
+        break;
+      case RoleType.fishProcessorRole:
+        setOpenPlaceFarmedFishPurchaseOrderPopup(true);
+        break;
+      default:
+        break;
+    }
   };
 
   const handleOpenBatchDetail = (item: BatchType) => {
@@ -87,37 +98,25 @@ const Batches = () => {
                       backgroundColor={`${item.farmedFishId ? 'green' : 'gray'}`}
                     />
                   </TableCell>
-                  <TableCell
-                    align='center'
-                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(item, RoleType.fishFarmerRole)}
-                  >
+                  <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.fishFarmerRole)}>
                     <ProcessStatus
                       content={`${item.fishFarmerId ? 'Completed' : 'Pending'}`}
                       backgroundColor={`${item.fishFarmerId ? 'green' : 'gray'}`}
                     />
                   </TableCell>
-                  <TableCell
-                    align='center'
-                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(item, RoleType.fishProcessorRole)}
-                  >
+                  <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.fishProcessorRole)}>
                     <ProcessStatus
                       content={`${item.fishProcessorId ? 'Completed' : 'Pending'}`}
                       backgroundColor={`${item.fishProcessorId ? 'green' : 'gray'}`}
                     />
                   </TableCell>
-                  <TableCell
-                    align='center'
-                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(item, RoleType.distributorRole)}
-                  >
+                  <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.distributorRole)}>
                     <ProcessStatus
                       content={`${item.distributorId ? 'Completed' : 'Pending'}`}
                       backgroundColor={`${item.distributorId ? 'green' : 'gray'}`}
                     />
                   </TableCell>
-                  <TableCell
-                    align='center'
-                    onClick={() => handlePlaceFishSeedsPurchaseOrderPopup(item, RoleType.distributorRole)}
-                  >
+                  <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.distributorRole)}>
                     <ProcessStatus
                       content={`${item.retailerId ? 'Completed' : 'Pending'}`}
                       backgroundColor={`${item.retailerId ? 'green' : 'gray'}`}
@@ -139,6 +138,10 @@ const Batches = () => {
 
       <Dialog open={openPlaceFishSeedsPurchaseOrderPopup} fullWidth maxWidth='sm'>
         <FishSeedsOrderPopup item={selectedBatch} onClose={() => setOpenPlaceFishSeedsPurchaseOrderPopup(false)} />
+      </Dialog>
+
+      <Dialog open={openPlaceFarmedFishPurchaseOrderPopup} fullWidth maxWidth='sm'>
+        <FarmedFishOrderPopup item={selectedBatch} onClose={() => setOpenPlaceFarmedFishPurchaseOrderPopup(false)} />
       </Dialog>
     </>
   );

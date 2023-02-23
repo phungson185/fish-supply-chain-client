@@ -4,6 +4,7 @@ import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer
 import { RegistrationView } from 'views/Registration';
 import { ProfileUpdate } from 'views/Profile';
 import FishGrowthDetails from 'views/FishFarmer/FishGrowthDetails';
+import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
 
 type RouteType = {
   path: string;
@@ -70,20 +71,35 @@ const fishFarmerRoute: PrivateRouteType = {
     name: 'Batches',
     element: <Batches />,
   },
-  orders: {
-    path: '/orders',
-    name: 'Orders',
-    element: <FishSeedCompanyFishFarmerOrders />,
-  },
   growthDetails: {
     path: '/growthDetails',
     name: 'Growth Details',
     element: <FishGrowthDetails />,
   },
+  fishSeedCompanyFishFarmerOrders: {
+    path: '/fishSeedCompanyFishFarmerOrders',
+    name: 'FishSeedCompany - FishFarmer - Orders',
+    element: <FishSeedCompanyFishFarmerOrders />,
+  },
+  fishFarmerFishProcessorOrders: {
+    path: '/fishFarmerFishProcessorOrders',
+    name: 'FishFarmer - FishProcessor - Orders',
+    element: <FishFarmerFishProcessorOrders />,
+  },
 };
 
 const fishProcessorRoute: PrivateRouteType = {
   ...baseRoute,
+  batch: {
+    path: '/batches',
+    name: 'Batches',
+    element: <Batches />,
+  },
+  fishFarmerFishProcessorOrders: {
+    path: '/fishFarmerFishProcessorOrders',
+    name: 'FishFarmer - FishProcessor - Orders',
+    element: <FishFarmerFishProcessorOrders />,
+  },
 };
 
 const distributorRoute: PrivateRouteType = {

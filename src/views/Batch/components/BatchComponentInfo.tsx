@@ -38,6 +38,12 @@ const BatchComponentInfo = ({ item }: PopupProps) => {
                         </Typography>
                       </>
                     )}
+
+                    {item?.owner?.role === RoleType.fishProcessorRole && (
+                      <>
+                        <Typography variant='subtitle2'>Number of fish ordered: {item?.numberOfFishOrdered}</Typography>
+                      </>
+                    )}
                   </>
                 </div>
               </div>
