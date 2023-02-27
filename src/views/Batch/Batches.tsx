@@ -13,7 +13,7 @@ import { getRoute } from 'routes';
 import { fishSeedCompanyService } from 'services';
 import { RoleType } from 'types/Auth';
 import { BatchType } from 'types/Batch';
-import { FarmedFishOrderPopup, FishSeedsOrderPopup, ProcessStatus } from './components';
+import { FarmedFishOrderPopup, FishSeedsOrderPopup, ProcessedFishOrderPopup, ProcessStatus } from './components';
 
 const Batches = () => {
   const location = useLocation();
@@ -32,6 +32,7 @@ const Batches = () => {
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
   const [openPlaceFishSeedsPurchaseOrderPopup, setOpenPlaceFishSeedsPurchaseOrderPopup] = useState(false);
   const [openPlaceFarmedFishPurchaseOrderPopup, setOpenPlaceFarmedFishPurchaseOrderPopup] = useState(false);
+  const [openPlaceProcessedFishPurchaseOrderPopup, setOpenPlaceProcessedFishPurchaseOrderPopup] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [selectedBatch, setSelectedBatch] = useState<BatchType>({} as BatchType);
   const [openBatchDetail, setOpenBatchDetail] = useState(false);
@@ -51,6 +52,9 @@ const Batches = () => {
         break;
       case RoleType.fishProcessorRole:
         setOpenPlaceFarmedFishPurchaseOrderPopup(true);
+        break;
+      case RoleType.distributorRole:
+        setOpenPlaceProcessedFishPurchaseOrderPopup(true);
         break;
       default:
         break;
@@ -142,6 +146,10 @@ const Batches = () => {
 
       <Dialog open={openPlaceFarmedFishPurchaseOrderPopup} fullWidth maxWidth='sm'>
         <FarmedFishOrderPopup item={selectedBatch} onClose={() => setOpenPlaceFarmedFishPurchaseOrderPopup(false)} />
+      </Dialog>
+
+      <Dialog open={openPlaceProcessedFishPurchaseOrderPopup} fullWidth maxWidth='sm'>
+        <ProcessedFishOrderPopup item={selectedBatch} onClose={() => setOpenPlaceProcessedFishPurchaseOrderPopup(false)} />
       </Dialog>
     </>
   );

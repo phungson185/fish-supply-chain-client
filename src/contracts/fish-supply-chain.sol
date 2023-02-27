@@ -683,6 +683,7 @@ contract FishProcessing {
     string public IPFS_Hash;
     string public CatchMethod;
     uint256 public FilletsInPacket;
+    uint256 public NumberOfPackets;
     uint256 public DateOfProcessing;
     address registrationContract;
     address public FishProcessor;
@@ -696,10 +697,15 @@ contract FishProcessing {
         string SpeciesName;
         string CatchMethod;
         uint256 FilletsInPacket;
+        uint256 NumberOfPackets;
     }
     enum status {
-        Created,
-        Failed
+        Accepted,
+        Rejected,
+        Pending,
+        Arrived,
+        Received,
+        Updated
     }
 
     modifier onlyProcessor() {
@@ -716,7 +722,8 @@ contract FishProcessing {
         string IPFS_Hash,
         uint256 DateOfProcessing,
         string CatchMethod,
-        uint256 FilletsInPacket
+        uint256 FilletsInPacket,
+        uint256 NumberOfPackets
     );
 
     constructor(
@@ -725,7 +732,8 @@ contract FishProcessing {
         string memory ipfsHash,
         uint256 dateOfProcessing,
         string memory catchMethod,
-        uint256 filletsInPacket
+        uint256 filletsInPacket,
+        uint256 numberOfPackets
     ) public {
         RegistrationContract = Registration(registration);
 
@@ -738,20 +746,23 @@ contract FishProcessing {
         DateOfProcessing = dateOfProcessing;
         CatchMethod = catchMethod;
         FilletsInPacket = filletsInPacket;
+        NumberOfPackets = numberOfPackets;
 
         bytes32 tenp = keccak256(
             abi.encodePacked(
                 msg.sender,
                 processedSpeciesname,
                 catchMethod,
-                filletsInPacket
+                filletsInPacket,
+                numberOfPackets
             )
         );
 
         ProcessedFishpackageId[tenp] = ProcessedFishPackageDetails(
             processedSpeciesname,
             catchMethod,
-            filletsInPacket
+            filletsInPacket,
+            numberOfPackets
         );
         PackageId = tenp;
 
@@ -761,13 +772,414 @@ contract FishProcessing {
             IPFS_Hash,
             DateOfProcessing,
             CatchMethod,
-            FilletsInPacket
+            FilletsInPacket,
+            NumberOfPackets
         );
     }
 
     function GetProcessedFishPackageID() public view returns (bytes32) {
         return PackageId;
     }
+
+    modifier onlyOrderer() {
+        require(
+            RegistrationContract.DistributorExists(msg.sender),
+            "Sender not authorized."
+        );
+        _;
+    }
+
+    modifier onlyReceiver() {
+        require(
+            RegistrationContract.FishProcessorExists(msg.sender),
+            "Sender not authorized."
+        );
+        _;
+    }
+
+    struct ProcessedFishPurchaseOrder {
+        address receiver;
+        bytes32 ProcessedFishPackageID;
+        address orderer;
+        uint256 QuantityofFishPackageOrdered;
+        status ProcessedFishPurchaseOrderStatus;
+    }
+
+    event ProcessedFishPuchaseOrderPlaced(
+        bytes32 ProcessedFishPurchaseOrderID,
+        address ReceiverEA,
+        bytes32 ProcessedFishPackageID,
+        uint256 quantityoffishpackageordered,
+        address OrdererEA
+    );
+
+    event ConfirmProcessedFishPurchaseOrderStatus(
+        bytes32 ProcessedFishPurchaseOrderID,
+        status NewStatus
+    );
+
+    event ProcessedFishOrderReceived(bytes32 ProcessedFishPurchaseOrderID);
+
+    mapping(bytes32 => ProcessedFishPurchaseOrder)
+        public GetProcessedFishPurchaseOrderID;
+
+    function PlaceProcessedFishPurchaseOrder(
+        address orderer,
+        bytes32 ProcessedFishPackageId,
+        uint256 quantityoffishpackageordered,
+        address Receiver
+    ) public onlyOrderer {
+        require(
+            RegistrationContract.DistributorExists(orderer),
+            "Distributor’s address is not valid"
+        );
+
+        bytes32 temp = keccak256(
+            abi.encodePacked(
+                msg.sender,
+                now,
+                address(this),
+                ProcessedFishPackageId,
+                quantityoffishpackageordered,
+                Receiver
+            )
+        );
+        GetProcessedFishPurchaseOrderID[temp] = ProcessedFishPurchaseOrder(
+            Receiver,
+            ProcessedFishPackageId,
+            msg.sender,
+            quantityoffishpackageordered,
+            status.Pending
+        );
+
+        emit ProcessedFishPuchaseOrderPlaced(
+            temp,
+            Receiver,
+            ProcessedFishPackageId,
+            quantityoffishpackageordered,
+            msg.sender
+        );
+    }
+
+    function ConfirmProcessedFishPurchaseOrder(
+        bytes32 ProcessedFishPurchaseOrderID,
+        bool Accepted
+    ) public onlyReceiver {
+        require(
+            GetProcessedFishPurchaseOrderID[ProcessedFishPurchaseOrderID]
+                .receiver == msg.sender,
+            "The receiver of the order is not authorized"
+        );
+        require(
+            GetProcessedFishPurchaseOrderID[ProcessedFishPurchaseOrderID]
+                .ProcessedFishPurchaseOrderStatus == status.Pending
+        );
+        if (Accepted) {
+            GetProcessedFishPurchaseOrderID[ProcessedFishPurchaseOrderID]
+                .ProcessedFishPurchaseOrderStatus = status.Accepted;
+        } else {
+            GetProcessedFishPurchaseOrderID[ProcessedFishPurchaseOrderID]
+                .ProcessedFishPurchaseOrderStatus = status.Rejected;
+        }
+        emit ConfirmProcessedFishPurchaseOrderStatus(
+            ProcessedFishPurchaseOrderID,
+            GetProcessedFishPurchaseOrderID[ProcessedFishPurchaseOrderID]
+                .ProcessedFishPurchaseOrderStatus
+        );
+    }
+
+    function ReceiveProcessedFishOrder(bytes32 ProcessedFishPurchaseOrderID)
+        public
+        onlyOrderer
+    {
+        require(
+            GetProcessedFishPurchaseOrderID[ProcessedFishPurchaseOrderID]
+                .orderer == msg.sender,
+            "Sender not authorized."
+        );
+        require(
+            keccak256(
+                abi.encodePacked(
+                    GetProcessedFishPurchaseOrderID[
+                        ProcessedFishPurchaseOrderID
+                    ].ProcessedFishPurchaseOrderStatus
+                )
+            ) == keccak256(abi.encodePacked(status.Accepted)),
+            "The shipment has not arrived yet"
+        );
+
+        GetProcessedFishPurchaseOrderID[ProcessedFishPurchaseOrderID]
+            .ProcessedFishPurchaseOrderStatus = status.Received;
+
+        emit ProcessedFishOrderReceived(ProcessedFishPurchaseOrderID);
+    }
+
+    struct RetailerPurchaseOrderDetails {
+        address buyer;
+        address seller;
+        bytes32 ProcessedFishPurchaseOrderID;
+        uint256 NumberOfFishPackagesOrdered;
+        status RetailerPurchaseOrderStatus;
+    }
+
+    mapping(bytes32 => RetailerPurchaseOrderDetails)
+        public GetRetailerPurchaseOrderID;
+
+    modifier onlyBuyer() {
+        require(
+            RegistrationContract.RetailerExists(msg.sender),
+            "Sender not authorized."
+        );
+        _;
+    }
+
+    modifier onlySeller() {
+        require(
+            RegistrationContract.DistributorExists(msg.sender),
+            "Sender not authorized."
+        );
+        _;
+    }
+
+    event RetailerPuchaseOrderPlaced(
+        bytes32 RetailerPurchaseOrderID,
+        address Buyer,
+        address Seller,
+        bytes32 ProcessedFishPurchaseOrderID,
+        uint256 NumberOfFishPackagesOrdered
+    );
+    event RetailerPurchaseOrderConfirmed(
+        bytes32 RetailerPurchaseOrderID,
+        status newstatuS
+    );
+    event RetailerOrderReceived(bytes32 RetailerPurchaseOrderID);
+
+    function PlaceRetailerPurchaseOrder(
+        address buyer,
+        address seller,
+        bytes32 ProcessedFishPurchaseOrderID,
+        uint256 NumberOfFishPackagesOrdered
+    ) public onlyBuyer {
+        require(
+            RegistrationContract.RetailerExists(buyer),
+            "Retailer’s address is not valid"
+        );
+
+        bytes32 temp1 = keccak256(
+            abi.encodePacked(
+                msg.sender,
+                now,
+                address(this),
+                ProcessedFishPurchaseOrderID,
+                NumberOfFishPackagesOrdered,
+                seller
+            )
+        );
+        GetRetailerPurchaseOrderID[temp1] = RetailerPurchaseOrderDetails(
+            msg.sender,
+            seller,
+            ProcessedFishPurchaseOrderID,
+            NumberOfFishPackagesOrdered,
+            status.Pending
+        );
+
+        emit RetailerPuchaseOrderPlaced(
+            temp1,
+            msg.sender,
+            seller,
+            ProcessedFishPurchaseOrderID,
+            NumberOfFishPackagesOrdered
+        );
+    }
+
+    function ConfirmRetailerPurchaseOrder(
+        bytes32 RetailerPurchaseOrderID,
+        bool accepted
+    ) public onlySeller {
+        require(
+            GetRetailerPurchaseOrderID[RetailerPurchaseOrderID].seller ==
+                msg.sender,
+            "Sender not authorized."
+        );
+        require(
+            GetRetailerPurchaseOrderID[RetailerPurchaseOrderID]
+                .RetailerPurchaseOrderStatus == status.Pending
+        );
+
+        if (accepted) {
+            GetRetailerPurchaseOrderID[RetailerPurchaseOrderID]
+                .RetailerPurchaseOrderStatus = status.Accepted;
+        } else {
+            GetRetailerPurchaseOrderID[RetailerPurchaseOrderID]
+                .RetailerPurchaseOrderStatus = status.Rejected;
+        }
+
+        emit RetailerPurchaseOrderConfirmed(
+            RetailerPurchaseOrderID,
+            GetRetailerPurchaseOrderID[RetailerPurchaseOrderID]
+                .RetailerPurchaseOrderStatus
+        );
+    }
+
+    function ReceiveRetailerOrder(bytes32 RetailerPurchaseOrderID)
+        public
+        onlyBuyer
+    {
+        require(
+            GetRetailerPurchaseOrderID[RetailerPurchaseOrderID].buyer ==
+                msg.sender,
+            "Buyer not authorized."
+        );
+        require(
+            keccak256(
+                abi.encodePacked(
+                    GetRetailerPurchaseOrderID[RetailerPurchaseOrderID]
+                        .RetailerPurchaseOrderStatus
+                )
+            ) == keccak256(abi.encodePacked(status.Accepted)),
+            "The shipment has not arrived yet"
+        );
+
+        GetRetailerPurchaseOrderID[RetailerPurchaseOrderID]
+            .RetailerPurchaseOrderStatus = status.Received;
+
+        emit RetailerOrderReceived(RetailerPurchaseOrderID);
+    }
+
+    struct ConsumerOrderDetails {
+        bytes32 RetailerPurchaseOrderID;
+        address vendor;
+        address vendee;
+        status ConsumerOrderDetailsStatus;
+    }
+
+    mapping(bytes32 => ConsumerOrderDetails) public GetConsumerOrderID;
+
+    modifier onlyVendor() {
+        require(
+            RegistrationContract.RetailerExists(msg.sender),
+            "Sender not authorized."
+        );
+        _;
+    }
+
+    modifier onlyVendee() {
+        require(
+            RegistrationContract.ConsumerExists(msg.sender),
+            "Sender not autorized."
+        );
+        _;
+    }
+
+    event ConsumerOrderPlaced(
+        bytes32 ConsumerOrderID,
+        bytes32 RetailerPurchaseOrderID,
+        address vendor,
+        address vendee
+    );
+    event ConsumerOrderConfirmed(bytes32 ConsumerOrderID, status newstatus);
+    event ConsumerOrderReceived(bytes32 ConsumerOrderID);
+
+    function PlaceConsumerOrder(
+        bytes32 RetailerPurchaseOrderID,
+        address vendor,
+        address vendee
+    ) public onlyVendee {
+        require(
+            RegistrationContract.ConsumerExists(vendee),
+            "Consumer is not authorized."
+        );
+        bytes32 poiu = keccak256(
+            abi.encodePacked(
+                msg.sender,
+                now,
+                address(this),
+                RetailerPurchaseOrderID
+            )
+        );
+
+        GetConsumerOrderID[poiu] = ConsumerOrderDetails(
+            RetailerPurchaseOrderID,
+            vendor,
+            msg.sender,
+            status.Pending
+        );
+
+        emit ConsumerOrderPlaced(
+            poiu,
+            RetailerPurchaseOrderID,
+            vendor,
+            msg.sender
+        );
+    }
+
+    function ConfirmConsumerPurchaseOrder(
+        bytes32 ConsumerOrderID,
+        bool accepted
+    ) public onlyVendor {
+        require(
+            GetConsumerOrderID[ConsumerOrderID].vendor == msg.sender,
+            "FishSeedsCompany is not authorized."
+        );
+
+        require(
+            GetConsumerOrderID[ConsumerOrderID].ConsumerOrderDetailsStatus ==
+                status.Pending
+        );
+        if (accepted) {
+            GetConsumerOrderID[ConsumerOrderID]
+                .ConsumerOrderDetailsStatus = status.Accepted;
+        } else {
+            GetConsumerOrderID[ConsumerOrderID]
+                .ConsumerOrderDetailsStatus = status.Rejected;
+        }
+        emit ConsumerOrderConfirmed(
+            ConsumerOrderID,
+            GetConsumerOrderID[ConsumerOrderID].ConsumerOrderDetailsStatus
+        );
+    }
+
+    function ReceiveConsumerOrder(bytes32 ConsumerOrderID) public onlyVendee {
+        require(
+            GetConsumerOrderID[ConsumerOrderID].vendee == msg.sender,
+            "Sender not authorized."
+        );
+        require(
+            keccak256(
+                abi.encodePacked(
+                    GetConsumerOrderID[ConsumerOrderID]
+                        .ConsumerOrderDetailsStatus
+                )
+            ) == keccak256(abi.encodePacked(status.Accepted)),
+            "The shipment has not arrived yet"
+        );
+
+        GetConsumerOrderID[ConsumerOrderID].ConsumerOrderDetailsStatus = status
+            .Received;
+
+        emit ConsumerOrderReceived(ConsumerOrderID);
+    }
+
+    // event FineStatusCreated(address FishProcessor, bool fineStatus);
+
+    // function CreateFineResult(
+    //     uint256 NumberOfViolations,
+    //     uint256 AcceptabeleNumberofViolations,
+    //     address FishProcessor
+    // ) public {
+    //     require(
+    //         RegistrationContract.isFDA(msg.sender) == true,
+    //         "only FDA can perform this."
+    //     );
+
+    //     Fine = false;
+
+    //     if ((NumberOfViolations) >= AcceptabeleNumberofViolations) {
+    //         Fine = true;
+    //     }
+
+    //     emit FineStatusCreated(FishProcessor, Fine);
+    // }
 }
 
 

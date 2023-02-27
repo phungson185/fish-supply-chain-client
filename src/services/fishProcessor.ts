@@ -54,18 +54,24 @@ const receiveFarmedFishOrder = async (body: ReceiveFarmedFishOrderType) => {
 };
 
 const deployFishProcessingContract = async (body: ProcessingContractType) => {
-  const { sender, registration, dateOfProcessing, ipfsHash, processedSpeciesname, catchMethod, filletsInPacket } = body;
+  const { sender, registration, dateOfProcessing, ipfsHash, processedSpeciesname, catchMethod, filletsInPacket, numberOfPackets } = body;
   const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], sender);
   const result = await processingContract
     .deploy({
       data: FishProcessing.data.bytecode.object,
-      arguments: [registration, processedSpeciesname, ipfsHash, dateOfProcessing, catchMethod, filletsInPacket],
+      arguments: [registration, processedSpeciesname, ipfsHash, dateOfProcessing, catchMethod, filletsInPacket, numberOfPackets],
     })
     .send({
       from: sender,
       gas: 3500000,
     });
 
+  return result;
+};
+
+const getProcessedFishPackageID = async (processingContractAddress: string) => {
+  const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], processingContractAddress);
+  const result = await processingContract.methods.GetProcessedFishPackageID().call();
   return result;
 };
 
@@ -87,6 +93,7 @@ export default {
   confirmFarmedFishPurchaseOrder,
   receiveFarmedFishOrder,
   deployFishProcessingContract,
+  getProcessedFishPackageID,
 
   createOder,
   getOrders,

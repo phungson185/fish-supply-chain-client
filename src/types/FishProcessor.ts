@@ -53,6 +53,7 @@ export type FishFarmerFishProcessorOrderType = {
   filletsInPacket: number;
   processingContract: string;
   numberOfPackets: number;
+  owner: UserType;
 };
 
 export type CreateOrderType = {

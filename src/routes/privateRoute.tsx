@@ -6,6 +6,7 @@ import { ProfileUpdate } from 'views/Profile';
 import FishGrowthDetails from 'views/FishFarmer/FishGrowthDetails';
 import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
 import { FishProcessor } from 'views/FishProcessor';
+import { FishProcessorDistributorOrders } from 'views/FishProcessor - Distributor - Orders';
 
 type RouteType = {
   path: string;
@@ -101,6 +102,11 @@ const fishProcessorRoute: PrivateRouteType = {
     name: 'FishFarmer - FishProcessor - Orders',
     element: <FishFarmerFishProcessorOrders />,
   },
+  fishDistributorFishProcessorOrders: {
+    path: '/fishDistributorFishProcessorOrders',
+    name: 'FishDistributor - FishProcessor - Orders',
+    element: <FishProcessorDistributorOrders />,
+  },
   processingContract: {
     path: '/processingContract',
     name: 'Processing Contract',
@@ -110,6 +116,16 @@ const fishProcessorRoute: PrivateRouteType = {
 
 const distributorRoute: PrivateRouteType = {
   ...baseRoute,
+  batch: {
+    path: '/batches',
+    name: 'Batches',
+    element: <Batches />,
+  },
+  fishDistributorFishProcessorOrders: {
+    path: '/fishDistributorFishProcessorOrders',
+    name: 'FishDistributor - FishProcessor - Orders',
+    element: <FishProcessorDistributorOrders />,
+  },
 };
 
 const retailerRoute: PrivateRouteType = {
