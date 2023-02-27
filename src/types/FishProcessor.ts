@@ -24,6 +24,16 @@ export type ReceiveFarmedFishOrderType = {
   FarmedFishPurchaseOrderID: string;
 };
 
+export type ProcessingContractType = {
+  sender: string;
+  registration: string;
+  processedSpeciesname: string;
+  ipfsHash: string;
+  dateOfProcessing: number;
+  catchMethod: string;
+  filletsInPacket: number;
+};
+
 // api types
 export type FishFarmerFishProcessorOrderType = {
   id: string;
@@ -34,6 +44,13 @@ export type FishFarmerFishProcessorOrderType = {
   numberOfFishOrdered: number;
   farmedFishPurchaseOrderID: string;
   status: number;
+  registrationContract: string;
+  fishProcessor: UserType;
+  IPFSHash: string;
+  dateOfProcessing: number;
+  catchMethod: string;
+  filletsInPacket: number;
+  processingContract: string;
 };
 
 export type CreateOrderType = {
@@ -49,6 +66,18 @@ export type ConfirmOrderType = {
   orderId: string;
   status: number;
 };
+
+export type CreateProcesingContractType = {
+  orderId: string;
+  registrationContract: string;
+  fishProcessor: string;
+  IPFSHash: string;
+  dateOfProcessing: number;
+  catchMethod: string;
+  filletsInPacket: number;
+  processingContract: string;
+};
+
 
 export type FishFarmerFishProcessorOrderParamsType = PaginateParamsType & {};
 

@@ -184,13 +184,17 @@ contract FarmedFish {
         bytes32 FishSeedsPurchaseOrderID,
         address FishSeedsPurchaser,
         address FishSeedsSeller,
-        uint256 NumberOfFishSeedsOrdered
+        uint256 NumberOfFishSeedsOrdered,
+        status FishSeedsPurchaseOrderDetailsStatus
     );
     event FishSeedsPurchaseOrderConfirmed(
         bytes32 FishSeedsPurchaseOrderID,
         status NEWSTatus
     );
-    event FishsSeedsOrderReceived(bytes32 FishSeedsPurchaseOrderID);
+    event FishsSeedsOrderReceived(
+        bytes32 FishSeedsPurchaseOrderID,
+        status NEWSTatus
+    );
 
     modifier onlyFishSeedsPurchaser() {
         require(
@@ -238,7 +242,8 @@ contract FarmedFish {
             temp,
             msg.sender,
             FishSeedsSeller,
-            NumberOfFishSeedsOrdered
+            NumberOfFishSeedsOrdered,
+            status.Pending
         );
     }
 
@@ -292,7 +297,11 @@ contract FarmedFish {
         GetFishSeedsPurchaseOrderID[FishSeedsPurchaseOrderID]
             .FishSeedsPurchaseOrderDetailsStatus = status.Received;
 
-        emit FishsSeedsOrderReceived(FishSeedsPurchaseOrderID);
+        emit FishsSeedsOrderReceived(
+            FishSeedsPurchaseOrderID,
+            GetFishSeedsPurchaseOrderID[FishSeedsPurchaseOrderID]
+                .FishSeedsPurchaseOrderDetailsStatus
+        );
     }
 
     struct FarmedFishGrowthDetails {
@@ -570,7 +579,7 @@ contract WildCaughtFish {
         status WildCaughtFishPurchaseOrderDetailsStatus
     );
 
-    // get info contract 
+    // get info contract
     function GetFarmedFishContractInfo() public view returns (address) {
         return registrationContract;
     }
@@ -671,8 +680,9 @@ contract WildCaughtFish {
 
 contract FishProcessing {
     string public ProcessedSpeciesName;
-    address public UnprocessedFishID;
     string public IPFS_Hash;
+    string public CatchMethod;
+    uint256 public FilletsInPacket;
     uint256 public DateOfProcessing;
     address registrationContract;
     address public FishProcessor;
@@ -681,41 +691,8 @@ contract FishProcessing {
 
     Registration RegistrationContract;
 
-    event ProcessedFishDetailsUpdated(
-        string ProcessedSpeciesName,
-        address UnprocessedFishID,
-        string IPFS_Hash,
-        uint256 DateOfProcessing
-    );
-
-    constructor(
-        address registration,
-        string memory ProcessedSpeciesname,
-        address UnprocessedFishId,
-        string memory IPFS_hash,
-        uint256 DateofProcessing
-    ) public {
-        RegistrationContract = Registration(registration);
-
-        if (!RegistrationContract.FishProcessorExists(msg.sender))
-            revert("Sender not authorized");
-        registrationContract = registration;
-        FishProcessor = msg.sender;
-        ProcessedSpeciesName = ProcessedSpeciesname;
-        UnprocessedFishID = UnprocessedFishId;
-        IPFS_Hash = IPFS_hash;
-        DateOfProcessing = DateofProcessing;
-
-        emit ProcessedFishDetailsUpdated(
-            ProcessedSpeciesName,
-            UnprocessedFishID,
-            IPFS_Hash,
-            DateOfProcessing
-        );
-    }
-
+    
     struct ProcessedFishPackageDetails {
-        address ProcessedFishPCRreportId;
         string SpeciesName;
         string CatchMethod;
         uint256 FilletsInPacket;
@@ -735,43 +712,54 @@ contract FishProcessing {
     mapping(bytes32 => ProcessedFishPackageDetails) ProcessedFishpackageId;
     event ProcessedFishPackageIDCreated(
         bytes32 ProcessedFishpackageId,
-        address ProcessedFishPCRreportId,
-        string SpeciesName,
-        string catchmethod,
+        string ProcessedSpeciesName,
+        string IPFS_Hash,
+        uint256 DateOfProcessing,
+        string CatchMethod,
         uint256 FilletsInPacket
     );
 
-    function CreateProcessedFishPackageID(
-        address ProcessedFishPCRreportId,
-        string memory SpeciesName,
-        string memory CatchMethod,
-        uint256 FilletsInPacket
-    ) public onlyProcessor {
-        require(
-            RegistrationContract.FishProcessorExists(FishProcessor),
-            "FishProcessor not authorized."
-        );
+    constructor(
+        address registration,
+        string memory processedSpeciesname,
+        string memory ipfsHash,
+        uint256 dateOfProcessing,
+        string memory catchMethod,
+        uint256 filletsInPacket
+    ) public {
+        RegistrationContract = Registration(registration);
+
+        if (!RegistrationContract.FishProcessorExists(msg.sender))
+            revert("Sender not authorized");
+        registrationContract = registration;
+        FishProcessor = msg.sender;
+        ProcessedSpeciesName = processedSpeciesname;
+        IPFS_Hash = ipfsHash;
+        DateOfProcessing = dateOfProcessing;
+        CatchMethod = catchMethod;
+        FilletsInPacket = filletsInPacket;
+
         bytes32 tenp = keccak256(
             abi.encodePacked(
                 msg.sender,
-                ProcessedFishPCRreportId,
-                SpeciesName,
-                CatchMethod,
-                FilletsInPacket
+                processedSpeciesname,
+                catchMethod,
+                filletsInPacket
             )
         );
+
         ProcessedFishpackageId[tenp] = ProcessedFishPackageDetails(
-            ProcessedFishPCRreportId,
-            SpeciesName,
-            CatchMethod,
-            FilletsInPacket
+            processedSpeciesname,
+            catchMethod,
+            filletsInPacket
         );
         PackageId = tenp;
 
         emit ProcessedFishPackageIDCreated(
             tenp,
-            ProcessedFishPCRreportId,
-            SpeciesName,
+            ProcessedSpeciesName,
+            IPFS_Hash,
+            DateOfProcessing,
             CatchMethod,
             FilletsInPacket
         );
@@ -781,6 +769,7 @@ contract FishProcessing {
         return PackageId;
     }
 }
+
 
 contract FishDistribution {
     address fishprocessingContract;

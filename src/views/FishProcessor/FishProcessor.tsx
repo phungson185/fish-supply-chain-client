@@ -1,7 +1,7 @@
 import { CategoryOutlined } from '@mui/icons-material';
 import {
   Button,
-  Dialog,
+  debounce,
   Menu,
   MenuItem,
   Pagination,
@@ -12,22 +12,20 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
 } from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
-import { statusStep } from 'components/ConfirmStatus';
 import { useAnchor, useSearch } from 'hooks';
+import moment from 'moment';
 import { parse } from 'qs';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
 import { fishProcessorService } from 'services';
-import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
-import { ConfirmPopup } from './popups';
-import CreateContractPopup from './popups/CreateContractPopup';
 
 const FILTERS = [
-  { label: 'Number of fish ordered', orderBy: 'numberOfFishOrdered' },
   { label: 'Species name', orderBy: 'speciesName' },
+  { label: 'Date of processing', orderBy: 'dateOfProcessing' },
 ];
 
 const SORT_TYPES = [
@@ -35,7 +33,7 @@ const SORT_TYPES = [
   { label: 'High to Low', desc: 'true' },
 ];
 
-const FishFarmerFishProcessorOrders = () => {
+const FishProcessor = () => {
   const location = useLocation();
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page });
@@ -56,19 +54,14 @@ const FishFarmerFishProcessorOrders = () => {
   const [desc, setDesc] = useState(query.desc || SORT_TYPES[0].desc);
   const [search, setSearch] = useState(query.search || '');
   const [params, setParams] = useState({ search, page });
-  const [openConfirmPopup, setOpenConfirmPopup] = useState(false);
-  const [openCreateContractPopup, setOpenCreateContractPopup] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<FishFarmerFishProcessorOrderType>(
-    {} as FishFarmerFishProcessorOrderType,
-  );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   const debounceChangeParams = useCallback(
-  //     debounce((values) => {
-  //       setParams((prev) => ({ ...prev, ...values }));
-  //     }, 300),
-  //     [],
-  //   );
+  const debounceChangeParams = useCallback(
+    debounce((values) => {
+      setParams((prev) => ({ ...prev, ...values }));
+    }, 300),
+    [],
+  );
   useEffect(() => {
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
@@ -140,76 +133,43 @@ const FishFarmerFishProcessorOrders = () => {
           </Menu>
         </div>
 
-        {/* <TextField
-            placeholder='Search...'
-            InputProps={{ className: 'bg-white text-black' }}
-            value={search}
-            sx={{ width: '30%' }}
-            onChange={(event) => {
-              const { value } = event.target;
-              setSearch(value);
-              debounceChangeParams({ search: value });
-            }}
-          /> */}
-
-        <Button
-          variant='contained'
-          onClick={() => {
-            setOpenCreateContractPopup(true);
+        <TextField
+          placeholder='Search...'
+          InputProps={{ className: 'bg-white text-black' }}
+          value={search}
+          sx={{ width: '30%' }}
+          onChange={(event) => {
+            const { value } = event.target;
+            setSearch(value);
+            debounceChangeParams({ search: value });
           }}
-        >
-          Create process contract
-        </Button>
+        />
+
       </div>
       <TableContainer component={Paper}>
         <Spinner loading={isFetching}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Order ID</TableCell>
-                <TableCell>Farmed fish purchaser</TableCell>
-                <TableCell>Farmed fish seller</TableCell>
+                <TableCell>Fish processor</TableCell>
+                <TableCell>Process contract</TableCell>
                 <TableCell>Species name</TableCell>
-                <TableCell>Number of fish ordered (kg)</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Action</TableCell>
+                <TableCell>IPFS hash</TableCell>
+                <TableCell>Date of processing</TableCell>
+                <TableCell>Catch method</TableCell>
+                <TableCell>Fillets in packet</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell align='center'>{item.id}</TableCell>
-                  <TableCell align='center'>{item.farmedFishPurchaser.address}</TableCell>
-                  <TableCell align='center'>{item.farmedFishSeller.address}</TableCell>
+                  <TableCell align='center'>{item.fishProcessor}</TableCell>
+                  <TableCell align='center'>{item.processingContract}</TableCell>
                   <TableCell align='center'>{item.speciesName}</TableCell>
-                  <TableCell align='center'>{item.numberOfFishOrdered}</TableCell>
-                  <TableCell align='center'>
-                    <Button
-                      variant='contained'
-                      sx={{
-                        backgroundColor: `${statusStep[item.status].color}`,
-                        color: 'white',
-                      }}
-                      onClick={() => {
-                        setSelectedOrder(item);
-                        setOpenConfirmPopup(true);
-                      }}
-                    >
-                      {`${statusStep[item.status].label}`}
-                    </Button>
-                  </TableCell>
-                  <TableCell align='center'>
-                    <Button
-                      variant='contained'
-                      onClick={() => {
-                        setOpenCreateContractPopup(true);
-                        setSelectedOrder(item);
-                      }}
-                      disabled={item.status !== 4}
-                    >
-                      Create contract
-                    </Button>
-                  </TableCell>
+                  <TableCell align='center'>{item.IPFSHash}</TableCell>
+                  <TableCell align='center'>{moment(item.dateOfProcessing).format('DD/MM/YYYY')}</TableCell>
+                  <TableCell align='center'>{item.catchMethod}</TableCell>
+                  <TableCell align='center'>{item.filletsInPacket}</TableCell>
                 </TableRow>
               ))}
               <TableRowEmpty visible={!isFetching && items.length === 0} />
@@ -226,16 +186,8 @@ const FishFarmerFishProcessorOrders = () => {
           onChange={(event, value) => onSearchChange({ page: value })}
         />
       </div>
-
-      <Dialog maxWidth='lg' open={openConfirmPopup} fullWidth>
-        <ConfirmPopup item={selectedOrder} refetch={refetch} onClose={() => setOpenConfirmPopup(false)} />
-      </Dialog>
-
-      <Dialog maxWidth='sm' open={openCreateContractPopup} fullWidth>
-        <CreateContractPopup item={selectedOrder} refetch={refetch} onClose={() => setOpenCreateContractPopup(false)} />
-      </Dialog>
     </>
   );
 };
 
-export default FishFarmerFishProcessorOrders;
+export default FishProcessor;

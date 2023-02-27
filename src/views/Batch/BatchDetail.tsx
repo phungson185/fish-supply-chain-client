@@ -23,7 +23,7 @@ const BatchDetailPopup = () => {
         <Typography variant='caption'>Batch No: {item.id}</Typography>
         <Typography variant='caption'>Updated time: {moment(item.updatedAt).format('L')}</Typography>
       </div>
-      <Timeline position='alternate' onResize={undefined} onResizeCapture={undefined}>
+      <Timeline position='alternate'>
         {Object.entries(item).map(
           ([key, value], index) =>
             !['id', 'type', 'createdAt', 'updatedAt'].includes(key) && (

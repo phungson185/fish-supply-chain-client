@@ -1,6 +1,6 @@
 import { createTheme, ThemeProvider } from '@mui/material';
-import { LocalizationProvider } from '@mui/lab';
-import { default as DateAdapter } from '@mui/lab/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
 export const appTheme = createTheme({
   components: {
@@ -80,7 +80,7 @@ export const appTheme = createTheme({
 const Theme = ({ children }: any) => {
   return (
     <ThemeProvider theme={appTheme}>
-      {children}
+      <LocalizationProvider dateAdapter={AdapterLuxon}>{children}</LocalizationProvider>
     </ThemeProvider>
   );
 };

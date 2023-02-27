@@ -43,8 +43,6 @@ const FarmedFishOrderPopup = ({ item, onClose }: PopupProps) => {
         speciesname: item.fishFarmerId?.speciesName!,
       });
 
-      console.log(resChain)
-
       await createOder({
         fishFarmerId: item.fishFarmerId?.id!,
         farmedFishPurchaseOrderID: resChain.events.FarmedFishPurchaseOrderPlaced.returnValues.FarmedFishPurchaseOrderID,

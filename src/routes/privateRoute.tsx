@@ -5,6 +5,7 @@ import { RegistrationView } from 'views/Registration';
 import { ProfileUpdate } from 'views/Profile';
 import FishGrowthDetails from 'views/FishFarmer/FishGrowthDetails';
 import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
+import { FishProcessor } from 'views/FishProcessor';
 
 type RouteType = {
   path: string;
@@ -99,6 +100,11 @@ const fishProcessorRoute: PrivateRouteType = {
     path: '/fishFarmerFishProcessorOrders',
     name: 'FishFarmer - FishProcessor - Orders',
     element: <FishFarmerFishProcessorOrders />,
+  },
+  processingContract: {
+    path: '/processingContract',
+    name: 'Processing Contract',
+    element: <FishProcessor />,
   },
 };
 

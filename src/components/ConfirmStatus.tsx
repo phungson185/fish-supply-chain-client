@@ -8,6 +8,7 @@ export const statusStep = [
   { label: 'Arrived', color: 'blue', component: <Done /> },
   { label: 'Received', color: 'purple', component: <AccessTime /> },
   { label: 'Updated', color: 'teal', component: <Schedule /> },
+  { label: 'Processed', color: 'pink', component: <Done />}
 ];
 
 type ConfirmStatusProps = {
