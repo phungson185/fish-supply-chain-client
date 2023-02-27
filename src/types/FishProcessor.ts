@@ -32,6 +32,7 @@ export type ProcessingContractType = {
   dateOfProcessing: number;
   catchMethod: string;
   filletsInPacket: number;
+  numberOfPackets: number;
 };
 
 // api types
@@ -51,6 +52,7 @@ export type FishFarmerFishProcessorOrderType = {
   catchMethod: string;
   filletsInPacket: number;
   processingContract: string;
+  numberOfPackets: number;
 };
 
 export type CreateOrderType = {
@@ -76,6 +78,7 @@ export type CreateProcesingContractType = {
   catchMethod: string;
   filletsInPacket: number;
   processingContract: string;
+  numberOfPackets: number;
 };
 
 

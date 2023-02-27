@@ -53,6 +53,7 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
         registration: systemConfig?.registrationContract,
         catchMethod: values.CatchMethod,
         filletsInPacket: values.FilletsInPacket,
+        numberOfPackets: values.NumberOfPackets,
       });
 
       createProcessingContract({
@@ -64,6 +65,7 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
         catchMethod: values.CatchMethod,
         filletsInPacket: values.FilletsInPacket,
         processingContract: resChain.options.address,
+        numberOfPackets: values.NumberOfPackets,
       });
     })();
   };
@@ -137,6 +139,23 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
                 {...field}
                 required
                 label='Fillets in packet'
+                error={invalid}
+                helperText={error?.message}
+                type='number'
+              />
+            )}
+          />
+
+          <Controller
+            name='NumberOfPackets'
+            defaultValue=''
+            control={control}
+            rules={{ required: 'Number of packets is required' }}
+            render={({ field, fieldState: { invalid, error } }) => (
+              <TextField
+                {...field}
+                required
+                label='Number of packets'
                 error={invalid}
                 helperText={error?.message}
                 type='number'

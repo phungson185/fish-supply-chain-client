@@ -34,14 +34,18 @@ const BatchComponentInfo = ({ item }: PopupProps) => {
                     {item?.owner?.role === RoleType.fishFarmerRole && (
                       <>
                         <Typography variant='subtitle2'>
-                          Number of fish seeds ordered: {item?.numberOfFishSeedsOrdered}
+                          Number of fish seeds ordered: {item?.numberOfFishSeedsOrdered} kg
                         </Typography>
                       </>
                     )}
 
                     {item?.owner?.role === RoleType.fishProcessorRole && (
                       <>
-                        <Typography variant='subtitle2'>Number of fish ordered: {item?.numberOfFishOrdered}</Typography>
+                        <Typography variant='subtitle2'>Number of fish processed: {item?.numberOfFishOrdered} kg</Typography>
+                        <Typography variant='subtitle2'>Catch method: {item?.catchMethod}</Typography>
+                        <Typography variant='subtitle2'>Fillets in packet: {item?.filletsInPacket}</Typography>
+                        <Typography variant='subtitle2'>Number of packets: {item?.numberOfPackets}</Typography>
+                        <Typography variant='subtitle2'>Processor: {item?.fishProcessor?.address}</Typography>
                       </>
                     )}
                   </>

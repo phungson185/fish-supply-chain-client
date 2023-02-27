@@ -158,6 +158,7 @@ const FishProcessor = () => {
                 <TableCell>Date of processing</TableCell>
                 <TableCell>Catch method</TableCell>
                 <TableCell>Fillets in packet</TableCell>
+                <TableCell>Number of packets</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -170,6 +171,7 @@ const FishProcessor = () => {
                   <TableCell align='center'>{moment(item.dateOfProcessing).format('DD/MM/YYYY')}</TableCell>
                   <TableCell align='center'>{item.catchMethod}</TableCell>
                   <TableCell align='center'>{item.filletsInPacket}</TableCell>
+                  <TableCell align='center'>{item.numberOfPackets}</TableCell>
                 </TableRow>
               ))}
               <TableRowEmpty visible={!isFetching && items.length === 0} />

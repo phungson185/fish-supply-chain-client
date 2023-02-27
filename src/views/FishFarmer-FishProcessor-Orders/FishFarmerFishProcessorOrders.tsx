@@ -152,14 +152,6 @@ const FishFarmerFishProcessorOrders = () => {
             }}
           /> */}
 
-        <Button
-          variant='contained'
-          onClick={() => {
-            setOpenCreateContractPopup(true);
-          }}
-        >
-          Create process contract
-        </Button>
       </div>
       <TableContainer component={Paper}>
         <Spinner loading={isFetching}>
@@ -194,6 +186,7 @@ const FishFarmerFishProcessorOrders = () => {
                         setSelectedOrder(item);
                         setOpenConfirmPopup(true);
                       }}
+                      disabled={item.status === 6}
                     >
                       {`${statusStep[item.status].label}`}
                     </Button>
