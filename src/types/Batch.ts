@@ -2,6 +2,8 @@ import { PaginateParamsType, PaginateType } from './Common';
 import { FarmedFishType } from './FishSeedCompany';
 import { FishSeedCompanyFishFarmerOrderType } from './FishFarmer';
 import { FishFarmerFishProcessorOrderType } from './FishProcessor';
+import { FishProcessorDistributorOrderType } from './Distributor';
+import { DistributorRetailerOrderType } from './Retailer';
 
 export type BatchType = {
   id: string;
@@ -9,8 +11,8 @@ export type BatchType = {
   farmedFishId: FarmedFishType;
   fishFarmerId?: FishSeedCompanyFishFarmerOrderType;
   fishProcessorId?: FishFarmerFishProcessorOrderType;
-  distributorId?: string;
-  retailerId?: string;
+  distributorId?: FishProcessorDistributorOrderType;
+  retailerId?: DistributorRetailerOrderType;
   updatedAt: string;
 };
 

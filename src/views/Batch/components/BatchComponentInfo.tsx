@@ -53,6 +53,11 @@ const BatchComponentInfo = ({ item }: PopupProps) => {
                         <Typography variant='subtitle2'>Quantity of fish package ordered: {item?.quantityOfFishPackageOrdered} packages</Typography>
                       </>
                     )}
+                    {item?.owner?.role === RoleType.retailerRole && (
+                      <>
+                        <Typography variant='subtitle2'>Number of fish package ordered: {item?.numberOfFishPackagesOrdered} packages</Typography>
+                      </>
+                    )}
                   </>
                 </div>
               </div>

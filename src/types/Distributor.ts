@@ -25,7 +25,6 @@ export type ReceiveProcessedFishOrderType = {
 };
 
 // api types
-
 export type CreateOrderType = {
   orderer: string;
   receiver: string;

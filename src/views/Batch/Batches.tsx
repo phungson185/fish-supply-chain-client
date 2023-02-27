@@ -1,10 +1,10 @@
 import { Visibility } from '@mui/icons-material';
-import { Dialog, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Dialog, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
 import { useSearch } from 'hooks';
 import { useSnackbar } from 'notistack';
 import { parse } from 'qs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
@@ -13,7 +13,7 @@ import { getRoute } from 'routes';
 import { fishSeedCompanyService } from 'services';
 import { RoleType } from 'types/Auth';
 import { BatchType } from 'types/Batch';
-import { FarmedFishOrderPopup, FishSeedsOrderPopup, ProcessedFishOrderPopup, ProcessStatus } from './components';
+import { DistributorOfFishOrderPopup, FarmedFishOrderPopup, FishSeedsOrderPopup, ProcessedFishOrderPopup, ProcessStatus } from './components';
 
 const Batches = () => {
   const location = useLocation();
@@ -33,10 +33,15 @@ const Batches = () => {
   const [openPlaceFishSeedsPurchaseOrderPopup, setOpenPlaceFishSeedsPurchaseOrderPopup] = useState(false);
   const [openPlaceFarmedFishPurchaseOrderPopup, setOpenPlaceFarmedFishPurchaseOrderPopup] = useState(false);
   const [openPlaceProcessedFishPurchaseOrderPopup, setOpenPlaceProcessedFishPurchaseOrderPopup] = useState(false);
+  const [openPlaceRetailerPurchaseOrderPopup, setOpenPlaceRetailerPurchaseOrderPopup] = useState(false);
+
   const { enqueueSnackbar } = useSnackbar();
   const [selectedBatch, setSelectedBatch] = useState<BatchType>({} as BatchType);
   const [openBatchDetail, setOpenBatchDetail] = useState(false);
-
+  const [orderBy, setOrderBy] = useState(query.orderBy);
+  const [desc, setDesc] = useState(query.desc );
+  const [search, setSearch] = useState(query.search || '');
+  const [params, setParams] = useState({ search, page });
   const handleOrderPopup = (item: BatchType, roleType: RoleType) => {
     if (role !== roleType) {
       enqueueSnackbar('You are not authorized to access this page', {
@@ -56,6 +61,9 @@ const Batches = () => {
       case RoleType.distributorRole:
         setOpenPlaceProcessedFishPurchaseOrderPopup(true);
         break;
+      case RoleType.retailerRole:
+        setOpenPlaceRetailerPurchaseOrderPopup(true);
+        break;
       default:
         break;
     }
@@ -65,6 +73,10 @@ const Batches = () => {
     setSelectedBatch(item);
     setOpenBatchDetail(true);
   };
+
+  useEffect(() => {
+    onSearchChange({ orderBy, desc, ...params });
+  }, [onSearchChange, orderBy, desc, params]);
 
   return (
     <>
@@ -120,7 +132,7 @@ const Batches = () => {
                       backgroundColor={`${item.distributorId ? 'green' : 'gray'}`}
                     />
                   </TableCell>
-                  <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.distributorRole)}>
+                  <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.retailerRole)}>
                     <ProcessStatus
                       content={`${item.retailerId ? 'Completed' : 'Pending'}`}
                       backgroundColor={`${item.retailerId ? 'green' : 'gray'}`}
@@ -140,6 +152,14 @@ const Batches = () => {
         </Spinner>
       </TableContainer>
 
+      <div className='flex justify-center'>
+        <Pagination
+          page={currentPage ?? 1}
+          count={totalPage}
+          onChange={(event, value) => onSearchChange({ page: value })}
+        />
+      </div>
+
       <Dialog open={openPlaceFishSeedsPurchaseOrderPopup} fullWidth maxWidth='sm'>
         <FishSeedsOrderPopup item={selectedBatch} onClose={() => setOpenPlaceFishSeedsPurchaseOrderPopup(false)} />
       </Dialog>
@@ -150,6 +170,10 @@ const Batches = () => {
 
       <Dialog open={openPlaceProcessedFishPurchaseOrderPopup} fullWidth maxWidth='sm'>
         <ProcessedFishOrderPopup item={selectedBatch} onClose={() => setOpenPlaceProcessedFishPurchaseOrderPopup(false)} />
+      </Dialog>
+
+      <Dialog open={openPlaceRetailerPurchaseOrderPopup} fullWidth maxWidth='sm'>
+        <DistributorOfFishOrderPopup item={selectedBatch} onClose={() => setOpenPlaceRetailerPurchaseOrderPopup(false)} />
       </Dialog>
     </>
   );

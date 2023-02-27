@@ -51,7 +51,7 @@ const getFarmedFishContracts = async (params?: FarmedFishContractParamsType): Pr
 
 const createBatch = async (body: CreateBatchType): Promise<any> => client.post('/fishseedcompany/createBatch', body);
 
-const getBatchs = async (params?: BatchParamsType): Promise<BatchPaginateType> => client.get('/batchs');
+const getBatchs = async (params?: BatchParamsType): Promise<BatchPaginateType> => client.get('/batchs', { params });
 
 export default {
   deployFarmedFishContract,
