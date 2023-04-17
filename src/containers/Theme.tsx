@@ -56,7 +56,14 @@ export const appTheme = createTheme({
         variant: 'outlined',
         size: 'medium',
         color: 'primary',
-        InputLabelProps: { shrink: true },
+        // InputLabelProps: { shrink: true },
+      },
+    },
+    MuiSelect: {
+      defaultProps: {
+        variant: 'outlined',
+        size: 'medium',
+        color: 'primary',
       },
     },
   },

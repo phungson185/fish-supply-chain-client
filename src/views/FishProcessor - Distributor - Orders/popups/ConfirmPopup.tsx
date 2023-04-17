@@ -105,7 +105,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
               <Grid item xs={12}>
                 <div className='flex flex-col items-center gap-4 '>
                   <div className='font-medium text-lg'>Available of processed fish order</div>
-                  <div className='text-7xl font-semibold'>{item.processorId?.filletsInPacket}</div>
+                  <div className='text-7xl font-semibold'>{item.processorId?.numberOfPackets}</div>
                 </div>
               </Grid>
             </Grid>

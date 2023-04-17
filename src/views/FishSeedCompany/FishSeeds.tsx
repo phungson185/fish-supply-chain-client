@@ -1,4 +1,4 @@
-import { CategoryOutlined } from '@mui/icons-material';
+import { CategoryOutlined, Visibility } from '@mui/icons-material';
 import {
   Button,
   debounce,
@@ -23,6 +23,11 @@ import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
 import { fishSeedCompanyService } from 'services';
 import CreateContractPopup from './popups/CreateContractPopup';
+import AddFishSeedPopup from './popups/AddFishSeedPopup';
+import { Link } from 'react-router-dom';
+import { getRoute } from 'routes';
+import { useSelector } from 'react-redux';
+import { profileSelector } from 'reducers/profile';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -36,16 +41,18 @@ const SORT_TYPES = [
   { label: 'High to Low', desc: 'true' },
 ];
 
-const Contracts = () => {
+const FishSeeds = () => {
   const location = useLocation();
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page });
+  const { role } = useSelector(profileSelector);
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
+  const privateRoute = getRoute(role);
 
   const { data, isFetching, refetch } = useQuery(
-    ['fishSeedCompanyService.getFarmedFishContracts', dataSearch],
-    () => fishSeedCompanyService.getFarmedFishContracts(dataSearch),
+    ['fishSeedCompanyService.getFishSeeds', dataSearch],
+    () => fishSeedCompanyService.getFishSeeds(dataSearch),
     {
       keepPreviousData: true,
       staleTime: 0,
@@ -58,6 +65,7 @@ const Contracts = () => {
   const [search, setSearch] = useState(query.search || '');
   const [params, setParams] = useState({ search, page });
   const [openCreatePopup, setOpenCreatePopup] = useState(false);
+  const [openAddFishSeedPopup, setOpenAddFishSeedPopup] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceChangeParams = useCallback(
@@ -73,7 +81,7 @@ const Contracts = () => {
   return (
     <>
       <div className='flex items-center justify-between'>
-        <div className='flex justify-between gap-2'>
+        {/* <div className='flex justify-between gap-2'>
           <Button
             variant='text'
             color='inherit'
@@ -147,15 +155,24 @@ const Contracts = () => {
             setSearch(value);
             debounceChangeParams({ search: value });
           }}
-        />
+        /> */}
 
-        <Button
+        {/* <Button
           variant='contained'
           onClick={() => {
             setOpenCreatePopup(true);
           }}
         >
           Create Farmed Fish Contract
+        </Button> */}
+
+        <Button
+          variant='contained'
+          onClick={() => {
+            setOpenAddFishSeedPopup(true);
+          }}
+        >
+          Add fish seed
         </Button>
       </div>
       <TableContainer component={Paper}>
@@ -163,23 +180,37 @@ const Contracts = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Contract address</TableCell>
-                <TableCell>Species name</TableCell>
+                <TableCell>Fish Seed ID</TableCell>
+                <TableCell>Images</TableCell>
                 <TableCell>Geographic origin</TableCell>
-                <TableCell>Number of fish seeds available (kg)</TableCell>
-                <TableCell>Aquaculture water type</TableCell>
+                <TableCell>Method of reproduction</TableCell>
+                <TableCell>Water temperature</TableCell>
+                <TableCell>Species name</TableCell>
+                <TableCell>Quantity</TableCell>
                 <TableCell>IPFS hash</TableCell>
+                <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell align='center'>{item.farmedFishContract}</TableCell>
+                  <TableCell align='center'>{item.id}</TableCell>
+                  <TableCell align='center'>{item?.images}</TableCell>
+                  <TableCell align='center'>
+                    {fishSeedCompanyService.handleMapGeographicOrigin(item.geographicOrigin)}
+                  </TableCell>
+                  <TableCell align='center'>
+                    {fishSeedCompanyService.handleMapMethodOfReproduction(item.methodOfReproduction)}
+                  </TableCell>
+                  <TableCell align='center'>{item.waterTemperature}°C</TableCell>
                   <TableCell align='center'>{item.speciesName}</TableCell>
-                  <TableCell align='center'>{item.geographicOrigin}</TableCell>
-                  <TableCell align='center'>{item.numberOfFishSeedsAvailable}</TableCell>
-                  <TableCell align='center'>{item.aquacultureWaterType}</TableCell>
+                  <TableCell align='center'>{item.quantity}kg</TableCell>
                   <TableCell align='center'>{item.IPFSHash}</TableCell>
+                  <TableCell align='center'>
+                    <Link to={privateRoute.fishSeedDetail.url?.(item)!}>
+                      <Visibility />
+                    </Link>
+                  </TableCell>
                 </TableRow>
               ))}
               <TableRowEmpty visible={!isFetching && items.length === 0} />
@@ -197,11 +228,15 @@ const Contracts = () => {
         />
       </div>
 
-      <Dialog open={openCreatePopup} fullWidth maxWidth='sm'>
+      {/* <Dialog open={openCreatePopup} fullWidth maxWidth='sm'>
         <CreateContractPopup refetch={refetch} onClose={() => setOpenCreatePopup(false)} />
+      </Dialog> */}
+
+      <Dialog open={openAddFishSeedPopup} fullWidth maxWidth='md'>
+        <AddFishSeedPopup refetch={refetch} onClose={() => setOpenAddFishSeedPopup(false)} />
       </Dialog>
     </>
   );
 };
 
-export default Contracts;
+export default FishSeeds;

@@ -22,4 +22,9 @@ export type SearchController = {
 
 export type Address = {
   address: string;
-}
+};
+
+export type BaseType = {
+  createAt: Date;
+  updatedAt: Date;
+};

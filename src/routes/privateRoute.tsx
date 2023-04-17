@@ -1,5 +1,5 @@
 import { Batches, BatchDetail } from 'views/Batch';
-import { Contracts } from 'views/FishSeedCompany';
+import { FishSeedDetail, FishSeeds } from 'views/FishSeedCompany';
 import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
 import { RegistrationView } from 'views/Registration';
 import { ProfileUpdate } from 'views/Profile';
@@ -56,9 +56,15 @@ const fishSeedCompanyRoute: PrivateRouteType = {
     element: <Batches />,
   },
   contracts: {
-    path: '/contracts',
-    name: 'Contracts',
-    element: <Contracts />,
+    path: '/fishSeeds',
+    name: 'Fish seeds',
+    element: <FishSeeds />,
+  },
+  fishSeedDetail: {
+    path: '/fishSeed/:id',
+    name: 'Fish seed detail',
+    url: ({ id }: { id: string }) => `/fishSeed/${id}`,
+    element: <FishSeedDetail />,
   },
   orders: {
     path: '/orders',

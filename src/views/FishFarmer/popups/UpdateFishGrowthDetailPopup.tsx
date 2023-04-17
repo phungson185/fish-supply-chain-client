@@ -69,7 +69,7 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
 
   return (
     <>
-      <DialogTitle>Farmed fish contract</DialogTitle>
+      <DialogTitle>Update fish growth</DialogTitle>
       <DialogContent>
         <Typography variant='h4' className='mb-4'>
           Fish Growth Detail
