@@ -8,6 +8,7 @@ import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Or
 import { FishProcessor } from 'views/FishProcessor';
 import { FishProcessorDistributorOrders } from 'views/FishProcessor - Distributor - Orders';
 import { DistributorRetailerOrders } from 'views/Distributor-Retailer-Orders';
+import Contracts from 'views/FishSeedCompany/Contracts';
 
 type RouteType = {
   path: string;
@@ -56,14 +57,19 @@ const fishSeedCompanyRoute: PrivateRouteType = {
     element: <Batches />,
   },
   contracts: {
-    path: '/fishSeeds',
+    path: '/contracts',
+    name: 'Contracts',
+    element: <Contracts />,
+  },
+  fishSeeds: {
+    path: '/fish-seeds',
     name: 'Fish seeds',
     element: <FishSeeds />,
   },
   fishSeedDetail: {
-    path: '/fishSeed/:id',
+    path: '/fish-seed/:id',
     name: 'Fish seed detail',
-    url: ({ id }: { id: string }) => `/fishSeed/${id}`,
+    url: ({ id }: { id: string }) => `/fish-seed/${id}`,
     element: <FishSeedDetail />,
   },
   orders: {

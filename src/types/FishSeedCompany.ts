@@ -32,16 +32,21 @@ export type FarmedFishContractType = {
   Speciesname: string;
   Geographicorigin: string;
   NumberOfFishSeedsavailable: number;
-  AquacultureWatertype: string;
+  MethodOfReproduction: string;
+  Images: string;
+  WaterTemperature: number;
   IPFShash: string;
 };
 
 export type CreateFarmedFishContractType = {
   farmedFishContract: string;
+  fishSeedId: string;
   speciesName: string;
-  geographicOrigin: string;
+  geographicOrigin: number;
   numberOfFishSeedsAvailable: number;
-  aquacultureWaterType: string;
+  methodOfReproduction: number;
+  images: string[];
+  waterTemperature: number;
   IPFSHash: string;
 };
 
@@ -61,15 +66,18 @@ export type AddFishSeedType = {
 export type FishSeedType = AddFishSeedType &
   BaseType & {
     id: string;
+    isMakeContract: boolean;
   };
 
 export type FarmedFishType = {
   id: string;
   farmedFishContract: string;
   speciesName: string;
-  geographicOrigin: string;
   numberOfFishSeedsAvailable: number;
-  aquacultureWaterType: string;
+  images: string[];
+  waterTemperature: number;
+  geographicOrigin: number;
+  methodOfReproduction: number;
   IPFSHash: string;
   owner: UserType;
 };

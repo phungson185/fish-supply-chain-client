@@ -11,3 +11,4 @@ export { default as systemService } from './system';
 export { default as fileService } from './file';
 export { default as userService } from './user';
 export { default as batchService } from './batch';
+export { default as logService } from './log';

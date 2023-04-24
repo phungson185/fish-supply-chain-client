@@ -12,24 +12,21 @@ import {
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 import { fishSeedCompanyService } from 'services';
 import { PopupController } from 'types/Common';
-import {
-  FishSeedPaginateType,
-  FishSeedType,
-  GeographicOriginType,
-  MethodOfReproductionType,
-} from 'types/FishSeedCompany';
+import { FishSeedType, GeographicOriginType, MethodOfReproductionType } from 'types/FishSeedCompany';
 import { UploadLabel } from 'views/Registration/components';
-import { useEffect, useState } from 'react';
 
 type PopupProps = PopupController & {
   data: FishSeedType;
+  fetchFishSeed: () => void;
+  fetchLogs: () => void;
 };
 
-const UpdateFishSeedPopup = ({ onClose, data }: PopupProps) => {
+const UpdateFishSeedPopup = ({ onClose, fetchFishSeed, fetchLogs, data }: PopupProps) => {
   const { control, handleSubmit, setValue } = useForm({ mode: 'onChange' });
   const { enqueueSnackbar } = useSnackbar();
 
@@ -39,6 +36,8 @@ const UpdateFishSeedPopup = ({ onClose, data }: PopupProps) => {
         variant: 'success',
       });
       onClose();
+      fetchFishSeed();
+      fetchLogs();
     },
     onError: (error: any) => {
       enqueueSnackbar(error, { variant: 'error' });

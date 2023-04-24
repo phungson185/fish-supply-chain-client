@@ -29,7 +29,7 @@ import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
 import { Controller, useForm } from 'react-hook-form';
 
-const FishSeedDetail = () => {
+const ContractDetail = () => {
   const params = useParams();
   const [openUpdateFishSeedPopup, setOpenUpdateFishSeedPopup] = useState(false);
   const [openEnterQuantityPopup, setOpenEnterQuantityPopup] = useState(false);
@@ -260,4 +260,4 @@ const FishSeedDetail = () => {
   );
 };
 
-export default FishSeedDetail;
+export default ContractDetail;

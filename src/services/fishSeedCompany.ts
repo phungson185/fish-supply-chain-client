@@ -26,8 +26,16 @@ const deployFarmedFishContract = async ({
   contract: FarmedFishContractType;
 }) => {
   const farmedFishContract = new web3.eth.Contract(FarmedFish.abi as AbiItem[], address);
-  const { registration, AquacultureWatertype, Geographicorigin, NumberOfFishSeedsavailable, Speciesname, IPFShash } =
-    contract;
+  const {
+    registration,
+    Geographicorigin,
+    NumberOfFishSeedsavailable,
+    Speciesname,
+    IPFShash,
+    Images,
+    MethodOfReproduction,
+    WaterTemperature,
+  } = contract;
   const result = await farmedFishContract
     .deploy({
       data: FarmedFish.data.bytecode.object,
@@ -36,13 +44,15 @@ const deployFarmedFishContract = async ({
         Speciesname,
         Geographicorigin,
         NumberOfFishSeedsavailable,
-        AquacultureWatertype,
         IPFShash,
+        MethodOfReproduction,
+        Images,
+        WaterTemperature,
       ],
     })
     .send({
       from: address,
-      gas: 3500000,
+      gas: 4000000,
     });
   return result;
 };
@@ -58,6 +68,8 @@ const createFarmedFishContract = async (body: CreateFarmedFishContractType): Pro
   client.post('/fishseedcompany/createFarmedFishContract', body);
 const getFarmedFishContracts = async (params?: FarmedFishContractParamsType): Promise<FarmedFishContractPaginateType> =>
   client.get('/fishSeedCompany/contracts', { params });
+const getFarmedFishContract = async (id: string): Promise<FarmedFishType> =>
+  client.get(`/fishSeedCompany/contract/${id}`);
 const createBatch = async (body: CreateBatchType): Promise<any> => client.post('/fishseedcompany/createBatch', body);
 const getBatchs = async (params?: BatchParamsType): Promise<BatchPaginateType> => client.get('/batchs', { params });
 
@@ -89,6 +101,7 @@ export default {
   deployFarmedFishContract,
   createFarmedFishContract,
   getFarmedFishContracts,
+  getFarmedFishContract,
   createBatch,
   getBatchs,
   addFishSeed,

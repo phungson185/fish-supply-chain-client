@@ -42,7 +42,7 @@ const SORT_TYPES = [
   { label: 'High to Low', desc: 'true' },
 ];
 
-const FishSeeds = () => {
+const Contracts = () => {
   const location = useLocation();
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page });
@@ -52,8 +52,8 @@ const FishSeeds = () => {
   const privateRoute = getRoute(role);
 
   const { data, isFetching, refetch } = useQuery(
-    ['fishSeedCompanyService.getFishSeeds', dataSearch],
-    () => fishSeedCompanyService.getFishSeeds(dataSearch),
+    ['fishSeedCompanyService.getFarmedFishContracts', dataSearch],
+    () => fishSeedCompanyService.getFarmedFishContracts(dataSearch),
     {
       keepPreviousData: true,
       staleTime: 0,
@@ -83,89 +83,89 @@ const FishSeeds = () => {
     <>
       <div className='flex items-center justify-between'>
         {/* <div className='flex justify-between gap-2'>
-          <Button
-            variant='text'
-            color='inherit'
-            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
-            startIcon={<CategoryOutlined />}
-            onClick={onOpenFilter}
-          >
-            {FILTERS.find((item) => item.orderBy === orderBy)?.label ?? FILTERS[0].label}
-          </Button>
-          <Menu
-            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-            anchorEl={anchorFilter}
-            open={openFilter}
-            onClose={onCloseFilter}
-            onClick={onCloseFilter}
-          >
-            {FILTERS.map((item, index) => (
-              <MenuItem
-                key={index}
-                classes={{ selected: 'bg-info-light' }}
-                selected={item.orderBy === orderBy}
-                onClick={() => {
-                  setOrderBy(item.orderBy);
-                }}
-              >
-                {item.label}
-              </MenuItem>
-            ))}
-          </Menu>
-
-          <Button
-            variant='text'
-            color='inherit'
-            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
-            startIcon={<CategoryOutlined />}
-            onClick={onOpenSort}
-          >
-            {SORT_TYPES.find((item) => item.desc === desc)?.label ?? SORT_TYPES[0].label}
-          </Button>
-          <Menu
-            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-            anchorEl={anchorSort}
-            open={openSort}
-            onClose={onCloseSort}
-            onClick={onCloseSort}
-          >
-            {SORT_TYPES.map((item, index) => (
-              <MenuItem
-                key={index}
-                classes={{ selected: 'bg-info-light' }}
-                selected={item.desc === desc}
-                onClick={() => {
-                  setDesc(item.desc);
-                }}
-              >
-                {item.label}
-              </MenuItem>
-            ))}
-          </Menu>
-        </div>
-
-        <TextField
-          placeholder='Search...'
-          InputProps={{ className: 'bg-white text-black' }}
-          value={search}
-          sx={{ width: '30%' }}
-          onChange={(event) => {
-            const { value } = event.target;
-            setSearch(value);
-            debounceChangeParams({ search: value });
-          }}
-        /> */}
+            <Button
+              variant='text'
+              color='inherit'
+              classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
+              startIcon={<CategoryOutlined />}
+              onClick={onOpenFilter}
+            >
+              {FILTERS.find((item) => item.orderBy === orderBy)?.label ?? FILTERS[0].label}
+            </Button>
+            <Menu
+              transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+              anchorEl={anchorFilter}
+              open={openFilter}
+              onClose={onCloseFilter}
+              onClick={onCloseFilter}
+            >
+              {FILTERS.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  classes={{ selected: 'bg-info-light' }}
+                  selected={item.orderBy === orderBy}
+                  onClick={() => {
+                    setOrderBy(item.orderBy);
+                  }}
+                >
+                  {item.label}
+                </MenuItem>
+              ))}
+            </Menu>
+  
+            <Button
+              variant='text'
+              color='inherit'
+              classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
+              startIcon={<CategoryOutlined />}
+              onClick={onOpenSort}
+            >
+              {SORT_TYPES.find((item) => item.desc === desc)?.label ?? SORT_TYPES[0].label}
+            </Button>
+            <Menu
+              transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+              anchorEl={anchorSort}
+              open={openSort}
+              onClose={onCloseSort}
+              onClick={onCloseSort}
+            >
+              {SORT_TYPES.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  classes={{ selected: 'bg-info-light' }}
+                  selected={item.desc === desc}
+                  onClick={() => {
+                    setDesc(item.desc);
+                  }}
+                >
+                  {item.label}
+                </MenuItem>
+              ))}
+            </Menu>
+          </div>
+  
+          <TextField
+            placeholder='Search...'
+            InputProps={{ className: 'bg-white text-black' }}
+            value={search}
+            sx={{ width: '30%' }}
+            onChange={(event) => {
+              const { value } = event.target;
+              setSearch(value);
+              debounceChangeParams({ search: value });
+            }}
+          /> */}
 
         {/* <Button
-          variant='contained'
-          onClick={() => {
-            setOpenCreatePopup(true);
-          }}
-        >
-          Create Farmed Fish Contract
-        </Button> */}
+            variant='contained'
+            onClick={() => {
+              setOpenCreatePopup(true);
+            }}
+          >
+            Create Farmed Fish Contract
+          </Button> */}
 
         <Button
           variant='contained'
@@ -181,13 +181,13 @@ const FishSeeds = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Fish Seed ID</TableCell>
+                <TableCell>Contract address</TableCell>
                 <TableCell>Images</TableCell>
                 <TableCell>Geographic origin</TableCell>
                 <TableCell>Method of reproduction</TableCell>
                 <TableCell>Water temperature</TableCell>
                 <TableCell>Species name</TableCell>
-                <TableCell>Quantity</TableCell>
+                <TableCell>Number of fish seeds available</TableCell>
                 <TableCell>IPFS hash</TableCell>
                 <TableCell>Action</TableCell>
               </TableRow>
@@ -195,8 +195,8 @@ const FishSeeds = () => {
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell align='center'>{item.id}</TableCell>
-                  <TableCell align='center'>{item?.images}</TableCell>
+                  <TableCell align='center'>{item.farmedFishContract}</TableCell>
+                  <TableCell align='center'>{item?.images[0]}</TableCell>
                   <TableCell align='center'>
                     <Chip
                       label={fishSeedCompanyService.handleMapGeographicOrigin(item.geographicOrigin)}
@@ -211,7 +211,7 @@ const FishSeeds = () => {
                   </TableCell>
                   <TableCell align='center'>{item.waterTemperature}°C</TableCell>
                   <TableCell align='center'>{item.speciesName}</TableCell>
-                  <TableCell align='center'>{item.quantity}kg</TableCell>
+                  <TableCell align='center'>{item.numberOfFishSeedsAvailable}kg</TableCell>
                   <TableCell align='center'>{item.IPFSHash}</TableCell>
                   <TableCell align='center'>
                     <Link to={privateRoute.fishSeedDetail.url?.(item)!}>
@@ -234,16 +234,8 @@ const FishSeeds = () => {
           onChange={(event, value) => onSearchChange({ page: value })}
         />
       </div>
-
-      {/* <Dialog open={openCreatePopup} fullWidth maxWidth='sm'>
-        <CreateContractPopup refetch={refetch} onClose={() => setOpenCreatePopup(false)} />
-      </Dialog> */}
-
-      <Dialog open={openAddFishSeedPopup} fullWidth maxWidth='md'>
-        <AddFishSeedPopup refetch={refetch} onClose={() => setOpenAddFishSeedPopup(false)} />
-      </Dialog>
     </>
   );
 };
 
-export default FishSeeds;
+export default Contracts;

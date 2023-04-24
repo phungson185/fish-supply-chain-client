@@ -1,5 +1,15 @@
 import { Visibility } from '@mui/icons-material';
-import { Dialog, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import {
+  Dialog,
+  Pagination,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
 import { useSearch } from 'hooks';
 import { useSnackbar } from 'notistack';
@@ -13,7 +23,13 @@ import { getRoute } from 'routes';
 import { fishSeedCompanyService } from 'services';
 import { RoleType } from 'types/Auth';
 import { BatchType } from 'types/Batch';
-import { DistributorOfFishOrderPopup, FarmedFishOrderPopup, FishSeedsOrderPopup, ProcessedFishOrderPopup, ProcessStatus } from './components';
+import {
+  DistributorOfFishOrderPopup,
+  FarmedFishOrderPopup,
+  FishSeedsOrderPopup,
+  ProcessedFishOrderPopup,
+  ProcessStatus,
+} from './components';
 
 const Batches = () => {
   const location = useLocation();
@@ -39,7 +55,7 @@ const Batches = () => {
   const [selectedBatch, setSelectedBatch] = useState<BatchType>({} as BatchType);
   const [openBatchDetail, setOpenBatchDetail] = useState(false);
   const [orderBy, setOrderBy] = useState(query.orderBy);
-  const [desc, setDesc] = useState(query.desc );
+  const [desc, setDesc] = useState(query.desc);
   const [search, setSearch] = useState(query.search || '');
   const [params, setParams] = useState({ search, page });
   const handleOrderPopup = (item: BatchType, roleType: RoleType) => {
@@ -86,11 +102,11 @@ const Batches = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Batch Id</TableCell>
-                <TableCell>Species name</TableCell>
+                {/* <TableCell>Species name</TableCell>
                 <TableCell>Geographic origin</TableCell>
                 <TableCell>Number of fish seeds available</TableCell>
                 <TableCell>Aquaculture water type</TableCell>
-                <TableCell>IPFS hash</TableCell>
+                <TableCell>IPFS hash</TableCell> */}
                 <TableCell>Fish seed company</TableCell>
                 <TableCell>Fish farmer</TableCell>
                 <TableCell>Fish processor</TableCell>
@@ -103,11 +119,11 @@ const Batches = () => {
               {items.map((item) => (
                 <TableRow key={item.id} className='cursor-pointer'>
                   <TableCell align='center'>{item.id}</TableCell>
-                  <TableCell align='center'>{item.farmedFishId?.speciesName}</TableCell>
+                  {/* <TableCell align='center'>{item.farmedFishId?.speciesName}</TableCell>
                   <TableCell align='center'>{item.farmedFishId?.geographicOrigin}</TableCell>
                   <TableCell align='center'>{item.farmedFishId?.numberOfFishSeedsAvailable}</TableCell>
                   <TableCell align='center'>{item.farmedFishId?.aquacultureWaterType}</TableCell>
-                  <TableCell align='center'>{item.farmedFishId?.IPFSHash}</TableCell>
+                  <TableCell align='center'>{item.farmedFishId?.IPFSHash}</TableCell> */}
                   <TableCell align='center'>
                     <ProcessStatus
                       content={`${item.farmedFishId ? 'Completed' : 'Pending'}`}
@@ -169,11 +185,17 @@ const Batches = () => {
       </Dialog>
 
       <Dialog open={openPlaceProcessedFishPurchaseOrderPopup} fullWidth maxWidth='sm'>
-        <ProcessedFishOrderPopup item={selectedBatch} onClose={() => setOpenPlaceProcessedFishPurchaseOrderPopup(false)} />
+        <ProcessedFishOrderPopup
+          item={selectedBatch}
+          onClose={() => setOpenPlaceProcessedFishPurchaseOrderPopup(false)}
+        />
       </Dialog>
 
       <Dialog open={openPlaceRetailerPurchaseOrderPopup} fullWidth maxWidth='sm'>
-        <DistributorOfFishOrderPopup item={selectedBatch} onClose={() => setOpenPlaceRetailerPurchaseOrderPopup(false)} />
+        <DistributorOfFishOrderPopup
+          item={selectedBatch}
+          onClose={() => setOpenPlaceRetailerPurchaseOrderPopup(false)}
+        />
       </Dialog>
     </>
   );
