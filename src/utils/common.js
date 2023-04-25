@@ -1,5 +1,6 @@
 import { web3 } from 'contracts';
 import { DateTime } from 'luxon';
+import moment from 'moment';
 
 export const isMobile = () => {
   const mobiles = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i];
@@ -37,6 +38,10 @@ export const randomTokenID = () => {
   const mils = Date.now() % (1e9 + 7);
   const rand = Math.floor(Math.random() * 9e3) + 1e3;
   return `${mils}${rand}`;
+};
+
+export const formatTime = (time) => {
+  return moment(time).format('HH:mm DD/MM/YYYY');
 };
 
 export { default as merge } from './merge';

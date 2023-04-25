@@ -42,19 +42,19 @@ const CreateContractPopup = ({ refetch, onClose }: PopupProps) => {
         contract: { registration: systemConfig?.registrationContract, ...values } as FarmedFishContractType,
       });
 
-      const restApi = await fishSeedCompanyService.createFarmedFishContract({
-        farmedFishContract: resChain.options.address,
-        speciesName: values.Speciesname,
-        geographicOrigin: values.Geographicorigin,
-        numberOfFishSeedsAvailable: values.NumberOfFishSeedsavailable,
-        aquacultureWaterType: values.AquacultureWatertype,
-        IPFSHash: values.IPFShash,
-      });
+      // const restApi = await fishSeedCompanyService.createFarmedFishContract({
+      //   farmedFishContract: resChain.options.address,
+      //   speciesName: values.Speciesname,
+      //   geographicOrigin: values.Geographicorigin,
+      //   numberOfFishSeedsAvailable: values.NumberOfFishSeedsavailable,
+      //   aquacultureWaterType: values.AquacultureWatertype,
+      //   IPFSHash: values.IPFShash,
+      // });
 
-      await createBatch({
-        farmedFishId: restApi.id,
-        type: 1,
-      });
+      // await createBatch({
+      //   farmedFishId: restApi.id,
+      //   type: 1,
+      // });
     })();
   };
 

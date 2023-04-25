@@ -123,10 +123,10 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
                   <div>{item.farmedFishId.geographicOrigin}</div>
                 </div>
 
-                <div className='flex justify-between gap-5'>
+                {/* <div className='flex justify-between gap-5'>
                   <div className='font-medium'>Aquaculture water type: </div>
                   <div>{item.farmedFishId.aquacultureWaterType}</div>
-                </div>
+                </div> */}
               </div>
               <ConfirmStatus index={orderStatus} />
             </div>

@@ -34,7 +34,9 @@ const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
   { label: 'Geographic origin', orderBy: 'geographicOrigin' },
   { label: 'Number of fish seeds available', orderBy: 'numberOfFishSeedsAvailable' },
-  { label: 'Aquaculture water type', orderBy: 'aquacultureWaterType' },
+  { label: 'Method of reproduction', orderBy: 'methodOfReproduction' },
+  { label: 'Water temperature', orderBy: 'waterTemperature' },
+  { label: 'Update time', orderBy: 'updatedAt' },
 ];
 
 const SORT_TYPES = [
@@ -82,81 +84,81 @@ const Contracts = () => {
   return (
     <>
       <div className='flex items-center justify-between'>
-        {/* <div className='flex justify-between gap-2'>
-            <Button
-              variant='text'
-              color='inherit'
-              classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
-              startIcon={<CategoryOutlined />}
-              onClick={onOpenFilter}
-            >
-              {FILTERS.find((item) => item.orderBy === orderBy)?.label ?? FILTERS[0].label}
-            </Button>
-            <Menu
-              transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-              anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-              anchorEl={anchorFilter}
-              open={openFilter}
-              onClose={onCloseFilter}
-              onClick={onCloseFilter}
-            >
-              {FILTERS.map((item, index) => (
-                <MenuItem
-                  key={index}
-                  classes={{ selected: 'bg-info-light' }}
-                  selected={item.orderBy === orderBy}
-                  onClick={() => {
-                    setOrderBy(item.orderBy);
-                  }}
-                >
-                  {item.label}
-                </MenuItem>
-              ))}
-            </Menu>
-  
-            <Button
-              variant='text'
-              color='inherit'
-              classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
-              startIcon={<CategoryOutlined />}
-              onClick={onOpenSort}
-            >
-              {SORT_TYPES.find((item) => item.desc === desc)?.label ?? SORT_TYPES[0].label}
-            </Button>
-            <Menu
-              transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-              anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-              anchorEl={anchorSort}
-              open={openSort}
-              onClose={onCloseSort}
-              onClick={onCloseSort}
-            >
-              {SORT_TYPES.map((item, index) => (
-                <MenuItem
-                  key={index}
-                  classes={{ selected: 'bg-info-light' }}
-                  selected={item.desc === desc}
-                  onClick={() => {
-                    setDesc(item.desc);
-                  }}
-                >
-                  {item.label}
-                </MenuItem>
-              ))}
-            </Menu>
-          </div>
-  
-          <TextField
-            placeholder='Search...'
-            InputProps={{ className: 'bg-white text-black' }}
-            value={search}
-            sx={{ width: '30%' }}
-            onChange={(event) => {
-              const { value } = event.target;
-              setSearch(value);
-              debounceChangeParams({ search: value });
-            }}
-          /> */}
+        <div className='flex justify-between gap-2'>
+          <Button
+            variant='text'
+            color='inherit'
+            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
+            startIcon={<CategoryOutlined />}
+            onClick={onOpenFilter}
+          >
+            {FILTERS.find((item) => item.orderBy === orderBy)?.label ?? FILTERS[0].label}
+          </Button>
+          <Menu
+            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            anchorEl={anchorFilter}
+            open={openFilter}
+            onClose={onCloseFilter}
+            onClick={onCloseFilter}
+          >
+            {FILTERS.map((item, index) => (
+              <MenuItem
+                key={index}
+                classes={{ selected: 'bg-info-light' }}
+                selected={item.orderBy === orderBy}
+                onClick={() => {
+                  setOrderBy(item.orderBy);
+                }}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
+          </Menu>
+
+          <Button
+            variant='text'
+            color='inherit'
+            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
+            startIcon={<CategoryOutlined />}
+            onClick={onOpenSort}
+          >
+            {SORT_TYPES.find((item) => item.desc === desc)?.label ?? SORT_TYPES[0].label}
+          </Button>
+          <Menu
+            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            anchorEl={anchorSort}
+            open={openSort}
+            onClose={onCloseSort}
+            onClick={onCloseSort}
+          >
+            {SORT_TYPES.map((item, index) => (
+              <MenuItem
+                key={index}
+                classes={{ selected: 'bg-info-light' }}
+                selected={item.desc === desc}
+                onClick={() => {
+                  setDesc(item.desc);
+                }}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
+          </Menu>
+        </div>
+
+        <TextField
+          placeholder='Search...'
+          InputProps={{ className: 'bg-white text-black' }}
+          value={search}
+          sx={{ width: '30%' }}
+          onChange={(event) => {
+            const { value } = event.target;
+            setSearch(value);
+            debounceChangeParams({ search: value });
+          }}
+        />
 
         {/* <Button
             variant='contained'
@@ -167,14 +169,14 @@ const Contracts = () => {
             Create Farmed Fish Contract
           </Button> */}
 
-        <Button
+        {/* <Button
           variant='contained'
           onClick={() => {
             setOpenAddFishSeedPopup(true);
           }}
         >
           Add fish seed
-        </Button>
+        </Button> */}
       </div>
       <TableContainer component={Paper}>
         <Spinner loading={isFetching}>
@@ -182,6 +184,7 @@ const Contracts = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Contract address</TableCell>
+                <TableCell>Company</TableCell>
                 <TableCell>Images</TableCell>
                 <TableCell>Geographic origin</TableCell>
                 <TableCell>Method of reproduction</TableCell>
@@ -196,6 +199,7 @@ const Contracts = () => {
               {items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell align='center'>{item.farmedFishContract}</TableCell>
+                  <TableCell align='center'>{item.owner.name}</TableCell>
                   <TableCell align='center'>{item?.images[0]}</TableCell>
                   <TableCell align='center'>
                     <Chip
@@ -214,7 +218,7 @@ const Contracts = () => {
                   <TableCell align='center'>{item.numberOfFishSeedsAvailable}kg</TableCell>
                   <TableCell align='center'>{item.IPFSHash}</TableCell>
                   <TableCell align='center'>
-                    <Link to={privateRoute.fishSeedDetail.url?.(item)!}>
+                    <Link to={privateRoute.contractDetail.url?.(item)!}>
                       <Visibility />
                     </Link>
                   </TableCell>

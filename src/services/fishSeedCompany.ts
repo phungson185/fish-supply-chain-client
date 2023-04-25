@@ -9,6 +9,8 @@ import {
   FarmedFishType,
   FishSeedParamsType,
   FishSeedType,
+  UpdateFarmedFishContractType,
+  UpdateFarmedFishType,
 } from 'types/FishSeedCompany';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -57,6 +59,37 @@ const deployFarmedFishContract = async ({
   return result;
 };
 
+const updateFarmedfishContract = async (body: UpdateFarmedFishContractType) => {
+  const {
+    FarmedFishContract,
+    FishSeedUploader,
+    Geographicorigin,
+    Images,
+    MethodOfReproduction,
+    NumberOfFishSeedsavailable,
+    Speciesname,
+    WaterTemperature,
+    IPFShash,
+  } = body;
+  const farmedFishContract = new web3.eth.Contract(FarmedFish.abi as AbiItem[], FarmedFishContract);
+  const result = await farmedFishContract.methods
+    .UpdateFishSeed(
+      FishSeedUploader,
+      Speciesname,
+      Geographicorigin,
+      NumberOfFishSeedsavailable,
+      IPFShash,
+      MethodOfReproduction,
+      Images,
+      WaterTemperature,
+    )
+    .send({
+      from: FishSeedUploader,
+      gas: 3500000,
+    });
+  return result;
+};
+
 const addFishSeed = async (body: AddFishSeedType): Promise<any> => client.post('/fishseedcompany/addFishSeed', body);
 const getFishSeeds = async (params?: FishSeedParamsType): Promise<FishSeedPaginateType> =>
   client.get('/fishSeedCompany/getFishSeeds', { params });
@@ -68,8 +101,15 @@ const createFarmedFishContract = async (body: CreateFarmedFishContractType): Pro
   client.post('/fishseedcompany/createFarmedFishContract', body);
 const getFarmedFishContracts = async (params?: FarmedFishContractParamsType): Promise<FarmedFishContractPaginateType> =>
   client.get('/fishSeedCompany/contracts', { params });
-const getFarmedFishContract = async (id: string): Promise<FarmedFishType> =>
+const getFarmedFishContract = async ({ id }: { id: string }): Promise<FarmedFishType> =>
   client.get(`/fishSeedCompany/contract/${id}`);
+const updateFarmedFishContract = async ({
+  id,
+  body,
+}: {
+  id: string;
+  body: UpdateFarmedFishType;
+}): Promise<FarmedFishType> => client.put(`/fishSeedCompany/contract/${id}`, body);
 const createBatch = async (body: CreateBatchType): Promise<any> => client.post('/fishseedcompany/createBatch', body);
 const getBatchs = async (params?: BatchParamsType): Promise<BatchPaginateType> => client.get('/batchs', { params });
 
@@ -102,6 +142,8 @@ export default {
   createFarmedFishContract,
   getFarmedFishContracts,
   getFarmedFishContract,
+  updateFarmedfishContract,
+  updateFarmedFishContract,
   createBatch,
   getBatchs,
   addFishSeed,

@@ -28,6 +28,8 @@ import { FarmedFishContractType } from 'types/FishSeedCompany';
 import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
 import { Controller, useForm } from 'react-hook-form';
+import { formatTime } from 'utils/common';
+import { LogParamsType } from 'types/Log';
 
 const FishSeedDetail = () => {
   const params = useParams();
@@ -51,7 +53,9 @@ const FishSeedDetail = () => {
     data: logs,
     isSuccess: getLogsSuccess,
     refetch: fetchLogs,
-  } = useQuery(['logService.getLogs', { id: params.id }], () => logService.getLogs());
+  } = useQuery(['logService.getLogs', { id: params.id }], () =>
+    logService.getLogs({ objectId: params.id } as LogParamsType),
+  );
   const { items = [], total, currentPage, pages: totalPage } = logs ?? {};
 
   const { mutate: createBatch, isLoading } = useMutation(fishSeedCompanyService.createBatch, {
@@ -138,10 +142,7 @@ const FishSeedDetail = () => {
               <CardContent className='flex flex-col gap-5'>
                 <div>
                   <Typography gutterBottom variant='h3' component='div'>
-                    {fishSeed.title}
-                  </Typography>
-                  <Typography variant='h6' color='text.secondary'>
-                    {fishSeed.subTitle}
+                    {fishSeed.speciesName}
                   </Typography>
                 </div>
                 <div className='flex gap-3 items-center'>
@@ -185,7 +186,7 @@ const FishSeedDetail = () => {
               <div
                 style={{ background: 'rgba(75, 85, 99, 100)', width: '100%', height: '1px', marginBottom: '10px' }}
               ></div>
-              <div className='h-44 w-full overflow-auto'>
+              <div className='h-48 w-full overflow-auto'>
                 {items.map((log, index) => (
                   <div key={index} className='flex flex-col gap-2 w-full mb-2 p-2 rounded-xl hover:bg-primary-main'>
                     <div className='flex flex-row justify-between items-center'>
@@ -199,7 +200,7 @@ const FishSeedDetail = () => {
                           {log.title}
                         </Typography>
                       </div>
-                      <Typography variant='caption'>{moment(log.updatedAt).format('HH:mm DD/MM/YYYY')}</Typography>
+                      <Typography variant='caption'>{formatTime(log.updatedAt)}</Typography>
                     </div>
                     <Typography variant='caption'>{log.message}</Typography>
                   </div>

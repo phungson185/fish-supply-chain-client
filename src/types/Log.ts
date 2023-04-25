@@ -18,7 +18,10 @@ export type LogType = BaseType & {
   title: string;
 };
 
-export type LogParamsType = PaginateParamsType & {};
+export type LogParamsType = PaginateParamsType & {
+  objectId?: string;
+};
+
 export type LogPaginateType = PaginateType & {
   items: LogType[];
 };
