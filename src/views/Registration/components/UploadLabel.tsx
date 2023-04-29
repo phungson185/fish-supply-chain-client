@@ -6,7 +6,7 @@ type UploadLabelType = {
   variant: 'circular' | 'rounded';
   image?: string;
   width: number | string;
-  height: number;
+  height: number | string;
   loading: boolean;
   error: boolean;
 };
@@ -16,7 +16,7 @@ const UploadLabel = ({ htmlFor, variant, image, width, height, loading, error }:
     htmlFor={htmlFor}
     className={merge(
       'relative border-2 border-dashed cursor-pointer block',
-      'bg-slate-50  hover:border-secondary-main/75',
+      'bg-slate-50 hover:border-secondary-main/75',
       { 'border-red-400': error },
     )}
     style={{ width, height, borderRadius: variant === 'circular' ? '50%' : 4 }}
@@ -35,8 +35,8 @@ const UploadLabel = ({ htmlFor, variant, image, width, height, loading, error }:
     <div className='flex items-center justify-center h-full'>
       {image ? (
         <Avatar src={image} className='w-full h-full' variant={variant} />
-        ) : (
-          <img src={require('assets/icons/Metafarm.png').default.src} style={{ height: height - 30 }} />
+      ) : (
+        <img src={require('assets/icons/Metafarm.png').default.src} style={{ height: 200 }} />
       )}
     </div>
   </label>

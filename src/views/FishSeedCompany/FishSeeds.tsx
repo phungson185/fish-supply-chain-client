@@ -1,11 +1,10 @@
-import { CategoryOutlined, Visibility } from '@mui/icons-material';
+import { Assignment, Visibility } from '@mui/icons-material';
+
 import {
+  Avatar,
   Button,
   Chip,
-  debounce,
   Dialog,
-  Menu,
-  MenuItem,
   Pagination,
   Paper,
   Table,
@@ -14,21 +13,19 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
+  debounce,
 } from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
 import { useAnchor, useSearch } from 'hooks';
 import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { useLocation } from 'react-router-dom';
-import { fishSeedCompanyService } from 'services';
-import CreateContractPopup from './popups/CreateContractPopup';
-import AddFishSeedPopup from './popups/AddFishSeedPopup';
-import { Link } from 'react-router-dom';
-import { getRoute } from 'routes';
 import { useSelector } from 'react-redux';
+import { Link, useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
+import { getRoute } from 'routes';
+import { fishSeedCompanyService } from 'services';
+import AddFishSeedPopup from './popups/AddFishSeedPopup';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -47,6 +44,7 @@ const FishSeeds = () => {
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page });
   const { role } = useSelector(profileSelector);
+
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
   const privateRoute = getRoute(role);
@@ -196,7 +194,11 @@ const FishSeeds = () => {
               {items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell align='center'>{item.id}</TableCell>
-                  <TableCell align='center'>{item?.images}</TableCell>
+                  <TableCell align='center'>
+                    <Avatar src={item.images[0]} variant='square'>
+                      <Assignment />
+                    </Avatar>
+                  </TableCell>
                   <TableCell align='center'>
                     <Chip
                       label={fishSeedCompanyService.handleMapGeographicOrigin(item.geographicOrigin)}
@@ -234,10 +236,6 @@ const FishSeeds = () => {
           onChange={(event, value) => onSearchChange({ page: value })}
         />
       </div>
-
-      {/* <Dialog open={openCreatePopup} fullWidth maxWidth='sm'>
-        <CreateContractPopup refetch={refetch} onClose={() => setOpenCreatePopup(false)} />
-      </Dialog> */}
 
       <Dialog open={openAddFishSeedPopup} fullWidth maxWidth='md'>
         <AddFishSeedPopup refetch={refetch} onClose={() => setOpenAddFishSeedPopup(false)} />

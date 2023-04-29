@@ -38,7 +38,7 @@ const Batches = () => {
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page });
   const { data, isFetching } = useQuery(
-    ['fishSeedCompanyService.getFarmedFishContracts', dataSearch],
+    ['fishSeedCompanyService.getBatchs', dataSearch],
     () => fishSeedCompanyService.getBatchs(dataSearch),
     {
       keepPreviousData: true,

@@ -135,7 +135,7 @@ const FishSeedDetail = () => {
             <Card className='mb-5'>
               <CardMedia
                 sx={{ height: 300 }}
-                image='https://picsum.photos/200/300'
+                image={fishSeed.images?.[0]}
                 title='fish image'
                 className='bg-cover bg-no-repeat'
               />
@@ -179,34 +179,36 @@ const FishSeedDetail = () => {
                 </Button>
               </CardActions>
             </Card>
-            <Card className='flex flex-col items-center p-2 gap-2'>
-              <Typography variant='h4' className='p-2'>
-                Activities log
-              </Typography>
-              <div
-                style={{ background: 'rgba(75, 85, 99, 100)', width: '100%', height: '1px', marginBottom: '10px' }}
-              ></div>
-              <div className='h-48 w-full overflow-auto'>
-                {items.map((log, index) => (
-                  <div key={index} className='flex flex-col gap-2 w-full mb-2 p-2 rounded-xl hover:bg-primary-main'>
-                    <div className='flex flex-row justify-between items-center'>
-                      <div className='flex flex-row gap-2 items-center'>
-                        <div
-                          className={`w-3 h-3 rounded-full ${
-                            logService.handleMapTransactionType(log.transactionType).color
-                          }`}
-                        />
-                        <Typography variant='h6' className='text-'>
-                          {log.title}
-                        </Typography>
+            {items && items.length > 0 && (
+              <Card className='flex flex-col items-center p-2 gap-2'>
+                <Typography variant='h4' className='p-2'>
+                  Activities log
+                </Typography>
+                <div
+                  style={{ background: 'rgba(75, 85, 99, 100)', width: '100%', height: '1px', marginBottom: '10px' }}
+                ></div>
+                <div className='h-48 w-full overflow-auto'>
+                  {items.map((log, index) => (
+                    <div key={index} className='flex flex-col gap-2 w-full mb-2 p-2 rounded-xl hover:bg-primary-main'>
+                      <div className='flex flex-row justify-between items-center'>
+                        <div className='flex flex-row gap-2 items-center'>
+                          <div
+                            className={`w-3 h-3 rounded-full ${
+                              logService.handleMapTransactionType(log.transactionType).color
+                            }`}
+                          />
+                          <Typography variant='h6' className='text-'>
+                            {log.title}
+                          </Typography>
+                        </div>
+                        <Typography variant='caption'>{formatTime(log.updatedAt)}</Typography>
                       </div>
-                      <Typography variant='caption'>{formatTime(log.updatedAt)}</Typography>
+                      <Typography variant='caption'>{log.message}</Typography>
                     </div>
-                    <Typography variant='caption'>{log.message}</Typography>
-                  </div>
-                ))}
-              </div>
-            </Card>
+                  ))}
+                </div>
+              </Card>
+            )}
           </Grid>
         </Grid>
       </div>

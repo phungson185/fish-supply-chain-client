@@ -110,8 +110,10 @@ contract Registration {
 contract FarmedFish {
     string public SpeciesName;
     string public GeographicOrigin;
+    string public methodOfReproduction;
     uint256 public NumberOfFishSeedsAvailable;
-    string public AquacultureWaterType;
+    uint256 public waterTemperature;
+    string public images;
     string IPFS_Hash;
     address registrationContract;
     address public FishSeedCompany;
@@ -121,8 +123,10 @@ contract FarmedFish {
     event FishSeedsDescriptionsSet(
         string SpeciesName,
         string GeographicOrigin,
+        string methodOfReproduction,
         uint256 NumberOfFishSeedsAvailable,
-        string AquacultureWaterType,
+        uint256 waterTemperature,
+        string images,
         string IPFS_Hash
     );
 
@@ -131,8 +135,10 @@ contract FarmedFish {
         string memory Speciesname,
         string memory Geographicorigin,
         uint256 NumberOfFishSeedsavailable,
-        string memory AquacultureWatertype,
-        string memory IPFShash
+        string memory IPFShash,
+        string memory MethodOfReproduction,
+        string memory Images,
+        uint256 WaterTemperature
     ) public {
         RegistrationContract = Registration(registration);
 
@@ -144,14 +150,18 @@ contract FarmedFish {
         SpeciesName = Speciesname;
         GeographicOrigin = Geographicorigin;
         NumberOfFishSeedsAvailable = NumberOfFishSeedsavailable;
-        AquacultureWaterType = AquacultureWatertype;
         IPFS_Hash = IPFShash;
+        methodOfReproduction = MethodOfReproduction;
+        waterTemperature = WaterTemperature;
+        images = Images;
 
         emit FishSeedsDescriptionsSet(
             SpeciesName,
             GeographicOrigin,
+            methodOfReproduction,
             NumberOfFishSeedsAvailable,
-            AquacultureWaterType,
+            waterTemperature,
+            images,
             IPFS_Hash
         );
     }
@@ -185,14 +195,17 @@ contract FarmedFish {
         address FishSeedsPurchaser,
         address FishSeedsSeller,
         uint256 NumberOfFishSeedsOrdered,
+        uint256 NumberOfFishSeedsAvailable,
         status FishSeedsPurchaseOrderDetailsStatus
     );
     event FishSeedsPurchaseOrderConfirmed(
         bytes32 FishSeedsPurchaseOrderID,
+        uint256 NumberOfFishSeedsAvailable,
         status NEWSTatus
     );
     event FishsSeedsOrderReceived(
         bytes32 FishSeedsPurchaseOrderID,
+        uint256 NumberOfFishSeedsAvailable,
         status NEWSTatus
     );
 
@@ -214,6 +227,41 @@ contract FarmedFish {
     mapping(bytes32 => FishSeedsPurchaseOrderDetails)
         public GetFishSeedsPurchaseOrderID;
 
+    function UpdateFishSeed(
+        address FishSeedUploader,
+        string memory Speciesname,
+        string memory Geographicorigin,
+        uint256 NumberOfFishSeedsavailable,
+        string memory IPFShash,
+        string memory MethodOfReproduction,
+        string memory Images,
+        uint256 WaterTemperature
+    ) public onlyFishSeedCompany {
+        require(
+            RegistrationContract.FishSeedCompanyExists(FishSeedUploader),
+            "Fish seed company is not authorized."
+        );
+
+        FishSeedCompany = FishSeedUploader;
+        SpeciesName = Speciesname;
+        GeographicOrigin = Geographicorigin;
+        NumberOfFishSeedsAvailable = NumberOfFishSeedsavailable;
+        IPFS_Hash = IPFShash;
+        methodOfReproduction = MethodOfReproduction;
+        waterTemperature = WaterTemperature;
+        images = Images;
+
+        emit FishSeedsDescriptionsSet(
+            SpeciesName,
+            GeographicOrigin,
+            methodOfReproduction,
+            NumberOfFishSeedsAvailable,
+            waterTemperature,
+            images,
+            IPFS_Hash
+        );
+    }
+
     function PlaceFishSeedsPurchaseOrder(
         address FishSeedsPurchaser,
         address FishSeedsSeller,
@@ -223,6 +271,11 @@ contract FarmedFish {
             RegistrationContract.FishFarmerExists(FishSeedsPurchaser),
             "FishSeedPurchaser not authorized."
         );
+        require(
+            NumberOfFishSeedsOrdered <= NumberOfFishSeedsAvailable,
+            "Not enough fish seeds available."
+        );
+
         bytes32 temp = keccak256(
             abi.encodePacked(
                 msg.sender,
@@ -238,11 +291,13 @@ contract FarmedFish {
             NumberOfFishSeedsOrdered,
             status.Pending
         );
+        NumberOfFishSeedsAvailable -= NumberOfFishSeedsOrdered;
         emit FishSeedsPurchaseOrderPlaced(
             temp,
             msg.sender,
             FishSeedsSeller,
             NumberOfFishSeedsOrdered,
+            NumberOfFishSeedsAvailable,
             status.Pending
         );
     }
@@ -267,9 +322,14 @@ contract FarmedFish {
         } else {
             GetFishSeedsPurchaseOrderID[FishSeedsPurchaseOrderID]
                 .FishSeedsPurchaseOrderDetailsStatus = status.Rejected;
+            uint256 NumberOfFishSeedsOrdered = GetFishSeedsPurchaseOrderID[
+                FishSeedsPurchaseOrderID
+            ].NumberOfFishSeedsOrdered;
+            NumberOfFishSeedsAvailable += NumberOfFishSeedsOrdered;
         }
         emit FishSeedsPurchaseOrderConfirmed(
             FishSeedsPurchaseOrderID,
+            NumberOfFishSeedsAvailable,
             GetFishSeedsPurchaseOrderID[FishSeedsPurchaseOrderID]
                 .FishSeedsPurchaseOrderDetailsStatus
         );
@@ -299,6 +359,7 @@ contract FarmedFish {
 
         emit FishsSeedsOrderReceived(
             FishSeedsPurchaseOrderID,
+            NumberOfFishSeedsAvailable,
             GetFishSeedsPurchaseOrderID[FishSeedsPurchaseOrderID]
                 .FishSeedsPurchaseOrderDetailsStatus
         );
@@ -692,7 +753,6 @@ contract FishProcessing {
 
     Registration RegistrationContract;
 
-    
     struct ProcessedFishPackageDetails {
         string SpeciesName;
         string CatchMethod;
@@ -1181,7 +1241,6 @@ contract FishProcessing {
     //     emit FineStatusCreated(FishProcessor, Fine);
     // }
 }
-
 
 contract FishDistribution {
     address fishprocessingContract;

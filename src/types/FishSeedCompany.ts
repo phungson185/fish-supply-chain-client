@@ -64,14 +64,14 @@ export type UpdateFarmedFishContractType = {
 
 export type AddFishSeedType = {
   title: string;
-  subTitle?: string;
-  description?: string;
+  subTitle: string;
+  description: string;
   geographicOrigin: number;
   methodOfReproduction: number;
   speciesName: string;
   quantity: number;
   waterTemperature: number;
-  images?: string[];
+  images: string[];
   IPFSHash: string;
 };
 

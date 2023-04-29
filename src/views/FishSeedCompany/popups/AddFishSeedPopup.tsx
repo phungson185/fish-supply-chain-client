@@ -14,7 +14,7 @@ import {
 import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from 'react-query';
-import { fishSeedCompanyService } from 'services';
+import { fileService, fishSeedCompanyService } from 'services';
 import { PopupController } from 'types/Common';
 import {
   FishSeedPaginateType,
@@ -24,6 +24,7 @@ import {
 } from 'types/FishSeedCompany';
 import { UploadLabel } from 'views/Registration/components';
 import { useEffect, useState } from 'react';
+import { getBase64 } from 'utils/common';
 
 type PopupProps = PopupController & {
   refetch?: <TPageData>(
@@ -32,8 +33,10 @@ type PopupProps = PopupController & {
 };
 
 const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
-  const { control, handleSubmit, setValue } = useForm({ mode: 'onChange' });
+  const { control, handleSubmit, setValue, clearErrors } = useForm({ mode: 'onChange' });
   const { enqueueSnackbar } = useSnackbar();
+  const [imageLoading, setImageLoading] = useState(false);
+  const [image, setImage] = useState('');
 
   const { mutate: addFishSeed, isLoading: addLoading } = useMutation(fishSeedCompanyService.addFishSeed, {
     onSuccess: () => {
@@ -63,6 +66,25 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
         IPFSHash: values.IPFShash,
       });
     })();
+  };
+
+  const handleChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    getBase64(file, setImage);
+
+    const formData = new FormData();
+    formData.append('file', file as Blob);
+
+    setImageLoading(true);
+    fileService
+      .uploadFile(formData)
+      .then((url) => {
+        setValue('images', url.pinataUrl ?? '');
+        clearErrors('images');
+      })
+      .finally(() => {
+        setImageLoading(false);
+      });
   };
 
   return (
@@ -116,7 +138,7 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
             control={control}
             rules={{ required: 'Geographic origin is required' }}
             render={({ field: { value, onChange }, fieldState: { invalid, error } }) => (
-              <FormControl fullWidth>
+              <FormControl fullWidth error={!!error}>
                 <InputLabel id='select-geographic-origin'>Geographic origin</InputLabel>
                 <Select labelId='select-geographic-origin' id='geographic-origin' value={value} onChange={onChange}>
                   <MenuItem value={GeographicOriginType.BRACKISH.value}>{GeographicOriginType.BRACKISH.label}</MenuItem>
@@ -133,7 +155,7 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
             control={control}
             rules={{ required: 'Method of reproduction is required' }}
             render={({ field: { value, onChange }, fieldState: { invalid, error } }) => (
-              <FormControl fullWidth>
+              <FormControl fullWidth error={!!error}>
                 <InputLabel id='method-reproduction-origin'>Method of reproduction</InputLabel>
                 <Select labelId='method-reproduction-origin' id='reproduction-origin' value={value} onChange={onChange}>
                   <MenuItem value={MethodOfReproductionType.NATURAL.value}>
@@ -201,15 +223,14 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
             name='images'
             defaultValue=''
             control={control}
+            rules={{ required: 'Image is required' }}
             render={({ fieldState: { invalid } }) => (
               <FormControl fullWidth className='mb-4'>
-                <Typography variant='subtitle1'>Images</Typography>
-                {/* <input hidden type='file' id='cover' accept='image/*' onChange={handleChangeCover} /> */}
-                <input hidden type='file' id='cover' accept='image/*' />
+                <Typography variant='subtitle1'>Image</Typography>
+                <input hidden type='file' id='image' accept='image/*' onChange={handleChangeImage} />
                 <UploadLabel
-                  // {...{ htmlFor: 'cover', variant: 'rounded', image: user?.cover }}
-                  {...{ htmlFor: 'cover', variant: 'rounded' }}
-                  {...{ width: '100%', height: 180, loading: false, error: invalid }}
+                  {...{ htmlFor: 'image', variant: 'rounded' }}
+                  {...{ width: '100%', height: '100%', loading: imageLoading, error: invalid, image: image }}
                 />
               </FormControl>
             )}

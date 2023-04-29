@@ -1,5 +1,6 @@
 import { DeviceThermostat, SetMeal } from '@mui/icons-material';
 import {
+  Avatar,
   Button,
   Card,
   Chip,
@@ -14,11 +15,11 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { TableRowEmpty } from 'components';
+import { Spinner, TableRowEmpty } from 'components';
 import { useSearch } from 'hooks';
 import { parse } from 'qs';
 import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
 import { fishSeedCompanyService, logService } from 'services';
 import { formatTime } from 'utils/common';
@@ -32,29 +33,21 @@ const ContractDetail = () => {
   const { tab, page = 1, size = 5, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [openUpdateContractPopup, setOpenUpdateContractPopup] = useState(false);
   const [dataSearch, onSearchChange] = useSearch({ page, size });
-
   const {
     data: contract,
     isSuccess: getContractSuccess,
     refetch: fetchContract,
   } = useQuery(
-    ['fishSeedCompanyService.getFarmedFishContract', { id: params.id }],
+    ['fishSeedCompanyService.getFarmedFishContract', dataSearch],
     () => fishSeedCompanyService.getFarmedFishContract({ id: params.id as string }),
     {
       onSuccess: async (res) => {
         setLogs(await logService.getLogs({ ...dataSearch, objectId: res?.farmedFishContract }));
       },
+      keepPreviousData: true,
+      staleTime: 0,
     },
   );
-
-  // const {
-  //   data: logs,
-  //   isSuccess: getLogsSuccess,
-  //   refetch: fetchLogs,
-  // } = useQuery(['logService.getLogs', dataSearch], () => logService.getLogs(dataSearch), {
-  //   keepPreviousData: true,
-  //   staleTime: 0,
-  // });
 
   const { items = [], total, currentPage, pages: totalPage } = logs ?? {};
 
@@ -119,7 +112,14 @@ const ContractDetail = () => {
             </div>
           </Grid>
           <Grid item xs={4}>
-            <img src='https://picsum.photos/400/300' alt='fish image' className='mx-auto bg-cover bg-no-repeat' />
+            <Spinner loading={!getContractSuccess}>
+              <Avatar
+                src={contract.images[0]}
+                alt='fish image'
+                variant='square'
+                className='mx-auto bg-cover bg-no-repeat w-full h-full'
+              />
+            </Spinner>
           </Grid>
         </Grid>
       </Card>

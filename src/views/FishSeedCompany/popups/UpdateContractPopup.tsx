@@ -12,15 +12,16 @@ import {
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
-import { fishSeedCompanyService } from 'services';
+import { fileService, fishSeedCompanyService } from 'services';
 import { PopupController } from 'types/Common';
 import { FarmedFishType, FishSeedType, GeographicOriginType, MethodOfReproductionType } from 'types/FishSeedCompany';
+import { getBase64 } from 'utils/common';
 import { UploadLabel } from 'views/Registration/components';
 
 type PopupProps = PopupController & {
@@ -29,9 +30,11 @@ type PopupProps = PopupController & {
 };
 
 const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
-  const { control, handleSubmit, setValue } = useForm({ mode: 'onChange' });
+  const { control, handleSubmit, setValue, clearErrors } = useForm({ mode: 'onChange' });
   const { enqueueSnackbar } = useSnackbar();
   const { address } = useSelector(profileSelector);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [image, setImage] = useState('');
 
   const { mutate: updateContract, isLoading: updateContractLoading } = useMutation(
     fishSeedCompanyService.updateFarmedFishContract,
@@ -54,6 +57,7 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
       Object.entries(data ?? {}).forEach(([key, value]) => {
         setValue(key, value);
       });
+      setImage(data.images[0]);
     }
   }, [data, setValue]);
 
@@ -85,6 +89,25 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
         },
       });
     })();
+  };
+
+  const handleChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    getBase64(file, setImage);
+
+    const formData = new FormData();
+    formData.append('file', file as Blob);
+
+    setImageLoading(true);
+    fileService
+      .uploadFile(formData)
+      .then((url) => {
+        setValue('images', url.pinataUrl ?? '');
+        clearErrors('images');
+      })
+      .finally(() => {
+        setImageLoading(false);
+      });
   };
 
   return (
@@ -196,12 +219,10 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
             render={({ fieldState: { invalid } }) => (
               <FormControl fullWidth className='mb-4'>
                 <Typography variant='subtitle1'>Images</Typography>
-                {/* <input hidden type='file' id='cover' accept='image/*' onChange={handleChangeCover} /> */}
-                <input hidden type='file' id='cover' accept='image/*' />
+                <input hidden type='file' id='cover' accept='image/*' onChange={handleChangeImage} />
                 <UploadLabel
-                  // {...{ htmlFor: 'cover', variant: 'rounded', image: user?.cover }}
-                  {...{ htmlFor: 'cover', variant: 'rounded' }}
-                  {...{ width: '100%', height: 180, loading: false, error: invalid }}
+                  {...{ htmlFor: 'cover', variant: 'rounded', image: image }}
+                  {...{ width: '100%', height: '100%', loading: imageLoading, error: invalid }}
                 />
               </FormControl>
             )}
