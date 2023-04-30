@@ -12,12 +12,13 @@ import {
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
-import { fishSeedCompanyService } from 'services';
+import { fileService, fishSeedCompanyService } from 'services';
 import { PopupController } from 'types/Common';
 import { FishSeedType, GeographicOriginType, MethodOfReproductionType } from 'types/FishSeedCompany';
+import { getBase64 } from 'utils/common';
 import { UploadLabel } from 'views/Registration/components';
 
 type PopupProps = PopupController & {
@@ -27,8 +28,10 @@ type PopupProps = PopupController & {
 };
 
 const UpdateFishSeedPopup = ({ onClose, fetchFishSeed, fetchLogs, data }: PopupProps) => {
-  const { control, handleSubmit, setValue } = useForm({ mode: 'onChange' });
+  const { control, handleSubmit, setValue, clearErrors } = useForm({ mode: 'onChange' });
   const { enqueueSnackbar } = useSnackbar();
+  const [imageLoading, setImageLoading] = useState(false);
+  const [image, setImage] = useState('');
 
   const { mutate: updateFishSeed, isLoading: updateLoading } = useMutation(fishSeedCompanyService.updateFishSeed, {
     onSuccess: () => {
@@ -49,6 +52,7 @@ const UpdateFishSeedPopup = ({ onClose, fetchFishSeed, fetchLogs, data }: PopupP
       Object.entries(data ?? {}).forEach(([key, value]) => {
         setValue(key, value);
       });
+      setImage(data.image);
     }
   }, [data, setValue]);
 
@@ -65,11 +69,30 @@ const UpdateFishSeedPopup = ({ onClose, fetchFishSeed, fetchLogs, data }: PopupP
           speciesName: values.speciesName,
           quantity: values.quantity,
           waterTemperature: values.waterTemperature,
-          images: values.images,
-          IPFSHash: values.IPFShash,
+          image: values.image,
+          IPFSHash: values.IPFSHash,
         },
       });
     })();
+  };
+
+  const handleChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    getBase64(file, setImage);
+
+    const formData = new FormData();
+    formData.append('file', file as Blob);
+
+    setImageLoading(true);
+    fileService
+      .uploadFile(formData)
+      .then((url) => {
+        setValue('image', url.pinataUrl ?? '');
+        clearErrors('image');
+      })
+      .finally(() => {
+        setImageLoading(false);
+      });
   };
 
   return (
@@ -205,18 +228,16 @@ const UpdateFishSeedPopup = ({ onClose, fetchFishSeed, fetchLogs, data }: PopupP
           />
 
           <Controller
-            name='images'
+            name='image'
             defaultValue=''
             control={control}
             render={({ fieldState: { invalid } }) => (
               <FormControl fullWidth className='mb-4'>
-                <Typography variant='subtitle1'>Images</Typography>
-                {/* <input hidden type='file' id='cover' accept='image/*' onChange={handleChangeCover} /> */}
-                <input hidden type='file' id='cover' accept='image/*' />
+                <Typography variant='subtitle1'>Image</Typography>
+                <input hidden type='file' id='cover' accept='image/*' onChange={handleChangeImage} />
                 <UploadLabel
-                  // {...{ htmlFor: 'cover', variant: 'rounded', image: user?.cover }}
-                  {...{ htmlFor: 'cover', variant: 'rounded' }}
-                  {...{ width: '100%', height: 180, loading: false, error: invalid }}
+                  {...{ htmlFor: 'cover', variant: 'rounded', image: image }}
+                  {...{ width: '100%', height: '100%', loading: imageLoading, error: invalid }}
                 />
               </FormControl>
             )}

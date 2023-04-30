@@ -62,7 +62,7 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
         speciesName: values.speciesName,
         quantity: values.quantity,
         waterTemperature: values.waterTemperature,
-        images: values.images,
+        image: values.image,
         IPFSHash: values.IPFShash,
       });
     })();
@@ -79,8 +79,8 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
     fileService
       .uploadFile(formData)
       .then((url) => {
-        setValue('images', url.pinataUrl ?? '');
-        clearErrors('images');
+        setValue('image', url.pinataUrl ?? '');
+        clearErrors('image');
       })
       .finally(() => {
         setImageLoading(false);
@@ -220,7 +220,7 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
           />
 
           <Controller
-            name='images'
+            name='image'
             defaultValue=''
             control={control}
             rules={{ required: 'Image is required' }}

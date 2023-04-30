@@ -9,9 +9,16 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogTitle,
   Grid,
   InputAdornment,
   Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from '@mui/material';
@@ -35,8 +42,12 @@ const FishSeedDetail = () => {
   const params = useParams();
   const [openUpdateFishSeedPopup, setOpenUpdateFishSeedPopup] = useState(false);
   const [openEnterQuantityPopup, setOpenEnterQuantityPopup] = useState(false);
+  const [openLogDetailPopup, setOpenLogDetailPopup] = useState(false);
+  const [logDetail, setLogDetail] = useState<{ oldData: string; newData: string }>({
+    oldData: '',
+    newData: '',
+  });
   const { control, handleSubmit, setValue } = useForm({ mode: 'onChange' });
-
   const { address } = useSelector(profileSelector);
   const systemConfig = useSelector(systemSelector);
   const { enqueueSnackbar } = useSnackbar();
@@ -76,7 +87,7 @@ const FishSeedDetail = () => {
         contract: {
           registration: systemConfig.registrationContract,
           Geographicorigin: fishSeed?.geographicOrigin.toString(),
-          Images: fishSeed?.images?.[0],
+          Images: fishSeed?.image,
           IPFShash: fishSeed?.IPFSHash,
           MethodOfReproduction: fishSeed?.methodOfReproduction.toString(),
           NumberOfFishSeedsavailable: values.numberOfFishSeedToDeploy,
@@ -92,7 +103,7 @@ const FishSeedDetail = () => {
         geographicOrigin: fishSeed?.geographicOrigin!,
         numberOfFishSeedsAvailable: values.numberOfFishSeedToDeploy,
         methodOfReproduction: fishSeed?.methodOfReproduction!,
-        images: fishSeed?.images!,
+        image: fishSeed?.image!,
         waterTemperature: fishSeed?.waterTemperature!,
         IPFSHash: fishSeed?.IPFSHash!,
       });
@@ -135,7 +146,7 @@ const FishSeedDetail = () => {
             <Card className='mb-5'>
               <CardMedia
                 sx={{ height: 300 }}
-                image={fishSeed.images?.[0]}
+                image={fishSeed.image}
                 title='fish image'
                 className='bg-cover bg-no-repeat'
               />
@@ -187,9 +198,16 @@ const FishSeedDetail = () => {
                 <div
                   style={{ background: 'rgba(75, 85, 99, 100)', width: '100%', height: '1px', marginBottom: '10px' }}
                 ></div>
-                <div className='h-48 w-full overflow-auto'>
+                <div className='h-72 w-full overflow-auto'>
                   {items.map((log, index) => (
-                    <div key={index} className='flex flex-col gap-2 w-full mb-2 p-2 rounded-xl hover:bg-primary-main'>
+                    <div
+                      key={index}
+                      className='flex flex-col gap-2 w-full mb-2 p-2 rounded-xl hover:bg-primary-main cursor-pointer'
+                      onClick={() => {
+                        setOpenLogDetailPopup(true);
+                        setLogDetail({ oldData: log.oldData, newData: log.newData });
+                      }}
+                    >
                       <div className='flex flex-row justify-between items-center'>
                         <div className='flex flex-row gap-2 items-center'>
                           <div
@@ -247,6 +265,33 @@ const FishSeedDetail = () => {
           </LoadingButton>
           <LoadingButton variant='contained' onClick={handleDeployContract} loading={isLoading}>
             Deploy
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openLogDetailPopup} fullWidth maxWidth='md'>
+        <DialogTitle>Log detail</DialogTitle>
+        <DialogContent>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Old data</TableCell>
+                  <TableCell>New data</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell dangerouslySetInnerHTML={{ __html: logDetail.oldData }}></TableCell>
+                  <TableCell dangerouslySetInnerHTML={{ __html: logDetail.newData }}></TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <LoadingButton variant='outlined' color='inherit' onClick={() => setOpenLogDetailPopup(false)}>
+            Cancel
           </LoadingButton>
         </DialogActions>
       </Dialog>

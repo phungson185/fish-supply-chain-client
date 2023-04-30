@@ -59,8 +59,6 @@ const Contracts = () => {
     },
   );
 
-  console.log(data);
-
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
   const [desc, setDesc] = useState(query.desc || SORT_TYPES[0].desc);
@@ -184,7 +182,7 @@ const Contracts = () => {
               <TableRow>
                 <TableCell>Contract address</TableCell>
                 <TableCell>Company</TableCell>
-                <TableCell>Images</TableCell>
+                <TableCell>Image</TableCell>
                 <TableCell>Geographic origin</TableCell>
                 <TableCell>Method of reproduction</TableCell>
                 <TableCell>Water temperature</TableCell>
@@ -200,7 +198,7 @@ const Contracts = () => {
                   <TableCell align='center'>{item.farmedFishContract}</TableCell>
                   <TableCell align='center'>{item.owner?.name}</TableCell>
                   <TableCell align='center'>
-                    <Avatar src={item.images[0]} variant='square'>
+                    <Avatar src={item.image} variant='square'>
                       <Assignment />
                     </Avatar>
                   </TableCell>

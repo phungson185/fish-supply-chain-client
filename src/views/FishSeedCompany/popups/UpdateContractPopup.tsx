@@ -57,7 +57,7 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
       Object.entries(data ?? {}).forEach(([key, value]) => {
         setValue(key, value);
       });
-      setImage(data.images[0]);
+      setImage(data.image);
     }
   }, [data, setValue]);
 
@@ -67,7 +67,7 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
         FarmedFishContract: data.farmedFishContract,
         FishSeedUploader: address,
         Geographicorigin: values.geographicOrigin,
-        Images: values.images[0],
+        Images: values.image,
         MethodOfReproduction: values.methodOfReproduction,
         NumberOfFishSeedsavailable: values.numberOfFishSeedsAvailable,
         Speciesname: values.speciesName,
@@ -80,12 +80,12 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
         body: {
           transactionHash: resChain.transactionHash,
           numberOfFishSeedsAvailable: values.numberOfFishSeedsAvailable,
-          IPFShash: values.IPFSHash,
+          IPFSHash: values.IPFSHash,
           geographicOrigin: values.geographicOrigin,
           methodOfReproduction: values.methodOfReproduction,
           speciesName: values.speciesName,
           waterTemperature: values.waterTemperature,
-          images: values.images,
+          image: values.image,
         },
       });
     })();
@@ -102,8 +102,8 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
     fileService
       .uploadFile(formData)
       .then((url) => {
-        setValue('images', url.pinataUrl ?? '');
-        clearErrors('images');
+        setValue('image', url.pinataUrl ?? '');
+        clearErrors('image');
       })
       .finally(() => {
         setImageLoading(false);
@@ -213,12 +213,12 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
           />
 
           <Controller
-            name='images'
+            name='image'
             defaultValue=''
             control={control}
             render={({ fieldState: { invalid } }) => (
               <FormControl fullWidth className='mb-4'>
-                <Typography variant='subtitle1'>Images</Typography>
+                <Typography variant='subtitle1'>Image</Typography>
                 <input hidden type='file' id='cover' accept='image/*' onChange={handleChangeImage} />
                 <UploadLabel
                   {...{ htmlFor: 'cover', variant: 'rounded', image: image }}

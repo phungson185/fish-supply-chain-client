@@ -12,8 +12,8 @@ export type LogType = BaseType & {
   transactionType: number;
   logType: number;
   owner: UserType;
-  oldData: Object;
-  newData: Object;
+  oldData: string;
+  newData: string;
   message: string;
   title: string;
 };

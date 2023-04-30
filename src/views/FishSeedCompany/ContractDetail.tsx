@@ -114,7 +114,7 @@ const ContractDetail = () => {
           <Grid item xs={4}>
             <Spinner loading={!getContractSuccess}>
               <Avatar
-                src={contract.images[0]}
+                src={contract.image}
                 alt='fish image'
                 variant='square'
                 className='mx-auto bg-cover bg-no-repeat w-full h-full'
@@ -148,8 +148,8 @@ const ContractDetail = () => {
                   <TableCell align='center'>{item.title}</TableCell>
                   <TableCell align='center'>{item.message}</TableCell>
                   <TableCell align='center'>{item.transactionHash}</TableCell>
-                  <TableCell align='center'>{JSON.stringify(item.oldData)}</TableCell>
-                  <TableCell align='center'>{JSON.stringify(item.newData)}</TableCell>
+                  <TableCell dangerouslySetInnerHTML={{ __html: item.oldData }}></TableCell>
+                  <TableCell dangerouslySetInnerHTML={{ __html: item.newData }}></TableCell>
                   <TableCell align='center'>{formatTime(item.updatedAt)}</TableCell>
                 </TableRow>
               ))}

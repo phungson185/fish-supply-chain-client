@@ -180,7 +180,7 @@ const FishSeeds = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Fish Seed ID</TableCell>
-                <TableCell>Images</TableCell>
+                <TableCell>Image</TableCell>
                 <TableCell>Geographic origin</TableCell>
                 <TableCell>Method of reproduction</TableCell>
                 <TableCell>Water temperature</TableCell>
@@ -195,7 +195,7 @@ const FishSeeds = () => {
                 <TableRow key={item.id}>
                   <TableCell align='center'>{item.id}</TableCell>
                   <TableCell align='center'>
-                    <Avatar src={item.images[0]} variant='square'>
+                    <Avatar src={item.image} variant='square'>
                       <Assignment />
                     </Avatar>
                   </TableCell>
