@@ -46,7 +46,6 @@ const Batches = () => {
     },
   );
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
-  const [openPlaceFishSeedsPurchaseOrderPopup, setOpenPlaceFishSeedsPurchaseOrderPopup] = useState(false);
   const [openPlaceFarmedFishPurchaseOrderPopup, setOpenPlaceFarmedFishPurchaseOrderPopup] = useState(false);
   const [openPlaceProcessedFishPurchaseOrderPopup, setOpenPlaceProcessedFishPurchaseOrderPopup] = useState(false);
   const [openPlaceRetailerPurchaseOrderPopup, setOpenPlaceRetailerPurchaseOrderPopup] = useState(false);
@@ -68,9 +67,6 @@ const Batches = () => {
     setSelectedBatch(item);
 
     switch (roleType) {
-      case RoleType.fishFarmerRole:
-        setOpenPlaceFishSeedsPurchaseOrderPopup(true);
-        break;
       case RoleType.fishProcessorRole:
         setOpenPlaceFarmedFishPurchaseOrderPopup(true);
         break;
@@ -125,12 +121,14 @@ const Batches = () => {
                   <TableCell align='center'>{item.farmedFishId?.aquacultureWaterType}</TableCell>
                   <TableCell align='center'>{item.farmedFishId?.IPFSHash}</TableCell> */}
                   <TableCell align='center'>
-                    <ProcessStatus
-                      content={`${item.farmedFishId ? 'Completed' : 'Pending'}`}
-                      backgroundColor={`${item.farmedFishId ? 'green' : 'gray'}`}
-                    />
+                    <Link to={privateRoute.contractDetail.url?.(item.farmedFishId)!}>
+                      <ProcessStatus
+                        content={`${item.farmedFishId ? 'Completed' : 'Pending'}`}
+                        backgroundColor={`${item.farmedFishId ? 'green' : 'gray'}`}
+                      />
+                    </Link>
                   </TableCell>
-                  <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.fishFarmerRole)}>
+                  <TableCell align='center'>
                     <ProcessStatus
                       content={`${item.fishFarmerId ? 'Completed' : 'Pending'}`}
                       backgroundColor={`${item.fishFarmerId ? 'green' : 'gray'}`}
@@ -175,10 +173,6 @@ const Batches = () => {
           onChange={(event, value) => onSearchChange({ page: value })}
         />
       </div>
-
-      <Dialog open={openPlaceFishSeedsPurchaseOrderPopup} fullWidth maxWidth='sm'>
-        <FishSeedsOrderPopup item={selectedBatch} onClose={() => setOpenPlaceFishSeedsPurchaseOrderPopup(false)} />
-      </Dialog>
 
       <Dialog open={openPlaceFarmedFishPurchaseOrderPopup} fullWidth maxWidth='sm'>
         <FarmedFishOrderPopup item={selectedBatch} onClose={() => setOpenPlaceFarmedFishPurchaseOrderPopup(false)} />

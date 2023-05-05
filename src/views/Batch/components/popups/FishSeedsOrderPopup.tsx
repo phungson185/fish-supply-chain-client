@@ -9,9 +9,10 @@ import { profileSelector } from 'reducers/profile';
 import { fishFarmerService } from 'services';
 import { BatchType } from 'types/Batch';
 import { PopupController } from 'types/Common';
+import { FarmedFishType } from 'types/FishSeedCompany';
 
 type PopupProps = PopupController & {
-  item: BatchType;
+  item: FarmedFishType;
 };
 
 const FishSeedsOrderPopup = ({ item, onClose }: PopupProps) => {
@@ -36,17 +37,17 @@ const FishSeedsOrderPopup = ({ item, onClose }: PopupProps) => {
   const handleOrder = () => {
     handleSubmit(async (values) => {
       const resChain = await fishFarmerService.placeFishSeedsPurchaseOrder({
-        farmedFishContractAddress: item.farmedFishId.farmedFishContract,
+        farmedFishContractAddress: item.farmedFishContract,
         FishSeedsPurchaser: address,
-        FishSeedsSeller: item.farmedFishId.owner.address,
+        FishSeedsSeller: item.owner.address,
         NumberOfFishSeedsOrdered: values.NumberOfFishSeedsOrdered,
       });
 
       createOder({
-        farmedFishId: item.farmedFishId.id,
+        farmedFishId: item.id,
         fishSeedPurchaseOrderId: resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.FishSeedsPurchaseOrderID,
         fishSeedsPurchaser: address,
-        fishSeedsSeller: item.farmedFishId.owner.address,
+        fishSeedsSeller: item.owner.address,
         numberOfFishSeedsOrdered: values.NumberOfFishSeedsOrdered,
         fishSeedsPurchaseOrderDetailsStatus:
           resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.FishSeedsPurchaseOrderDetailsStatus,
@@ -63,16 +64,16 @@ const FishSeedsOrderPopup = ({ item, onClose }: PopupProps) => {
 
         <div className='mt-6 mb-6 flex flex-col gap-6'>
           <TextField required label='Fish seeds purchaser' value={address} disabled />
-          <TextField required label='Fish seeds seller' value={item.farmedFishId.owner.address} disabled />
+          <TextField required label='Fish seeds seller' value={item.owner.address} disabled />
 
           <Controller
             name='NumberOfFishSeedsOrdered'
             defaultValue=''
             control={control}
             rules={{
-              required: `Number of fish seeds available ranges from 0 to ${item.farmedFishId.numberOfFishSeedsAvailable}`,
-              min: 0,
-              max: item.farmedFishId.numberOfFishSeedsAvailable,
+              required: `Number of fish seeds available ranges from 1 to ${item.numberOfFishSeedsAvailable}`,
+              min: 1,
+              max: item.numberOfFishSeedsAvailable,
             }}
             render={({ field, fieldState: { invalid, error } }) => (
               <TextField

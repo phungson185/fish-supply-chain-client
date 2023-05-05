@@ -72,8 +72,8 @@ const FarmedFishOrderPopup = ({ item, onClose }: PopupProps) => {
             defaultValue=''
             control={control}
             rules={{
-              required: `Number of fish seeds available ranges from 0 to ${item.fishFarmerId?.totalNumberOfFish}`,
-              min: 0,
+              required: `Number of fish seeds available ranges from 1 to ${item.fishFarmerId?.totalNumberOfFish}`,
+              min: 1,
               max: item.fishFarmerId?.totalNumberOfFish,
             }}
             render={({ field, fieldState: { invalid, error } }) => (

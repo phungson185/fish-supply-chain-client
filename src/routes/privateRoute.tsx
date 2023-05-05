@@ -96,6 +96,12 @@ const fishFarmerRoute: PrivateRouteType = {
     name: 'Growth Details',
     element: <FishGrowthDetails />,
   },
+  contractDetail: {
+    path: '/contract/:id',
+    name: 'Contract detail',
+    url: ({ id }: { id: string }) => `/contract/${id}`,
+    element: <ContractDetail />,
+  },
   fishSeedCompanyFishFarmerOrders: {
     path: '/fishSeedCompanyFishFarmerOrders',
     name: 'FishSeedCompany - FishFarmer - Orders',

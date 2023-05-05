@@ -25,14 +25,20 @@ import { fishSeedCompanyService, logService } from 'services';
 import { formatTime } from 'utils/common';
 import UpdateContractPopup from './popups/UpdateContractPopup';
 import { LogPaginateType } from 'types/Log';
+import { useSelector } from 'react-redux';
+import { profileSelector } from 'reducers/profile';
+import { RoleType } from 'types/Auth';
+import { FishSeedsOrderPopup } from 'views/Batch/components';
 
 const ContractDetail = () => {
+  const { role } = useSelector(profileSelector);
   const params = useParams();
   const location = useLocation();
   const [logs, setLogs] = useState<LogPaginateType | undefined>({} as LogPaginateType);
   const { tab, page = 1, size = 5, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [openUpdateContractPopup, setOpenUpdateContractPopup] = useState(false);
   const [dataSearch, onSearchChange] = useSearch({ page, size });
+  const [openPlaceFishSeedsPurchaseOrderPopup, setOpenPlaceFishSeedsPurchaseOrderPopup] = useState(false);
   const {
     data: contract,
     isSuccess: getContractSuccess,
@@ -89,12 +95,12 @@ const ContractDetail = () => {
                 />
               </div>
               <div className='flex gap-1 items-center mb-2'>
-                <div>Nhiệt độ môi trường nước nuôi cá:</div>
+                <div>Water temperature in fish farming environment:</div>
                 <div className='font-bold'>{contract?.waterTemperature}°C</div>
                 <DeviceThermostat color='error' />
               </div>
               <div className='flex gap-1 items-center'>
-                <div>Số lượng có sẵn:</div>
+                <div>Quantity available:</div>
                 <div className='font-bold'>{contract?.numberOfFishSeedsAvailable}kg</div>
                 <SetMeal className='text-blue-600' />
               </div>
@@ -102,13 +108,25 @@ const ContractDetail = () => {
                 {contract?.owner.name + ' / ' + contract?.owner.userAddress + ' / ' + contract?.owner.phone}
               </Typography>
 
-              <Button
-                className='absolute bottom-0 right-0'
-                size='small'
-                onClick={() => setOpenUpdateContractPopup(true)}
-              >
-                Edit
-              </Button>
+              {role === RoleType.fishSeedCompanyRole && (
+                <Button
+                  className='absolute bottom-0 right-0'
+                  size='small'
+                  onClick={() => setOpenUpdateContractPopup(true)}
+                >
+                  Edit
+                </Button>
+              )}
+
+              {role === RoleType.fishFarmerRole && (
+                <Button
+                  className='absolute bottom-0 right-0'
+                  size='small'
+                  onClick={() => setOpenPlaceFishSeedsPurchaseOrderPopup(true)}
+                >
+                  Make order
+                </Button>
+              )}
             </div>
           </Grid>
           <Grid item xs={4}>
@@ -173,6 +191,10 @@ const ContractDetail = () => {
           onClose={() => setOpenUpdateContractPopup(false)}
           fetchContract={fetchContract}
         />
+      </Dialog>
+
+      <Dialog open={openPlaceFishSeedsPurchaseOrderPopup} fullWidth maxWidth='sm'>
+        <FishSeedsOrderPopup item={contract} onClose={() => setOpenPlaceFishSeedsPurchaseOrderPopup(false)} />
       </Dialog>
     </>
   );
