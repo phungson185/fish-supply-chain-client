@@ -1,6 +1,9 @@
-import { CategoryOutlined } from '@mui/icons-material';
+import { AccessTime, CategoryOutlined, DeviceThermostat, SetMeal } from '@mui/icons-material';
 import {
+  Avatar,
   Button,
+  Chip,
+  Container,
   debounce,
   Dialog,
   Menu,
@@ -13,17 +16,25 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
-import { statusStep } from 'components/ConfirmStatus';
+import { ProcessStatus, statusStep } from 'components/ConfirmStatus';
 import { useAnchor, useSearch } from 'hooks';
 import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
-import { fishFarmerService } from 'services';
+import { fishFarmerService, fishSeedCompanyService } from 'services';
 import { FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
 import { ConfirmPopup } from './popups';
+import { RoleType } from 'types/Auth';
+import { useSelector } from 'react-redux';
+import { profileSelector } from 'reducers/profile';
+import { LoadingButton } from '@mui/lab';
+import { useSnackbar } from 'notistack';
+import moment from 'moment';
+import { formatTime } from 'utils/common';
 
 const FILTERS = [{ label: 'Number of fish seeds ordered', orderBy: 'numberOfFishSeedsOrdered' }];
 
@@ -33,17 +44,19 @@ const SORT_TYPES = [
 ];
 
 const FishSeedCompanyFishFarmerOrders = () => {
+  const { address, role } = useSelector(profileSelector);
+
   const location = useLocation();
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page });
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
-
+  const { enqueueSnackbar } = useSnackbar();
   const { data, isFetching, refetch } = useQuery(
     ['fishFarmerService.getOrders', dataSearch],
     () => fishFarmerService.getOrders(dataSearch),
     {
-      keepPreviousData: true,
+      keepPreviousData: false,
       staleTime: 0,
     },
   );
@@ -69,9 +82,50 @@ const FishSeedCompanyFishFarmerOrders = () => {
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
 
+  const { mutate: confirmOrder, isLoading } = useMutation(fishFarmerService.confirmOrder, {
+    onSuccess: () => {
+      enqueueSnackbar('Confirm order successfully', {
+        variant: 'success',
+      });
+    },
+    onError: (error: any) => {
+      enqueueSnackbar(error, { variant: 'error' });
+    },
+  });
+
+  const handleConfirm = async (item: FishSeedCompanyFishFarmerOrderType, accepted: boolean) => {
+    const resChain = await fishFarmerService.confirmFishSeedsPurchaseOrder({
+      accepted,
+      farmedFishContractAddress: item.farmedFishId.farmedFishContract,
+      sender: address,
+      FishSeedsPurchaseOrderID: item.fishSeedPurchaseOrderId,
+    });
+
+    await confirmOrder({
+      orderId: item.id,
+      status: resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NEWSTatus,
+    });
+    refetch();
+  };
+
+  const handleRecieve = async (item: FishSeedCompanyFishFarmerOrderType) => {
+    const resChain = await fishFarmerService.receiveFishSeedsOrder({
+      farmedFishContractAddress: item.farmedFishId.farmedFishContract,
+      sender: address,
+      FishSeedsPurchaseOrderID: item.fishSeedPurchaseOrderId,
+    });
+
+    await confirmOrder({
+      orderId: item.id,
+      status: resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus,
+    });
+
+    refetch();
+  };
+
   return (
     <>
-      <div className='flex items-center justify-between'>
+      <div className='flex items-center justify-between mb-10'>
         <div className='flex justify-between gap-2'>
           <Button
             variant='text'
@@ -148,7 +202,7 @@ const FishSeedCompanyFishFarmerOrders = () => {
           }}
         /> */}
       </div>
-      <TableContainer component={Paper}>
+      {/* <TableContainer component={Paper}>
         <Spinner loading={isFetching}>
           <Table>
             <TableHead>
@@ -191,16 +245,123 @@ const FishSeedCompanyFishFarmerOrders = () => {
             <caption className='font-bold border-t'>{total ?? 0} Contracts</caption>
           </Table>
         </Spinner>
-      </TableContainer>
+      </TableContainer> */}
+      <Container>
+        <Spinner loading={isFetching}>
+          {items.map((item) => (
+            <div
+              key={item.id}
+              className='bg-white p-5 rounded-2xl mb-5 cursor-pointer'
+              onClick={() => {
+                setSelectedOrder(item);
+                setOpenConfirmPopup(true);
+              }}
+            >
+              <div className='flex flex-row items-center gap-2 border-b-2 border-solid border-gray-200 pb-3 mb-3'>
+                <Avatar src={item.owner.avatar ?? ''} />
+                <div className='font-bold'>{item.owner.name}</div>
+                <div className='flex-1'></div>
+                {/* <AccessTime className='text-green-500' />
+              <div className='text-green-500'>Waiting for the seller to confirm</div> */}
 
-      <div className='flex justify-center'>
-        <Pagination
-          page={currentPage ?? 1}
-          count={totalPage}
-          onChange={(event, value) => onSearchChange({ page: value })}
-        />
-      </div>
+                {statusStep.find((step) => step.code === item.fishSeedsPurchaseOrderDetailsStatus)?.component}
+                {statusStep.find((step) => step.code === item.fishSeedsPurchaseOrderDetailsStatus)?.description}
+              </div>
 
+              <div className='flex flex-row gap-3 border-b-2 border-solid border-gray-200 pb-3 mb-3'>
+                <Avatar variant='square' src={item.image ?? ''} sx={{ width: 240, height: 240 }} />
+                <div>
+                  <div className='mb-5 text-xl font-bold'>{item.speciesName}</div>
+                  <div className='mb-1 text-gray-400 text-sm'>
+                    <span className='mr-2'>Geopraphic origin: </span>
+                    <Chip
+                      label={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!)}
+                      color='warning'
+                    />
+                  </div>
+                  <div className='mb-1 text-gray-400 text-sm'>
+                    <span className='mr-2'>Method of reproduction: </span>
+                    <Chip
+                      label={fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!)}
+                      color='secondary'
+                    />
+                  </div>
+                  <div className='flex gap-1 items-center mb-2 text-gray-400 text-sm'>
+                    <div>Water temperature in fish farming environment:</div>
+                    <div className='font-bold'>{item?.waterTemperature}°C</div>
+                    <DeviceThermostat color='error' />
+                  </div>
+                  <div className='flex-1'></div>
+                  <div className=''>
+                    <div className='inline-block mr-1'>Number of fish seeds ordered: </div>
+                    <div className='inline-block'>{item.numberOfFishSeedsOrdered}kg</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className='flex flex-row justify-between items-center'>
+                <Typography variant='caption' className='block'>
+                  Transaction hash: {item.fishSeedPurchaseOrderId}
+                </Typography>
+                <Typography variant='caption' className='block'>
+                  Updated time: {formatTime(item.updatedAt)}
+                </Typography>
+                {/* {role === RoleType.fishSeedCompanyRole && (
+                  <>
+                    <LoadingButton
+                      variant='contained'
+                      color='success'
+                      disabled={['Accepted', 'Rejected', 'Received'].includes(
+                        statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
+                      )}
+                      onClick={() => {
+                        handleConfirm(item, true);
+                      }}
+                    >
+                      Accept
+                    </LoadingButton>
+                    <LoadingButton
+                      variant='contained'
+                      color='error'
+                      disabled={['Accepted', 'Rejected', 'Received'].includes(
+                        statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
+                      )}
+                      onClick={() => {
+                        handleConfirm(item, false);
+                      }}
+                    >
+                      Reject
+                    </LoadingButton>
+                  </>
+                )}
+
+                {role === RoleType.fishFarmerRole && (
+                  <LoadingButton
+                    variant='contained'
+                    color='warning'
+                    disabled={['Pending', 'Rejected', 'Received'].includes(
+                      statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
+                    )}
+                    onClick={() => {
+                      handleRecieve(item);
+                    }}
+                  >
+                    Received
+                  </LoadingButton>
+                )} */}
+              </div>
+            </div>
+          ))}
+
+          <div className='flex justify-center'>
+            <Pagination
+              page={currentPage ?? 1}
+              count={totalPage}
+              onChange={(event, value) => onSearchChange({ page: value })}
+            />
+          </div>
+        </Spinner>
+      </Container>
       <Dialog maxWidth='lg' open={openConfirmPopup} fullWidth>
         <ConfirmPopup item={selectedOrder} refetch={refetch} onClose={() => setOpenConfirmPopup(false)} />
       </Dialog>

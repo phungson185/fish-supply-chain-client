@@ -6,7 +6,7 @@ import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
-import { fishFarmerService } from 'services';
+import { fishFarmerService, fishSeedCompanyService } from 'services';
 import { BatchType } from 'types/Batch';
 import { PopupController } from 'types/Common';
 import { FarmedFishType } from 'types/FishSeedCompany';
@@ -20,6 +20,8 @@ const FishSeedsOrderPopup = ({ item, onClose }: PopupProps) => {
   const { address } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+
+  const { mutate: updateContract } = useMutation(fishSeedCompanyService.updateFarmedFishContract);
 
   const { mutate: createOder, isLoading } = useMutation(fishFarmerService.createOder, {
     onSuccess: () => {
@@ -43,12 +45,21 @@ const FishSeedsOrderPopup = ({ item, onClose }: PopupProps) => {
         NumberOfFishSeedsOrdered: values.NumberOfFishSeedsOrdered,
       });
 
+      updateContract({
+        id: item.id,
+        body: {
+          transactionHash: resChain.transactionHash,
+          numberOfFishSeedsAvailable:
+            resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.NumberOfFishSeedsAvailable,
+        },
+      });
+
       createOder({
         farmedFishId: item.id,
         fishSeedPurchaseOrderId: resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.FishSeedsPurchaseOrderID,
         fishSeedsPurchaser: address,
         fishSeedsSeller: item.owner.address,
-        numberOfFishSeedsOrdered: values.NumberOfFishSeedsOrdered,
+        numberOfFishSeedsOrdered: resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.NumberOfFishSeedsOrdered,
         fishSeedsPurchaseOrderDetailsStatus:
           resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.FishSeedsPurchaseOrderDetailsStatus,
       });

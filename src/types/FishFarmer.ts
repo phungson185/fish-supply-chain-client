@@ -1,3 +1,4 @@
+import { BaseType } from './Common';
 import { PaginateParamsType, PaginateType } from './Common';
 import { FarmedFishType } from './FishSeedCompany';
 import { UserType } from './User';
@@ -41,7 +42,7 @@ export type CreateOrderType = {
   fishSeedsPurchaseOrderDetailsStatus: string;
 };
 
-export type FishSeedCompanyFishFarmerOrderType = {
+export type FishSeedCompanyFishFarmerOrderType = BaseType & {
   id: string;
   fishSeedPurchaseOrderId: string;
   fishSeedsPurchaser: UserType;
@@ -51,7 +52,11 @@ export type FishSeedCompanyFishFarmerOrderType = {
   farmedFishId: FarmedFishType;
   totalNumberOfFish: number;
   fishWeight?: number;
+  geographicOrigin: number;
+  methodOfReproduction: number;
+  waterTemperature: number;
   speciesName: string;
+  image: string;
   IPFSHash: string;
   owner: UserType;
   updater?: UserType;

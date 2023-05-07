@@ -20,6 +20,7 @@ export type LogType = BaseType & {
 
 export type LogParamsType = PaginateParamsType & {
   objectId?: string;
+  transactionType?: number;
 };
 
 export type LogPaginateType = PaginateType & {

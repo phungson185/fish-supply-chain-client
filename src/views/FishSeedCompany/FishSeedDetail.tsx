@@ -168,12 +168,12 @@ const FishSeedDetail = () => {
                 </div>
                 <div className='flex gap-1 items-center'>
                   <DeviceThermostat color='error' />
-                  <div>Nhiệt độ nước:</div>
+                  <div>Water temperature in fish farming environment:</div>
                   <div className='font-bold'>{fishSeed.waterTemperature}°C</div>
                 </div>
                 <div className='flex gap-1 items-center'>
                   <SetMeal className='text-blue-600' />
-                  <div>Số lượng:</div>
+                  <div>Quantity available:</div>
                   <div className='font-bold'>{fishSeed.quantity}kg</div>
                 </div>
               </CardContent>

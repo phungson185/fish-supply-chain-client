@@ -95,14 +95,14 @@ export type FarmedFishType = BaseType & {
 };
 
 export type UpdateFarmedFishType = {
-  transactionHash: string;
-  speciesName: string;
-  geographicOrigin: number;
-  numberOfFishSeedsAvailable: number;
-  IPFSHash: string;
-  methodOfReproduction: number;
-  image: string;
-  waterTemperature: number;
+  transactionHash?: string;
+  speciesName?: string;
+  geographicOrigin?: number;
+  numberOfFishSeedsAvailable?: number;
+  IPFSHash?: string;
+  methodOfReproduction?: number;
+  image?: string;
+  waterTemperature?: number;
 };
 
 export type CreateBatchType = {

@@ -1,18 +1,21 @@
 import { AccountBalanceWallet, Apartment, Home, LocalPhone } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Avatar, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
+import { Avatar, DialogActions, DialogContent, DialogTitle, Grid, Step, StepLabel, Stepper } from '@mui/material';
 import { ConfirmStatus } from 'components';
-import { statusStep } from 'components/ConfirmStatus';
+import { ProcessStatus, statusStep } from 'components/ConfirmStatus';
 import { useSnackbar } from 'notistack';
-import { useState } from 'react';
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from 'react-query';
+import { useEffect, useState } from 'react';
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
-import { fishFarmerService } from 'services';
+import { fishFarmerService, logService } from 'services';
 import { RoleType } from 'types/Auth';
 import { PopupController } from 'types/Common';
 import { FishSeedCompanyFishFarmerOrderPaginateType, FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
-import { shorten } from 'utils/common';
+import { LogParamsType } from 'types/Log';
+import { formatTime, shorten } from 'utils/common';
+
+const steps = ['The request is being processed', 'The seller has accepted the request', 'The item has been received'];
 
 type PopupProps = PopupController & {
   item: FishSeedCompanyFishFarmerOrderType;
@@ -25,6 +28,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
   const [orderStatus, setOrderStatus] = useState(item.fishSeedsPurchaseOrderDetailsStatus);
   const { address, role } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
+  const [activeStep, setActiveStep] = useState<number>(0);
 
   const { mutate: confirmOrder, isLoading } = useMutation(fishFarmerService.confirmOrder, {
     onSuccess: () => {
@@ -32,12 +36,31 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
         variant: 'success',
       });
       refetch();
-      onClose();
     },
     onError: (error: any) => {
       enqueueSnackbar(error, { variant: 'error' });
     },
   });
+
+  const {
+    data: logs,
+    isSuccess: getLogsSuccess,
+    refetch: fetchLogs,
+  } = useQuery(['logService.getLogs', { id: item.id }], () =>
+    logService.getLogs({ objectId: item.id, transactionType: 2 } as LogParamsType),
+  );
+
+  useEffect(() => {
+    if (getLogsSuccess) {
+      if (logs?.items?.length === 1) {
+        setActiveStep(0);
+      } else if (logs?.items?.length === 2) {
+        setActiveStep(1);
+      } else if (logs?.items?.length === 3) {
+        setActiveStep(2);
+      }
+    }
+  }, [getLogsSuccess, logs]);
 
   const handleConfirm = async (accepted: boolean) => {
     const resChain = await fishFarmerService.confirmFishSeedsPurchaseOrder({
@@ -53,6 +76,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     });
 
     setOrderStatus(Number(resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NEWSTatus));
+    setActiveStep(activeStep + 1);
   };
 
   const handleRecieve = async () => {
@@ -68,12 +92,45 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     });
 
     setOrderStatus(Number(resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus));
+    setActiveStep(activeStep + 1);
   };
 
   return (
     <>
       <DialogTitle>Confirm fish seeds order</DialogTitle>
       <DialogContent>
+        <Stepper activeStep={activeStep} className='mb-10'>
+          <Step>
+            <StepLabel
+              optional={formatTime(
+                logs?.items?.filter((log) => log.newData === ProcessStatus.Pending.toString())[0].updatedAt,
+              )}
+            >
+              The request is being processed
+            </StepLabel>
+          </Step>
+          <Step>
+            <StepLabel
+              error={item.fishSeedsPurchaseOrderDetailsStatus === ProcessStatus.Rejected}
+              optional={formatTime(
+                item.fishSeedsPurchaseOrderDetailsStatus === ProcessStatus.Rejected
+                  ? logs?.items?.filter((log) => log.newData === ProcessStatus.Rejected.toString())[0].updatedAt
+                  : logs?.items?.filter((log) => log.newData === ProcessStatus.Accepted.toString())[0].updatedAt,
+              )}
+            >
+              The seller has accepted the request
+            </StepLabel>
+          </Step>
+          <Step>
+            <StepLabel
+              optional={formatTime(
+                logs?.items?.filter((log) => log.newData === ProcessStatus.Received.toString())[0].updatedAt,
+              )}
+            >
+              The item has been received
+            </StepLabel>
+          </Step>
+        </Stepper>
         <Grid container>
           <Grid item xs={4}>
             <Grid container spacing={5} border='medium'>
