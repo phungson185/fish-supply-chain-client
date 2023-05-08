@@ -36,6 +36,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
         variant: 'success',
       });
       refetch();
+      fetchLogs();
     },
     onError: (error: any) => {
       enqueueSnackbar(error, { variant: 'error' });
@@ -94,7 +95,6 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     setOrderStatus(Number(resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus));
     setActiveStep(activeStep + 1);
   };
-
   return (
     <>
       <DialogTitle>Confirm fish seeds order</DialogTitle>
@@ -102,30 +102,39 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
         <Stepper activeStep={activeStep} className='mb-10'>
           <Step>
             <StepLabel
-              optional={formatTime(
-                logs?.items?.filter((log) => log.newData === ProcessStatus.Pending.toString())[0].updatedAt,
-              )}
+              optional={
+                activeStep >= 0 &&
+                formatTime(
+                  logs?.items?.filter((log) => log.newData == ProcessStatus.Pending.toString())?.[0]?.updatedAt ?? '',
+                )
+              }
             >
               The request is being processed
             </StepLabel>
           </Step>
           <Step>
             <StepLabel
-              error={item.fishSeedsPurchaseOrderDetailsStatus === ProcessStatus.Rejected}
-              optional={formatTime(
-                item.fishSeedsPurchaseOrderDetailsStatus === ProcessStatus.Rejected
-                  ? logs?.items?.filter((log) => log.newData === ProcessStatus.Rejected.toString())[0].updatedAt
-                  : logs?.items?.filter((log) => log.newData === ProcessStatus.Accepted.toString())[0].updatedAt,
-              )}
+              error={item.fishSeedsPurchaseOrderDetailsStatus == ProcessStatus.Rejected}
+              optional={
+                activeStep >= 1 &&
+                formatTime(
+                  logs?.items?.filter((log) =>
+                    [ProcessStatus.Accepted, ProcessStatus.Rejected].includes(Number(log.newData)),
+                  )?.[0]?.updatedAt ?? '',
+                )
+              }
             >
               The seller has accepted the request
             </StepLabel>
           </Step>
           <Step>
             <StepLabel
-              optional={formatTime(
-                logs?.items?.filter((log) => log.newData === ProcessStatus.Received.toString())[0].updatedAt,
-              )}
+              optional={
+                activeStep == 2 &&
+                formatTime(
+                  logs?.items?.filter((log) => log.newData == ProcessStatus.Received.toString())?.[0]?.updatedAt ?? '',
+                )
+              }
             >
               The item has been received
             </StepLabel>
