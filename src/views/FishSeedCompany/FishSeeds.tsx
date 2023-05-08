@@ -201,14 +201,16 @@ const FishSeeds = () => {
                   </TableCell>
                   <TableCell align='center'>
                     <Chip
-                      label={fishSeedCompanyService.handleMapGeographicOrigin(item.geographicOrigin)}
-                      color='warning'
+                      label={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).label}
+                      color={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).color as any}
                     />
                   </TableCell>
                   <TableCell align='center'>
                     <Chip
-                      label={fishSeedCompanyService.handleMapMethodOfReproduction(item.methodOfReproduction)}
-                      color='secondary'
+                      label={fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).label}
+                      color={
+                        fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).color as any
+                      }
                     />
                   </TableCell>
                   <TableCell align='center'>{item.waterTemperature}°C</TableCell>

@@ -116,24 +116,45 @@ const getBatchs = async (params?: BatchParamsType): Promise<BatchPaginateType> =
 const handleMapGeographicOrigin = (geographicOrigin: number) => {
   switch (geographicOrigin) {
     case 0:
-      return 'Brackish';
+      return {
+        label: 'Brackish',
+        color: 'primary',
+      };
     case 1:
-      return 'Fresh';
+      return {
+        label: 'Fresh',
+        color: 'secondary',
+      };
     case 2:
-      return 'Marine';
+      return {
+        label: 'Marine',
+        color: 'info',
+      };
     default:
-      return 'Not Found';
+      return {
+        label: 'Not Found',
+        color: 'danger',
+      };
   }
 };
 
 const handleMapMethodOfReproduction = (methodOfReproduction: number) => {
   switch (methodOfReproduction) {
     case 0:
-      return 'Natural';
+      return {
+        label: 'Natural',
+        color: 'warning',
+      };
     case 1:
-      return 'Artifical';
+      return {
+        label: 'Artificial',
+        color: 'success',
+      };
     default:
-      return 'Not Found';
+      return {
+        label: 'Not Found',
+        color: 'danger',
+      };
   }
 };
 

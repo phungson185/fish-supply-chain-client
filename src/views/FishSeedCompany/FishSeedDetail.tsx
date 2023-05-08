@@ -158,12 +158,14 @@ const FishSeedDetail = () => {
                 </div>
                 <div className='flex gap-3 items-center'>
                   <Chip
-                    label={fishSeedCompanyService.handleMapGeographicOrigin(fishSeed.geographicOrigin)}
-                    color='warning'
+                    label={fishSeedCompanyService.handleMapGeographicOrigin(fishSeed?.geographicOrigin!).label}
+                    color={fishSeedCompanyService.handleMapGeographicOrigin(fishSeed?.geographicOrigin!).color as any}
                   />
                   <Chip
-                    label={fishSeedCompanyService.handleMapMethodOfReproduction(fishSeed.methodOfReproduction)}
-                    color='secondary'
+                    label={fishSeedCompanyService.handleMapMethodOfReproduction(fishSeed?.methodOfReproduction!).label}
+                    color={
+                      fishSeedCompanyService.handleMapMethodOfReproduction(fishSeed?.methodOfReproduction!).color as any
+                    }
                   />
                 </div>
                 <div className='flex gap-1 items-center'>

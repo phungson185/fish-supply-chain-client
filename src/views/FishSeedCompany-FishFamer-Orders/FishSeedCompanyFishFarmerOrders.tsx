@@ -1,4 +1,4 @@
-import { AccessTime, CategoryOutlined, DeviceThermostat, SetMeal } from '@mui/icons-material';
+import { AccessTime, BalanceOutlined, CategoryOutlined, DeviceThermostat, SetMeal } from '@mui/icons-material';
 import {
   Avatar,
   Button,
@@ -261,9 +261,6 @@ const FishSeedCompanyFishFarmerOrders = () => {
                 <Avatar src={item.owner.avatar ?? ''} />
                 <div className='font-bold'>{item.owner.name}</div>
                 <div className='flex-1'></div>
-                {/* <AccessTime className='text-green-500' />
-              <div className='text-green-500'>Waiting for the seller to confirm</div> */}
-
                 {statusStep.find((step) => step.code === item.fishSeedsPurchaseOrderDetailsStatus)?.component}
                 {statusStep.find((step) => step.code === item.fishSeedsPurchaseOrderDetailsStatus)?.description}
               </div>
@@ -275,15 +272,17 @@ const FishSeedCompanyFishFarmerOrders = () => {
                   <div className='mb-1 text-gray-400 text-sm'>
                     <span className='mr-2'>Geopraphic origin: </span>
                     <Chip
-                      label={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!)}
-                      color='warning'
+                      label={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).label}
+                      color={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).color as any}
                     />
                   </div>
                   <div className='mb-1 text-gray-400 text-sm'>
                     <span className='mr-2'>Method of reproduction: </span>
                     <Chip
-                      label={fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!)}
-                      color='secondary'
+                      label={fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).label}
+                      color={
+                        fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).color as any
+                      }
                     />
                   </div>
                   <div className='flex gap-1 items-center mb-2 text-gray-400 text-sm'>
@@ -294,7 +293,8 @@ const FishSeedCompanyFishFarmerOrders = () => {
                   <div className='flex-1'></div>
                   <div className=''>
                     <div className='inline-block mr-1'>Number of fish seeds ordered: </div>
-                    <div className='inline-block'>{item.numberOfFishSeedsOrdered}kg</div>
+                    <div className='inline-block mr-1'>{item.numberOfFishSeedsOrdered}kg</div>
+                    <BalanceOutlined className='inline-block' color='primary' />
                   </div>
                 </div>
               </div>
@@ -306,49 +306,6 @@ const FishSeedCompanyFishFarmerOrders = () => {
                 <Typography variant='caption' className='block'>
                   Updated time: {formatTime(item.updatedAt)}
                 </Typography>
-                {/* {role === RoleType.fishSeedCompanyRole && (
-                  <>
-                    <LoadingButton
-                      variant='contained'
-                      color='success'
-                      disabled={['Accepted', 'Rejected', 'Received'].includes(
-                        statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
-                      )}
-                      onClick={() => {
-                        handleConfirm(item, true);
-                      }}
-                    >
-                      Accept
-                    </LoadingButton>
-                    <LoadingButton
-                      variant='contained'
-                      color='error'
-                      disabled={['Accepted', 'Rejected', 'Received'].includes(
-                        statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
-                      )}
-                      onClick={() => {
-                        handleConfirm(item, false);
-                      }}
-                    >
-                      Reject
-                    </LoadingButton>
-                  </>
-                )}
-
-                {role === RoleType.fishFarmerRole && (
-                  <LoadingButton
-                    variant='contained'
-                    color='warning'
-                    disabled={['Pending', 'Rejected', 'Received'].includes(
-                      statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
-                    )}
-                    onClick={() => {
-                      handleRecieve(item);
-                    }}
-                  >
-                    Received
-                  </LoadingButton>
-                )} */}
               </div>
             </div>
           ))}

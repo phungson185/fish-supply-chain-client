@@ -83,15 +83,17 @@ const ContractDetail = () => {
               <div className='mb-1'>
                 <span className='mr-2'>Geopraphic origin: </span>
                 <Chip
-                  label={fishSeedCompanyService.handleMapGeographicOrigin(contract?.geographicOrigin!)}
-                  color='warning'
+                  label={fishSeedCompanyService.handleMapGeographicOrigin(contract?.geographicOrigin!).label}
+                  color={fishSeedCompanyService.handleMapGeographicOrigin(contract?.geographicOrigin!).color as any}
                 />
               </div>
               <div className='mb-1'>
                 <span className='mr-2'>Method of reproduction: </span>
                 <Chip
-                  label={fishSeedCompanyService.handleMapMethodOfReproduction(contract?.methodOfReproduction!)}
-                  color='secondary'
+                  label={fishSeedCompanyService.handleMapMethodOfReproduction(contract?.methodOfReproduction!).label}
+                  color={
+                    fishSeedCompanyService.handleMapMethodOfReproduction(contract?.methodOfReproduction!).color as any
+                  }
                 />
               </div>
               <div className='flex gap-1 items-center mb-2'>
