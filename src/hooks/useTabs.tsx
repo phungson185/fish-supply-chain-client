@@ -1,7 +1,7 @@
 import { SyntheticEvent, useCallback, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-type TabType = {
+export type TabType = {
   code: string;
   label: React.ReactNode;
   component: React.ReactNode;

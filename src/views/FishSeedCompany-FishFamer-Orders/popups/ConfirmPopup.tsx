@@ -90,6 +90,9 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
 
     await confirmOrder({
       orderId: item.id,
+      numberOfFishSeedsAvailable: Number(
+        resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NumberOfFishSeedsAvailable,
+      ),
       status: resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NEWSTatus,
     });
 
@@ -106,6 +109,9 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
 
     await confirmOrder({
       orderId: item.id,
+      numberOfFishSeedsAvailable: Number(
+        resChain.events.FishsSeedsOrderReceived.returnValues.NumberOfFishSeedsAvailable,
+      ),
       status: resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus,
     });
 

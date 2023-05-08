@@ -65,6 +65,7 @@ export type FishSeedCompanyFishFarmerOrderType = BaseType & {
 export type ConfirmOrderType = {
   orderId: string;
   status: number;
+  numberOfFishSeedsAvailable: number;
 };
 
 export type UpdateGrowthDetailType = {
@@ -75,7 +76,9 @@ export type UpdateGrowthDetailType = {
   IPFSHash: string;
 };
 
-export type FishSeedCompanyFishFarmerOrderParamsType = PaginateParamsType & {};
+export type FishSeedCompanyFishFarmerOrderParamsType = PaginateParamsType & {
+  fishSeedsPurchaseOrderDetailsStatus?: number;
+};
 
 export type FishSeedCompanyFishFarmerOrderPaginateType = PaginateType & {
   items: FishSeedCompanyFishFarmerOrderType[];
