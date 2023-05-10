@@ -45,8 +45,8 @@ const connectWallet = async () => {
     } else {
       const { nonce } = await authService.getNonce({ address });
       const signature = await web3.eth.personal.sign(nonce.toString(), address, '');
-      const accessToken = await authService.getToken({ address, signature });
-      store.dispatch(signIn({ accessToken, address, role }));
+      const res = await authService.getToken({ address, signature });
+      store.dispatch(signIn({ accessToken: res?.accessToken as any, address, role, id: res.id }));
       await authService.syncRole({ address, role } as SyncRoleType);
     }
   } catch (error) {

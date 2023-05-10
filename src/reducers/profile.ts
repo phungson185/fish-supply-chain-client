@@ -7,6 +7,7 @@ export type ProfileState = {
   role: string;
   isLoggedIn?: boolean;
   accessToken?: string;
+  id?: string;
 } & UserUpdateType;
 
 export const profileSlice = createSlice({

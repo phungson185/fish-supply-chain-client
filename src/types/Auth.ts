@@ -14,6 +14,7 @@ export type GetTokenType = {
 
 export type GetTokenData = {
   accessToken: string;
+  id: string;
 };
 
 export type SyncRoleType = {

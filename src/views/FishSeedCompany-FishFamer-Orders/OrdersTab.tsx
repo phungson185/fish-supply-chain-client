@@ -10,6 +10,7 @@ import {
   Pagination,
   Tab,
   Tabs,
+  TextField,
   Typography,
   debounce,
 } from '@mui/material';
@@ -28,23 +29,34 @@ import { fishFarmerService, fishSeedCompanyService } from 'services';
 import { FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
 import { formatTime } from 'utils/common';
 import { ConfirmPopup } from './popups';
+import { RoleType } from 'types/Auth';
 
-const FILTERS = [{ label: 'Number of fish seeds ordered', orderBy: 'numberOfFishSeedsOrdered' }];
+const FILTERS = [
+  { label: 'Number of fish seeds ordered', orderBy: 'numberOfFishSeedsOrdered' },
+  {
+    label: 'Updated time',
+    orderBy: 'updatedAt',
+  },
+];
 
 const SORT_TYPES = [
   { label: 'Low to High', desc: 'false' },
   { label: 'High to Low', desc: 'true' },
 ];
 
-const ReceivedTab = () => {
-  const { address, role } = useSelector(profileSelector);
+const OrdersTab = ({ status }: { status: ProcessStatus }) => {
+  const { id, role } = useSelector(profileSelector);
 
   const location = useLocation();
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
-  const [dataSearch, onSearchChange] = useSearch({ page, fishSeedsPurchaseOrderDetailsStatus: ProcessStatus.Received });
+  const [dataSearch, onSearchChange] = useSearch({
+    page,
+    fishSeedsSeller: role === RoleType.fishSeedCompanyRole ? id : undefined,
+    fishSeedsPurchaser: role === RoleType.fishFarmerRole ? id : undefined,
+    fishSeedsPurchaseOrderDetailsStatus: status === ProcessStatus.All ? undefined : status,
+  });
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
-  const { enqueueSnackbar } = useSnackbar();
   const { data, isFetching, refetch } = useQuery(
     ['fishFarmerService.getOrders', dataSearch],
     () => fishFarmerService.getOrders(dataSearch),
@@ -54,6 +66,7 @@ const ReceivedTab = () => {
     },
   );
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
+  console.log(totalPage);
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
   const [desc, setDesc] = useState(query.desc || SORT_TYPES[0].desc);
   const [search, setSearch] = useState(query.search || '');
@@ -81,7 +94,19 @@ const ReceivedTab = () => {
 
   return (
     <>
-      <div className='flex items-center justify-between mb-10'>
+      <div className='flex items-center justify-between mb-5'>
+        <TextField
+          placeholder='Search...'
+          InputProps={{ className: 'bg-white text-black' }}
+          value={search}
+          sx={{ width: '60%' }}
+          onChange={(event) => {
+            const { value } = event.target;
+            setSearch(value);
+            debounceChangeParams({ search: value });
+          }}
+        />
+
         <div className='flex justify-between gap-2'>
           <Button
             variant='text'
@@ -145,98 +170,84 @@ const ReceivedTab = () => {
             ))}
           </Menu>
         </div>
-
-        {/* <TextField
-            placeholder='Search...'
-            InputProps={{ className: 'bg-white text-black' }}
-            value={search}
-            sx={{ width: '30%' }}
-            onChange={(event) => {
-              const { value } = event.target;
-              setSearch(value);
-              debounceChangeParams({ search: value });
-            }}
-          /> */}
       </div>
-      <Container>
-        <Spinner loading={isFetching}>
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className='bg-white p-5 rounded-2xl mb-5 cursor-pointer'
-              onClick={() => {
-                setSelectedOrder(item);
-                setOpenConfirmPopup(true);
-              }}
-            >
-              <div className='flex flex-row items-center gap-2 border-b-2 border-solid border-gray-200 pb-3 mb-3'>
-                <Avatar src={item.owner.avatar ?? ''} />
-                <div className='font-bold'>{item.owner.name}</div>
-                <div className='flex-1'></div>
-                {statusStep.find((step) => step.code === item.fishSeedsPurchaseOrderDetailsStatus)?.component}
-                {statusStep.find((step) => step.code === item.fishSeedsPurchaseOrderDetailsStatus)?.description}
-              </div>
+      <Spinner loading={isFetching}>
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className='bg-white p-5 rounded-2xl mb-5 cursor-pointer'
+            onClick={() => {
+              setSelectedOrder(item);
+              setOpenConfirmPopup(true);
+            }}
+          >
+            <div className='flex flex-row items-center gap-2 border-b-2 border-solid border-gray-200 pb-3 mb-3'>
+              <Avatar src={item.owner.avatar ?? ''} />
+              <div className='font-bold'>{item.owner.name}</div>
+              <div className='flex-1'></div>
+              {statusStep.find((step) => step.code === item.fishSeedsPurchaseOrderDetailsStatus)?.component}
+              {statusStep.find((step) => step.code === item.fishSeedsPurchaseOrderDetailsStatus)?.description}
+            </div>
 
-              <div className='flex flex-row gap-3 border-b-2 border-solid border-gray-200 pb-3 mb-3'>
-                <Avatar variant='square' src={item.image ?? ''} sx={{ width: 240, height: 240 }} />
-                <div>
-                  <div className='mb-5 text-xl font-bold'>{item.speciesName}</div>
-                  <div className='mb-1 text-gray-400 text-sm'>
-                    <span className='mr-2'>Geopraphic origin: </span>
-                    <Chip
-                      label={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).label}
-                      color={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).color as any}
-                    />
-                  </div>
-                  <div className='mb-1 text-gray-400 text-sm'>
-                    <span className='mr-2'>Method of reproduction: </span>
-                    <Chip
-                      label={fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).label}
-                      color={
-                        fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).color as any
-                      }
-                    />
-                  </div>
-                  <div className='flex gap-1 items-center mb-2 text-gray-400 text-sm'>
-                    <div>Water temperature in fish farming environment:</div>
-                    <div className='font-bold'>{item?.waterTemperature}°C</div>
-                    <DeviceThermostat color='error' />
-                  </div>
-                  <div className='flex-1'></div>
-                  <div className=''>
-                    <div className='inline-block mr-1'>Number of fish seeds ordered: </div>
-                    <div className='inline-block mr-1'>{item.numberOfFishSeedsOrdered}kg</div>
-                    <BalanceOutlined className='inline-block' color='primary' />
-                  </div>
+            <div className='flex flex-row gap-3 border-b-2 border-solid border-gray-200 pb-3 mb-3'>
+              <Avatar variant='square' src={item.image ?? ''} sx={{ width: 240, height: 240 }} />
+              <div>
+                <div className='mb-5 text-xl font-bold'>{item.speciesName}</div>
+                <div className='mb-1 text-gray-400 text-sm'>
+                  <span className='mr-2'>Geopraphic origin: </span>
+                  <Chip
+                    label={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).label}
+                    color={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).color as any}
+                  />
+                </div>
+                <div className='mb-1 text-gray-400 text-sm'>
+                  <span className='mr-2'>Method of reproduction: </span>
+                  <Chip
+                    label={fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).label}
+                    color={
+                      fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).color as any
+                    }
+                  />
+                </div>
+                <div className='flex gap-1 items-center mb-2 text-gray-400 text-sm'>
+                  <div>Water temperature in fish farming environment:</div>
+                  <div className='font-bold'>{item?.waterTemperature}°C</div>
+                  <DeviceThermostat color='error' />
+                </div>
+                <div className='flex-1'></div>
+                <div className=''>
+                  <div className='inline-block mr-1'>Number of fish seeds ordered: </div>
+                  <div className='inline-block mr-1'>{item.numberOfFishSeedsOrdered}kg</div>
+                  <BalanceOutlined className='inline-block' color='primary' />
                 </div>
               </div>
-
-              <div className='flex flex-row justify-between items-center'>
-                <Typography variant='caption' className='block'>
-                  Transaction hash: {item.fishSeedPurchaseOrderId}
-                </Typography>
-                <Typography variant='caption' className='block'>
-                  Updated time: {formatTime(item.updatedAt)}
-                </Typography>
-              </div>
             </div>
-          ))}
 
-          {items.length > 0 && (
-            <div className='flex justify-center'>
-              <Pagination
-                page={currentPage ?? 1}
-                count={totalPage}
-                onChange={(event, value) => onSearchChange({ page: value })}
-              />
+            <div className='flex flex-row justify-between items-center'>
+              <Typography variant='caption' className='block'>
+                Transaction hash: {item.fishSeedPurchaseOrderId}
+              </Typography>
+              <Typography variant='caption' className='block'>
+                Updated time: {formatTime(item.updatedAt)}
+              </Typography>
             </div>
-          )}
-        </Spinner>
-      </Container>
+          </div>
+        ))}
+
+        {items.length > 0 && (
+          <div className='flex justify-center'>
+            <Pagination
+              page={currentPage ?? 1}
+              count={totalPage}
+              onChange={(event, value) => onSearchChange({ page: value })}
+            />
+          </div>
+        )}
+      </Spinner>
       <Dialog maxWidth='lg' open={openConfirmPopup} fullWidth>
         <ConfirmPopup item={selectedOrder} refetch={refetch} onClose={() => setOpenConfirmPopup(false)} />
       </Dialog>
     </>
   );
 };
-export default ReceivedTab;
+export default OrdersTab;

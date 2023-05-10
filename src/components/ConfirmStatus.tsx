@@ -9,6 +9,7 @@ export enum ProcessStatus {
   Received = 4,
   Updated = 5,
   Proccessed = 6,
+  All = 7,
 }
 
 export const statusStep = [

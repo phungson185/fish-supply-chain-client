@@ -78,6 +78,8 @@ export type UpdateGrowthDetailType = {
 
 export type FishSeedCompanyFishFarmerOrderParamsType = PaginateParamsType & {
   fishSeedsPurchaseOrderDetailsStatus?: number;
+  fishSeedsPurchaser?: string;
+  fishSeedsSeller?: string;
 };
 
 export type FishSeedCompanyFishFarmerOrderPaginateType = PaginateType & {
