@@ -21,11 +21,12 @@ import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { getRoute } from 'routes';
 import { fishSeedCompanyService } from 'services';
 import AddFishSeedPopup from './popups/AddFishSeedPopup';
+import { pinataUrl } from 'utils/common';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -44,7 +45,7 @@ const FishSeeds = () => {
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page });
   const { role } = useSelector(profileSelector);
-
+  const navigate = useNavigate();
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
   const privateRoute = getRoute(role);
@@ -216,7 +217,13 @@ const FishSeeds = () => {
                   <TableCell align='center'>{item.waterTemperature}°C</TableCell>
                   <TableCell align='center'>{item.speciesName}</TableCell>
                   <TableCell align='center'>{item.quantity}kg</TableCell>
-                  <TableCell align='center'>{item.IPFSHash}</TableCell>
+                  <TableCell
+                    align='center'
+                    className='cursor-pointer hover:text-blue-500'
+                    onClick={() => window.open(pinataUrl(item.IPFSHash), '_blank')}
+                  >
+                    {item.IPFSHash}
+                  </TableCell>
                   <TableCell align='center'>
                     <Link to={privateRoute.fishSeedDetail.url?.(item)!}>
                       <Visibility />

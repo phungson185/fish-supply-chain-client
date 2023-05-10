@@ -35,6 +35,7 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
   const { address } = useSelector(profileSelector);
   const [imageLoading, setImageLoading] = useState(false);
   const [image, setImage] = useState('');
+  const [documentLoading, setDocumentLoading] = useState(false);
 
   const { mutate: updateContract, isLoading: updateContractLoading } = useMutation(
     fishSeedCompanyService.updateFarmedFishContract,
@@ -107,6 +108,24 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
       })
       .finally(() => {
         setImageLoading(false);
+      });
+  };
+
+  const handleChangeDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    console.log(file);
+    const formData = new FormData();
+    formData.append('file', file as Blob);
+
+    setDocumentLoading(true);
+    fileService
+      .uploadFile(formData)
+      .then((url) => {
+        setValue('IPFSHash', url.pinataUrl.split('/').pop() ?? '');
+        clearErrors('IPFSHash');
+      })
+      .finally(() => {
+        setDocumentLoading(false);
       });
   };
 
@@ -206,9 +225,23 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
             name='IPFSHash'
             defaultValue=''
             control={control}
-            rules={{ required: 'IPFS hash is required' }}
+            rules={{ required: 'Document is required' }}
             render={({ field, fieldState: { invalid, error } }) => (
-              <TextField {...field} required label='IPFS hash' error={invalid} helperText={error?.message} />
+              <div className='flex justify-center gap-3'>
+                <TextField
+                  className='w-full'
+                  {...field}
+                  required
+                  disabled
+                  label='Document'
+                  error={invalid}
+                  helperText={error?.message}
+                />
+                <LoadingButton variant='contained' component='label' loading={documentLoading}>
+                  Upload
+                  <input hidden type='file' onChange={handleChangeDocument} />
+                </LoadingButton>
+              </div>
             )}
           />
 

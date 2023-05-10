@@ -26,6 +26,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { getRoute } from 'routes';
 import { fishSeedCompanyService } from 'services';
+import { pinataUrl } from 'utils/common';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -219,7 +220,13 @@ const Contracts = () => {
                   <TableCell align='center'>{item.waterTemperature}°C</TableCell>
                   <TableCell align='center'>{item.speciesName}</TableCell>
                   <TableCell align='center'>{item.numberOfFishSeedsAvailable}kg</TableCell>
-                  <TableCell align='center'>{item.IPFSHash}</TableCell>
+                  <TableCell
+                    align='center'
+                    className='cursor-pointer hover:text-blue-500'
+                    onClick={() => window.open(pinataUrl(item.IPFSHash), '_blank')}
+                  >
+                    {item.IPFSHash}
+                  </TableCell>
                   <TableCell align='center'>
                     <Link to={privateRoute.contractDetail.url?.(item)!}>
                       <Visibility />

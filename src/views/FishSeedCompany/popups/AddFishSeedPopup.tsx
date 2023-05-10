@@ -1,5 +1,6 @@
 import { LoadingButton } from '@mui/lab';
 import {
+  Button,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -36,6 +37,7 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
   const { control, handleSubmit, setValue, clearErrors } = useForm({ mode: 'onChange' });
   const { enqueueSnackbar } = useSnackbar();
   const [imageLoading, setImageLoading] = useState(false);
+  const [documentLoading, setDocumentLoading] = useState(false);
   const [image, setImage] = useState('');
 
   const { mutate: addFishSeed, isLoading: addLoading } = useMutation(fishSeedCompanyService.addFishSeed, {
@@ -84,6 +86,26 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
       })
       .finally(() => {
         setImageLoading(false);
+      });
+  };
+
+  const handleChangeDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    console.log(file);
+    const formData = new FormData();
+    formData.append('file', file as Blob);
+
+    setDocumentLoading(true);
+    fileService
+      .uploadFile(formData)
+      .then((url) => {
+        console.log(url);
+
+        setValue('IPFShash', url.pinataUrl.split('/').pop() ?? '');
+        clearErrors('IPFShash');
+      })
+      .finally(() => {
+        setDocumentLoading(false);
       });
   };
 
@@ -213,9 +235,23 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
             name='IPFShash'
             defaultValue=''
             control={control}
-            rules={{ required: 'IPFS hash is required' }}
+            rules={{ required: 'Document is required' }}
             render={({ field, fieldState: { invalid, error } }) => (
-              <TextField {...field} required label='IPFS hash' error={invalid} helperText={error?.message} />
+              <div className='flex justify-center gap-3'>
+                <TextField
+                  className='w-full'
+                  {...field}
+                  required
+                  disabled
+                  label='Document'
+                  error={invalid}
+                  helperText={error?.message}
+                />
+                <LoadingButton variant='contained' component='label' loading={documentLoading}>
+                  Upload
+                  <input hidden type='file' onChange={handleChangeDocument} />
+                </LoadingButton>
+              </div>
             )}
           />
 

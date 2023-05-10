@@ -44,4 +44,8 @@ export const formatTime = (time) => {
   return moment(time).format('HH:mm DD/MM/YYYY');
 };
 
+export const pinataUrl = (hash) => {
+  return `https://gateway.pinata.cloud/ipfs/${hash}`;
+};
+
 export { default as merge } from './merge';

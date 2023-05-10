@@ -31,6 +31,7 @@ const UpdateFishSeedPopup = ({ onClose, fetchFishSeed, fetchLogs, data }: PopupP
   const { control, handleSubmit, setValue, clearErrors } = useForm({ mode: 'onChange' });
   const { enqueueSnackbar } = useSnackbar();
   const [imageLoading, setImageLoading] = useState(false);
+  const [documentLoading, setDocumentLoading] = useState(false);
   const [image, setImage] = useState('');
 
   const { mutate: updateFishSeed, isLoading: updateLoading } = useMutation(fishSeedCompanyService.updateFishSeed, {
@@ -92,6 +93,24 @@ const UpdateFishSeedPopup = ({ onClose, fetchFishSeed, fetchLogs, data }: PopupP
       })
       .finally(() => {
         setImageLoading(false);
+      });
+  };
+
+  const handleChangeDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    console.log(file);
+    const formData = new FormData();
+    formData.append('file', file as Blob);
+
+    setDocumentLoading(true);
+    fileService
+      .uploadFile(formData)
+      .then((url) => {
+        setValue('IPFSHash', url.pinataUrl.split('/').pop() ?? '');
+        clearErrors('IPFSHash');
+      })
+      .finally(() => {
+        setDocumentLoading(false);
       });
   };
 
@@ -221,9 +240,23 @@ const UpdateFishSeedPopup = ({ onClose, fetchFishSeed, fetchLogs, data }: PopupP
             name='IPFSHash'
             defaultValue=''
             control={control}
-            rules={{ required: 'IPFS hash is required' }}
+            rules={{ required: 'Document is required' }}
             render={({ field, fieldState: { invalid, error } }) => (
-              <TextField {...field} required label='IPFS hash' error={invalid} helperText={error?.message} />
+              <div className='flex justify-center gap-3'>
+                <TextField
+                  className='w-full'
+                  {...field}
+                  required
+                  disabled
+                  label='Document'
+                  error={invalid}
+                  helperText={error?.message}
+                />
+                <LoadingButton variant='contained' component='label' loading={documentLoading}>
+                  Upload
+                  <input hidden type='file' onChange={handleChangeDocument} />
+                </LoadingButton>
+              </div>
             )}
           />
 
