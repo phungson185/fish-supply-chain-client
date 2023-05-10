@@ -1,4 +1,4 @@
-import { DeviceThermostat, SetMeal } from '@mui/icons-material';
+import { BalanceOutlined, DeviceThermostat, SetMeal } from '@mui/icons-material';
 import {
   Avatar,
   Button,
@@ -21,34 +21,40 @@ import { parse } from 'qs';
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
-import { fishSeedCompanyService, logService } from 'services';
+import { fishFarmerService, fishSeedCompanyService, logService } from 'services';
 import { formatTime } from 'utils/common';
-import UpdateContractPopup from './popups/UpdateContractPopup';
-import { LogPaginateType } from 'types/Log';
+// import UpdateContractPopup from './popups/UpdateContractPopup';
+import { LogPaginateType, TransactionType } from 'types/Log';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
 import { RoleType } from 'types/Auth';
 import { FishSeedsOrderPopup } from 'views/Batch/components';
+import { UpdateFishGrowthDetailPopup } from './popups';
 
-const ContractDetail = () => {
+const FishGrowthDetail = () => {
   const { role } = useSelector(profileSelector);
   const params = useParams();
   const location = useLocation();
   const [logs, setLogs] = useState<LogPaginateType | undefined>({} as LogPaginateType);
   const { tab, page = 1, size = 5, ...query } = parse(location.search, { ignoreQueryPrefix: true });
-  const [openUpdateContractPopup, setOpenUpdateContractPopup] = useState(false);
   const [dataSearch, onSearchChange] = useSearch({ page, size });
-  const [openPlaceFishSeedsPurchaseOrderPopup, setOpenPlaceFishSeedsPurchaseOrderPopup] = useState(false);
+  const [openUpdatePopup, setOpenUpdatePopup] = useState(false);
   const {
-    data: contract,
-    isSuccess: getContractSuccess,
-    refetch: fetchContract,
+    data: growth,
+    isSuccess: getGrowthSuccess,
+    refetch: fetchGrowthDetail,
   } = useQuery(
-    ['fishSeedCompanyService.getFarmedFishContract'],
-    () => fishSeedCompanyService.getFarmedFishContract({ id: params.id as string }),
+    ['fishFarmerService.getOrder', dataSearch],
+    () => fishFarmerService.getOrder({ id: params.id as string }),
     {
       onSuccess: async (res) => {
-        setLogs(await logService.getLogs({ ...dataSearch, objectId: res?.farmedFishContract }));
+        setLogs(
+          await logService.getLogs({
+            ...dataSearch,
+            objectId: res?.id,
+            transactionType: TransactionType.UPDATE_FISH_GROWTH,
+          }),
+        );
       },
       keepPreviousData: true,
       staleTime: 0,
@@ -61,7 +67,7 @@ const ContractDetail = () => {
     onSearchChange({ ...params });
   }, [onSearchChange, params]);
 
-  if (!getContractSuccess) return <></>;
+  if (!getGrowthSuccess) return <></>;
 
   return (
     <>
@@ -71,60 +77,63 @@ const ContractDetail = () => {
             <div className='relative h-full'>
               <div className='flex items-center justify-between w-full mb-5'>
                 <div className='w-[70%]'>
-                  <Typography variant='h1'>{contract?.speciesName}</Typography>
+                  <Typography variant='h1'>{growth?.speciesName}</Typography>
                   <Typography variant='h6'>
-                    Contract address: <span className='text-blue-600'>{contract?.farmedFishContract}</span>
+                    Contract address: <span className='text-blue-600'>{growth?.farmedFishId.farmedFishContract}</span>
                   </Typography>
                 </div>
                 <Typography variant='caption' className='w-[30%]'>
-                  Updated time: {formatTime(contract?.updatedAt)}
+                  Updated time: {formatTime(growth?.updatedAt)}
                 </Typography>
               </div>
               <div className='mb-1'>
                 <span className='mr-2'>Geopraphic origin: </span>
                 <Chip
-                  label={fishSeedCompanyService.handleMapGeographicOrigin(contract?.geographicOrigin!).label}
-                  color={fishSeedCompanyService.handleMapGeographicOrigin(contract?.geographicOrigin!).color as any}
+                  label={fishSeedCompanyService.handleMapGeographicOrigin(growth?.geographicOrigin!).label}
+                  color={fishSeedCompanyService.handleMapGeographicOrigin(growth?.geographicOrigin!).color as any}
                 />
               </div>
               <div className='mb-1'>
                 <span className='mr-2'>Method of reproduction: </span>
                 <Chip
-                  label={fishSeedCompanyService.handleMapMethodOfReproduction(contract?.methodOfReproduction!).label}
+                  label={fishSeedCompanyService.handleMapMethodOfReproduction(growth?.methodOfReproduction!).label}
                   color={
-                    fishSeedCompanyService.handleMapMethodOfReproduction(contract?.methodOfReproduction!).color as any
+                    fishSeedCompanyService.handleMapMethodOfReproduction(growth?.methodOfReproduction!).color as any
                   }
                 />
               </div>
               <div className='flex gap-1 items-center mb-2'>
                 <div>Water temperature in fish farming environment:</div>
-                <div className='font-bold'>{contract?.waterTemperature}°C</div>
+                <div className='font-bold'>{growth?.waterTemperature}°C</div>
                 <DeviceThermostat color='error' />
               </div>
+              {growth.fishWeight && (
+                <div className='flex gap-1 items-center mb-2'>
+                  <div>Fish weight:</div>
+                  <div className='font-bold'>{growth?.fishWeight}kg</div>
+                  <SetMeal className='text-blue-600' />
+                </div>
+              )}
               <div className='flex gap-1 items-center'>
-                <div>Quantity available:</div>
-                <div className='font-bold'>{contract?.numberOfFishSeedsAvailable}kg</div>
-                <SetMeal className='text-blue-600' />
+                <div>Total number of fish:</div>
+                <div className='font-bold'>{growth?.totalNumberOfFish}kg</div>
+                <BalanceOutlined color='primary' />
               </div>
               <Typography variant='caption' className='absolute bottom-0 left-0'>
-                {contract?.owner.name + ' / ' + contract?.owner.userAddress + ' / ' + contract?.owner.phone}
+                {growth?.owner.name + ' / ' + growth?.owner.userAddress + ' / ' + growth?.owner.phone}
               </Typography>
 
-              {role === RoleType.fishSeedCompanyRole && (
-                <Button
-                  className='absolute bottom-0 right-0'
-                  size='small'
-                  onClick={() => setOpenUpdateContractPopup(true)}
-                >
-                  Edit
+              {role === RoleType.fishFarmerRole && (
+                <Button className='absolute bottom-0 right-0' size='small' onClick={() => setOpenUpdatePopup(true)}>
+                  Update growth
                 </Button>
               )}
 
-              {role === RoleType.fishFarmerRole && (
+              {role === RoleType.fishProcessorRole && (
                 <Button
                   className='absolute bottom-0 right-0'
                   size='small'
-                  onClick={() => setOpenPlaceFishSeedsPurchaseOrderPopup(true)}
+                  //   onClick={() => setOpenPlaceFishSeedsPurchaseOrderPopup(true)}
                 >
                   Make order
                 </Button>
@@ -132,9 +141,9 @@ const ContractDetail = () => {
             </div>
           </Grid>
           <Grid item xs={4}>
-            <Spinner loading={!getContractSuccess}>
+            <Spinner loading={!getGrowthSuccess}>
               <Avatar
-                src={contract.image}
+                src={growth.image}
                 alt='fish image'
                 variant='square'
                 className='mx-auto bg-cover bg-no-repeat w-full h-full'
@@ -173,7 +182,7 @@ const ContractDetail = () => {
                   <TableCell align='center'>{formatTime(item.updatedAt)}</TableCell>
                 </TableRow>
               ))}
-              <TableRowEmpty visible={!getContractSuccess && items.length === 0} />
+              <TableRowEmpty visible={!getGrowthSuccess && items.length === 0} />
             </TableBody>
             <caption className='font-bold border-t'>{total ?? 0} Transactions</caption>
           </Table>
@@ -187,19 +196,15 @@ const ContractDetail = () => {
         </div>
       </Card>
 
-      <Dialog open={openUpdateContractPopup} fullWidth maxWidth='md'>
-        <UpdateContractPopup
-          data={contract!}
-          onClose={() => setOpenUpdateContractPopup(false)}
-          fetchContract={fetchContract}
+      <Dialog maxWidth='sm' open={openUpdatePopup} fullWidth>
+        <UpdateFishGrowthDetailPopup
+          item={growth}
+          refetch={fetchGrowthDetail}
+          onClose={() => setOpenUpdatePopup(false)}
         />
-      </Dialog>
-
-      <Dialog open={openPlaceFishSeedsPurchaseOrderPopup} fullWidth maxWidth='sm'>
-        <FishSeedsOrderPopup item={contract} onClose={() => setOpenPlaceFishSeedsPurchaseOrderPopup(false)} />
       </Dialog>
     </>
   );
 };
 
-export default ContractDetail;
+export default FishGrowthDetail;

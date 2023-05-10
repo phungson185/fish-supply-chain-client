@@ -1,30 +1,43 @@
 import { LoadingButton } from '@mui/lab';
-import { DialogActions, DialogContent, DialogTitle, InputAdornment, TextField, Typography } from '@mui/material';
+import {
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  InputAdornment,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
-import { fishFarmerService } from 'services';
+import { fileService, fishFarmerService } from 'services';
 import { PopupController } from 'types/Common';
 import {
   FishSeedCompanyFishFarmerOrderPaginateType,
   FishSeedCompanyFishFarmerOrderType,
   UpdateGrowthDetailType,
 } from 'types/FishFarmer';
+import { useState } from 'react';
+import { UploadLabel } from 'views/Registration/components';
+import { getBase64 } from 'utils/common';
 
 type PopupProps = PopupController & {
   item: FishSeedCompanyFishFarmerOrderType;
-  refetch: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined,
-  ) => Promise<QueryObserverResult<FishSeedCompanyFishFarmerOrderPaginateType, unknown>>;
+  refetch: () => void;
 };
 
 const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => {
-  const { control, handleSubmit, setValue } = useForm({ mode: 'onChange' });
+  const { control, handleSubmit, setValue, clearErrors } = useForm({ mode: 'onChange' });
   const { address } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
+  const [documentLoading, setDocumentLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [image, setImage] = useState('');
+
   const { mutate: updateGrowthDetail, isLoading } = useMutation(fishFarmerService.updateGrowthDetail, {
     onSuccess: () => {
       enqueueSnackbar('Update growth detail successfully', {
@@ -40,32 +53,75 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
 
   const handleUpdateGrowthDetail = () => {
     handleSubmit(async (values) => {
-      await fishFarmerService.updateFarmedFishGrowthDetails({
+      const resChain = await fishFarmerService.updateFarmedFishGrowthDetails({
         FarmedFishGrowthDetailsUploader: address,
         FishWeight: values.FishWeight,
         TotalNumberOfFish: values.TotalNumberOfFish,
         IPFShash: values.IPFShash,
-        speciesname: values.speciesname,
+        WaterTemperature: values.WaterTemperature,
+        Image: values.Image,
+        farmedFishContractAddress: item.farmedFishId.farmedFishContract,
       });
 
       await updateGrowthDetail({
+        transactionHash: resChain.transactionHash,
         orderId: item.id,
-        speciesName: values.Speciesname,
+        waterTemperature: values.WaterTemperature,
         fishWeight: values.FishWeight,
         totalNumberOfFish: values.TotalNumberOfFish,
         IPFSHash: values.IPFShash,
+        image: values.Image,
       } as UpdateGrowthDetailType);
     })();
   };
 
   useEffect(() => {
     if (item) {
-      setValue('speciesname', item.speciesName);
+      setValue('WaterTemperature', item.waterTemperature);
       setValue('FishWeight', item.fishWeight);
       setValue('TotalNumberOfFish', item.totalNumberOfFish);
       setValue('IPFShash', item.IPFSHash);
+      setValue('Image', item.image);
+      setImage(item.image);
     }
   }, [item]);
+
+  const handleChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    getBase64(file, setImage);
+
+    const formData = new FormData();
+    formData.append('file', file as Blob);
+
+    setImageLoading(true);
+    fileService
+      .uploadFile(formData)
+      .then((url) => {
+        setValue('image', url.pinataUrl ?? '');
+        clearErrors('image');
+      })
+      .finally(() => {
+        setImageLoading(false);
+      });
+  };
+
+  const handleChangeDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    console.log(file);
+    const formData = new FormData();
+    formData.append('file', file as Blob);
+
+    setDocumentLoading(true);
+    fileService
+      .uploadFile(formData)
+      .then((url) => {
+        setValue('IPFShash', url.pinataUrl.split('/').pop() ?? '');
+        clearErrors('IPFShash');
+      })
+      .finally(() => {
+        setDocumentLoading(false);
+      });
+  };
 
   return (
     <>
@@ -77,11 +133,22 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
 
         <div className='mt-6 mb-6 flex flex-col gap-6'>
           <Controller
-            name='speciesname'
+            name='WaterTemperature'
             defaultValue=''
             control={control}
+            rules={{ required: 'Water temperature is required', min: 0 }}
             render={({ field, fieldState: { invalid, error } }) => (
-              <TextField {...field} required label='Species name' error={invalid} helperText={error?.message} />
+              <TextField
+                {...field}
+                required
+                label='Water temperature'
+                error={invalid}
+                helperText={error?.message}
+                type='number'
+                InputProps={{
+                  endAdornment: <InputAdornment position='start'>℃</InputAdornment>,
+                }}
+              />
             )}
           />
 
@@ -122,12 +189,44 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
               />
             )}
           />
+
           <Controller
             name='IPFShash'
             defaultValue=''
             control={control}
+            rules={{ required: 'Document is required' }}
             render={({ field, fieldState: { invalid, error } }) => (
-              <TextField {...field} required label='IPFS hash' error={invalid} helperText={error?.message} />
+              <div className='flex justify-center gap-3'>
+                <TextField
+                  className='w-full'
+                  {...field}
+                  required
+                  disabled
+                  label='Document'
+                  error={invalid}
+                  helperText={error?.message}
+                />
+                <LoadingButton variant='contained' component='label' loading={documentLoading}>
+                  Upload
+                  <input hidden type='file' onChange={handleChangeDocument} />
+                </LoadingButton>
+              </div>
+            )}
+          />
+
+          <Controller
+            name='Image'
+            defaultValue=''
+            control={control}
+            render={({ fieldState: { invalid } }) => (
+              <FormControl fullWidth className='mb-4'>
+                <Typography variant='subtitle1'>Image</Typography>
+                <input hidden type='file' id='cover' accept='image/*' onChange={handleChangeImage} />
+                <UploadLabel
+                  {...{ htmlFor: 'cover', variant: 'rounded', image: image }}
+                  {...{ width: '100%', height: '100%', loading: imageLoading, error: invalid }}
+                />
+              </FormControl>
             )}
           />
         </div>
@@ -137,7 +236,11 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
         <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
           Cancel
         </LoadingButton>
-        <LoadingButton variant='contained' onClick={handleUpdateGrowthDetail} loading={isLoading}>
+        <LoadingButton
+          variant='contained'
+          onClick={handleUpdateGrowthDetail}
+          loading={isLoading || imageLoading || documentLoading}
+        >
           Update
         </LoadingButton>
       </DialogActions>

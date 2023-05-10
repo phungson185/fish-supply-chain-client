@@ -369,8 +369,9 @@ contract FarmedFish {
         address FarmedFishGrowthDetailsUploader;
         uint256 FishWeight;
         uint256 TotalNumberOfFish;
-        string speciesname;
+        uint256 waterTemperature;
         string IPFShash;
+        string Image;
         status FarmedFishGrowthDetailsStatus;
     }
 
@@ -388,14 +389,17 @@ contract FarmedFish {
         address FishGrowthDetailsUploader,
         uint256 FishWeight,
         uint256 TotalNumberOfFish,
-        string speciesname
+        uint256 waterTemperature,
+        string Image,
+        string IPFShash
     );
 
     function UpdateFarmedFishGrowthDetails(
         address FarmedFishGrowthDetailsUploader,
         uint256 FishWeight,
         uint256 TotalNumberOfFish,
-        string memory speciesname,
+        uint256 WaterTemperature,
+        string memory Image,
         string memory IPFShash
     ) public onlyFarmedFishGrowthDetailsUploader {
         require(
@@ -411,15 +415,18 @@ contract FarmedFish {
                 address(this),
                 TotalNumberOfFish,
                 FishWeight,
-                speciesname
+                WaterTemperature,
+                Image,
+                IPFShash
             )
         );
         GetFarmedFishGrowthDetailsID[tebp] = FarmedFishGrowthDetails(
             FarmedFishGrowthDetailsUploader,
             FishWeight,
             TotalNumberOfFish,
-            speciesname,
+            WaterTemperature,
             IPFShash,
+            Image,
             status.Updated
         );
 
@@ -428,7 +435,9 @@ contract FarmedFish {
             FarmedFishGrowthDetailsUploader,
             FishWeight,
             TotalNumberOfFish,
-            speciesname
+            waterTemperature,
+            Image,
+            IPFShash
         );
     }
 
@@ -451,23 +460,32 @@ contract FarmedFish {
     struct FarmedFishPurchaseOrderDetails {
         address FarmedFishpurchaser;
         uint256 NumberOfFishOrdered;
-        string speciesname;
         address FarmedFishseller;
         status FarmedFishPurchaseOrderDetailsStatus;
     }
     mapping(bytes32 => FarmedFishPurchaseOrderDetails)
         public GetFarmedFishPurchaseOrderID;
-    event FarmedFishPurchaseOrderPlaced(bytes32 FarmedFishPurchaseOrderID);
+    event FarmedFishPurchaseOrderPlaced(
+        bytes32 FarmedFishPurchaseOrderID,
+        address FarmedFishPurchaser,
+        address FarmedFishSeller,
+        uint256 NumberOfFishOrdered,
+        status FarmedFishPurchaseOrderDetailsStatus
+    );
     event FarmedFishPurchaseOrderReceived(
+        bytes32 FarmedFishPurchaseOrderID,
+        uint256 TotalNumberOfFish,
+        status NEWStatus
+    );
+    event FarmedFishOrderReceived(
         bytes32 FarmedFishPurchaseOrderID,
         status NEWStatus
     );
-    event FarmedFishOrderReceived(bytes32 FarmedFishPurchaseOrderID);
 
     function PlaceFarmedFishPurchaseOrder(
+        bytes32 FarmedFishGrowthDetailsID,
         address FarmedFishPurchaser,
         uint256 NumberOfFishOrdered,
-        string memory speciesname,
         address FarmedFishSeller
     ) public onlyFarmedFishPurchaser {
         require(
@@ -475,40 +493,60 @@ contract FarmedFish {
             "FishProcessor not authorized."
         );
         bytes32 temp1 = keccak256(
-            abi.encodePacked(msg.sender, NumberOfFishOrdered, speciesname)
+            abi.encodePacked(msg.sender, NumberOfFishOrdered)
         );
         GetFarmedFishPurchaseOrderID[temp1] = FarmedFishPurchaseOrderDetails(
             FarmedFishPurchaser,
             NumberOfFishOrdered,
-            speciesname,
             FarmedFishSeller,
             status.Pending
         );
-        emit FarmedFishPurchaseOrderPlaced(temp1);
+
+        GetFarmedFishGrowthDetailsID[FarmedFishGrowthDetailsID]
+            .TotalNumberOfFish -= NumberOfFishOrdered;
+
+        emit FarmedFishPurchaseOrderPlaced(
+            temp1,
+            FarmedFishPurchaser,
+            FarmedFishSeller,
+            NumberOfFishOrdered,
+            status.Pending
+        );
     }
 
     function ConfirmFarmedFishPurchaseOrder(
         bytes32 FarmedFishPurchaseOrderID,
+        bytes32 FarmedFishGrowthDetailsID,
         bool Accepted
     ) public onlyFarmedFishSeller {
         require(
             GetFarmedFishPurchaseOrderID[FarmedFishPurchaseOrderID]
                 .FarmedFishseller == msg.sender,
-            "FarmedFishPOReceiver is not authorized."
+            "Fish farmer is not authorized."
         );
         require(
             GetFarmedFishPurchaseOrderID[FarmedFishPurchaseOrderID]
                 .FarmedFishPurchaseOrderDetailsStatus == status.Pending
         );
+
         if (Accepted) {
             GetFarmedFishPurchaseOrderID[FarmedFishPurchaseOrderID]
                 .FarmedFishPurchaseOrderDetailsStatus = status.Accepted;
         } else {
             GetFarmedFishPurchaseOrderID[FarmedFishPurchaseOrderID]
                 .FarmedFishPurchaseOrderDetailsStatus = status.Rejected;
+
+            uint256 NumberOfFishOrdered = GetFarmedFishPurchaseOrderID[
+                FarmedFishPurchaseOrderID
+            ].NumberOfFishOrdered;
+
+            GetFarmedFishGrowthDetailsID[FarmedFishGrowthDetailsID]
+                .TotalNumberOfFish += NumberOfFishOrdered;
         }
         emit FarmedFishPurchaseOrderReceived(
             FarmedFishPurchaseOrderID,
+            GetFarmedFishGrowthDetailsID[FarmedFishGrowthDetailsID]
+                .TotalNumberOfFish,
             GetFarmedFishPurchaseOrderID[FarmedFishPurchaseOrderID]
                 .FarmedFishPurchaseOrderDetailsStatus
         );
@@ -536,7 +574,11 @@ contract FarmedFish {
         GetFarmedFishPurchaseOrderID[FarmedFishPurchaseOrderID]
             .FarmedFishPurchaseOrderDetailsStatus = status.Received;
 
-        emit FarmedFishOrderReceived(FarmedFishPurchaseOrderID);
+        emit FarmedFishOrderReceived(
+            FarmedFishPurchaseOrderID,
+            GetFarmedFishPurchaseOrderID[FarmedFishPurchaseOrderID]
+                .FarmedFishPurchaseOrderDetailsStatus
+        );
     }
 }
 

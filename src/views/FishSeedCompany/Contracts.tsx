@@ -183,11 +183,11 @@ const Contracts = () => {
               <TableRow>
                 <TableCell>Contract address</TableCell>
                 <TableCell>Company</TableCell>
+                <TableCell>Species name</TableCell>
                 <TableCell>Image</TableCell>
                 <TableCell>Geographic origin</TableCell>
                 <TableCell>Method of reproduction</TableCell>
                 <TableCell>Water temperature</TableCell>
-                <TableCell>Species name</TableCell>
                 <TableCell>Number of fish seeds available</TableCell>
                 <TableCell>IPFS hash</TableCell>
                 <TableCell>Action</TableCell>
@@ -198,6 +198,7 @@ const Contracts = () => {
                 <TableRow key={item.id}>
                   <TableCell align='center'>{item.farmedFishContract}</TableCell>
                   <TableCell align='center'>{item.owner?.name}</TableCell>
+                  <TableCell align='center'>{item.speciesName}</TableCell>
                   <TableCell align='center'>
                     <Avatar src={item.image} variant='square'>
                       <Assignment />
@@ -218,7 +219,6 @@ const Contracts = () => {
                     />
                   </TableCell>
                   <TableCell align='center'>{item.waterTemperature}°C</TableCell>
-                  <TableCell align='center'>{item.speciesName}</TableCell>
                   <TableCell align='center'>{item.numberOfFishSeedsAvailable}kg</TableCell>
                   <TableCell
                     align='center'

@@ -1,6 +1,13 @@
 import { BaseType, PaginateParamsType, PaginateType } from './Common';
 import { UserType } from './User';
 
+export enum TransactionType {
+  UPDATE_FISH_SEED = 0,
+  DEPLOY_CONTRACT = 1,
+  UPDATE_ORDER_STATUS = 2,
+  UPDATE_FISH_GROWTH = 3,
+}
+
 export type MapLogType = {
   label: string;
   color: string;

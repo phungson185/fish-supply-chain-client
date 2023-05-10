@@ -29,7 +29,7 @@ import { fishFarmerService, fishSeedCompanyService, logService } from 'services'
 import { RoleType } from 'types/Auth';
 import { PopupController } from 'types/Common';
 import { FishSeedCompanyFishFarmerOrderPaginateType, FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
-import { LogParamsType } from 'types/Log';
+import { LogParamsType, TransactionType } from 'types/Log';
 import { formatTime, shorten } from 'utils/common';
 
 const steps = ['The request is being processed', 'The seller has accepted the request', 'The item has been received'];
@@ -65,7 +65,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     isSuccess: getLogsSuccess,
     refetch: fetchLogs,
   } = useQuery(['logService.getLogs', { id: item.id }], () =>
-    logService.getLogs({ objectId: item.id, transactionType: 2 } as LogParamsType),
+    logService.getLogs({ objectId: item.id, transactionType: TransactionType.UPDATE_ORDER_STATUS } as LogParamsType),
   );
 
   useEffect(() => {
@@ -170,6 +170,10 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
         </Stepper>
         <Grid container spacing={5}>
           <Grid item xs={4}>
+            <div className='flex flex-row gap-3 items-center mb-5'>
+              <Typography variant='h3'>Order ID: </Typography>
+              <div className='text-xl text-blue-500'>{shorten(item.fishSeedPurchaseOrderId)}</div>
+            </div>
             <Avatar variant='square' src={item.image} sx={{ width: '100%', height: 'auto' }} />
           </Grid>
           <Grid item xs={8}>

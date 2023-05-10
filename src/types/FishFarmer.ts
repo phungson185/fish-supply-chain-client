@@ -25,10 +25,12 @@ export type ReceiveFishSeedsOrderType = {
 };
 
 export type UpdateFarmedFishGrowthDetailsType = {
+  farmedFishContractAddress: string;
   FarmedFishGrowthDetailsUploader: string;
   FishWeight: string;
   TotalNumberOfFish: string;
-  speciesname: string;
+  WaterTemperature: number;
+  Image: string;
   IPFShash: string;
 };
 
@@ -69,10 +71,12 @@ export type ConfirmOrderType = {
 };
 
 export type UpdateGrowthDetailType = {
+  transactionHash: string;
   orderId: string;
   totalNumberOfFish: number;
   fishWeight: number;
-  speciesName: string;
+  waterTemperature: number;
+  image: string;
   IPFSHash: string;
 };
 

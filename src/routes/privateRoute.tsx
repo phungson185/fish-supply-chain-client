@@ -3,11 +3,11 @@ import { ContractDetail, Contracts, FishSeedDetail, FishSeeds } from 'views/Fish
 import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
 import { RegistrationView } from 'views/Registration';
 import { ProfileUpdate } from 'views/Profile';
-import FishGrowthDetails from 'views/FishFarmer/FishGrowthDetails';
 import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
 import { FishProcessor } from 'views/FishProcessor';
 import { FishProcessorDistributorOrders } from 'views/FishProcessor - Distributor - Orders';
 import { DistributorRetailerOrders } from 'views/Distributor-Retailer-Orders';
+import { FishGrowthDetail, FishGrowths } from 'views/FishFarmer';
 
 type RouteType = {
   path: string;
@@ -91,10 +91,16 @@ const fishFarmerRoute: PrivateRouteType = {
     name: 'Batches',
     element: <Batches />,
   },
-  growthDetails: {
-    path: '/growthDetails',
-    name: 'Growth Details',
-    element: <FishGrowthDetails />,
+  growths: {
+    path: '/fish-growths',
+    name: 'Fish growths',
+    element: <FishGrowths />,
+  },
+  growthDetail: {
+    path: '/fish-growth/:id',
+    name: 'Fish growth detail',
+    url: ({ id }: { id: string }) => `/fish-growth/${id}`,
+    element: <FishGrowthDetail />,
   },
   contractDetail: {
     path: '/contract/:id',

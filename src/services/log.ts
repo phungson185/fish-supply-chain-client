@@ -7,13 +7,23 @@ const handleMapTransactionType = (log: number): MapLogType => {
   switch (log) {
     case 0:
       return {
-        label: 'Update',
+        label: 'Update fish seed',
         color: 'bg-green-500',
       };
     case 1:
       return {
-        label: 'Deploy',
+        label: 'Deploy contract',
         color: 'bg-blue-500',
+      };
+    case 2:
+      return {
+        label: 'Update order status',
+        color: 'bg-yellow-500',
+      };
+    case 3:
+      return {
+        label: 'Update fish growth',
+        color: 'bg-red-500',
       };
     default:
       return {

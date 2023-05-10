@@ -1,6 +1,8 @@
-import { CategoryOutlined } from '@mui/icons-material';
+import { Assignment, CategoryOutlined, Visibility } from '@mui/icons-material';
 import {
+  Avatar,
   Button,
+  Chip,
   debounce,
   Dialog,
   Menu,
@@ -20,9 +22,15 @@ import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
-import { fishFarmerService } from 'services';
+import { fishFarmerService, fishSeedCompanyService } from 'services';
 import { FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
 import { UpdateFishGrowthDetailPopup } from './popups';
+import { useSelector } from 'react-redux';
+import { profileSelector } from 'reducers/profile';
+import { ProcessStatus } from 'components/ConfirmStatus';
+import { pinataUrl } from 'utils/common';
+import { Link } from 'react-router-dom';
+import { getRoute } from 'routes';
 
 const FILTERS = [
   { label: 'Total number of fish', orderBy: 'totalNumberOfFish' },
@@ -34,10 +42,15 @@ const SORT_TYPES = [
   { label: 'High to Low', desc: 'true' },
 ];
 
-const FishGrowthDetails = () => {
+const FishGrowths = () => {
+  const { id, role } = useSelector(profileSelector);
   const location = useLocation();
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
-  const [dataSearch, onSearchChange] = useSearch({ page, fishSeedsPurchaseOrderDetailsStatus: 4 });
+  const [dataSearch, onSearchChange] = useSearch({
+    page,
+    fishSeedsPurchaseOrderDetailsStatus: ProcessStatus.Received,
+    fishSeedsPurchaser: id,
+  });
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
 
@@ -59,6 +72,7 @@ const FishGrowthDetails = () => {
   const [selectedOrder, setSelectedOrder] = useState<FishSeedCompanyFishFarmerOrderType>(
     {} as FishSeedCompanyFishFarmerOrderType,
   );
+  const privateRoute = getRoute(role);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceChangeParams = useCallback(
@@ -155,36 +169,56 @@ const FishGrowthDetails = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Growth ID</TableCell>
-                <TableCell>Owner address</TableCell>
-                <TableCell>Updater address</TableCell>
-                <TableCell>Total number of fish</TableCell>
-                <TableCell>Fish weight (kg)</TableCell>
+                <TableCell>Contract address</TableCell>
                 <TableCell>Species name</TableCell>
-                <TableCell>IPFSHash</TableCell>
+                <TableCell>Image</TableCell>
+                <TableCell>Geographic origin</TableCell>
+                <TableCell>Method of reproduction</TableCell>
+                <TableCell>Water temperature</TableCell>
+                <TableCell>Number of fish seeds available</TableCell>
+                <TableCell>Fish weight</TableCell>
+                <TableCell>IPFS hash</TableCell>
                 <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell align='center'>{item.id}</TableCell>
-                  <TableCell align='center'>{item.owner.address}</TableCell>
-                  <TableCell align='center'>{item.updater?.address ?? 'NA'}</TableCell>
-                  <TableCell align='center'>{item.totalNumberOfFish}</TableCell>
-                  <TableCell align='center'>{item.fishWeight ?? 'NA'}</TableCell>
+                  <TableCell align='center'>{item.farmedFishId.farmedFishContract}</TableCell>
                   <TableCell align='center'>{item.speciesName}</TableCell>
-                  <TableCell align='center'>{item.IPFSHash}</TableCell>
                   <TableCell align='center'>
-                    <Button
-                      variant='contained'
-                      onClick={() => {
-                        setSelectedOrder(item);
-                        setOpenUpdatePopup(true);
-                      }}
-                    >
-                      Update
-                    </Button>
+                    <Avatar src={item.image} variant='square'>
+                      <Assignment />
+                    </Avatar>
+                  </TableCell>
+                  <TableCell align='center'>
+                    <Chip
+                      label={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).label}
+                      color={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).color as any}
+                    />
+                  </TableCell>
+                  <TableCell align='center'>
+                    <Chip
+                      label={fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).label}
+                      color={
+                        fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).color as any
+                      }
+                    />
+                  </TableCell>
+                  <TableCell align='center'>{item.waterTemperature}°C</TableCell>
+                  <TableCell align='center'>{item.totalNumberOfFish}kg</TableCell>
+                  <TableCell align='center'>{item.fishWeight ? `${item.fishWeight}kg` : 'NA'}</TableCell>
+                  <TableCell
+                    align='center'
+                    className='cursor-pointer hover:text-blue-500'
+                    onClick={() => window.open(pinataUrl(item.IPFSHash), '_blank')}
+                  >
+                    {item.IPFSHash}
+                  </TableCell>
+                  <TableCell align='center'>
+                    <Link to={privateRoute.growthDetail.url?.(item)!}>
+                      <Visibility />
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}
@@ -202,12 +236,8 @@ const FishGrowthDetails = () => {
           onChange={(event, value) => onSearchChange({ page: value })}
         />
       </div>
-
-      <Dialog maxWidth='sm' open={openUpdatePopup} fullWidth>
-        <UpdateFishGrowthDetailPopup item={selectedOrder} refetch={refetch} onClose={() => setOpenUpdatePopup(false)} />
-      </Dialog>
     </>
   );
 };
 
-export default FishGrowthDetails;
+export default FishGrowths;

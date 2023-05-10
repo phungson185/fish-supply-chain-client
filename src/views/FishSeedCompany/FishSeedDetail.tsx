@@ -123,115 +123,108 @@ const FishSeedDetail = () => {
 
   return (
     <>
-      <div>
-        <Grid container spacing={5}>
-          <Grid item xs={8}>
-            <Paper className='min-h-screen p-6'>
-              <div className='flex flex-row justify-between items-center mb-5'>
-                <div>
-                  <Typography variant='h1'>{fishSeed.title}</Typography>
-                  <Typography variant='h4'>{fishSeed.subTitle}</Typography>
-                </div>
-                <Typography variant='caption'>
-                  Updated time:{' '}
-                  <span className='font-bold'>{moment(fishSeed.updatedAt).format('HH:mm DD/MM/YYYY')}</span>
+      <Grid container spacing={5}>
+        <Grid item xs={8}>
+          <Paper className='min-h-full p-6'>
+            <div className='flex flex-row justify-between items-center mb-5'>
+              <div>
+                <Typography variant='h1'>{fishSeed.title}</Typography>
+                <Typography variant='h4'>{fishSeed.subTitle}</Typography>
+              </div>
+              <Typography variant='caption'>
+                Updated time: <span className='font-bold'>{moment(fishSeed.updatedAt).format('HH:mm DD/MM/YYYY')}</span>
+              </Typography>
+            </div>
+            <Typography variant='caption' className='text-base'>
+              {fishSeed.description}
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={4}>
+          <Card className='mb-5'>
+            <CardMedia
+              sx={{ height: 300 }}
+              image={fishSeed.image}
+              title='fish image'
+              className='bg-cover bg-no-repeat'
+            />
+            <CardContent className='flex flex-col gap-5'>
+              <div>
+                <Typography gutterBottom variant='h3' component='div'>
+                  {fishSeed.speciesName}
                 </Typography>
               </div>
-              <Typography variant='caption' className='text-base'>
-                {fishSeed.description}
+              <div className='flex gap-3 items-center'>
+                <Chip
+                  label={fishSeedCompanyService.handleMapGeographicOrigin(fishSeed?.geographicOrigin!).label}
+                  color={fishSeedCompanyService.handleMapGeographicOrigin(fishSeed?.geographicOrigin!).color as any}
+                />
+                <Chip
+                  label={fishSeedCompanyService.handleMapMethodOfReproduction(fishSeed?.methodOfReproduction!).label}
+                  color={
+                    fishSeedCompanyService.handleMapMethodOfReproduction(fishSeed?.methodOfReproduction!).color as any
+                  }
+                />
+              </div>
+              <div className='flex gap-1 items-center'>
+                <DeviceThermostat color='error' />
+                <div>Water temperature in fish farming environment:</div>
+                <div className='font-bold'>{fishSeed.waterTemperature}°C</div>
+              </div>
+              <div className='flex gap-1 items-center'>
+                <SetMeal className='text-blue-600' />
+                <div>Quantity available:</div>
+                <div className='font-bold'>{fishSeed.quantity}kg</div>
+              </div>
+            </CardContent>
+            <CardActions className='flex justify-end'>
+              <Button size='small' onClick={() => setOpenUpdateFishSeedPopup(true)} disabled={fishSeed.isMakeContract}>
+                Edit
+              </Button>
+              <Button size='small' onClick={() => setOpenEnterQuantityPopup(true)} disabled={fishSeed.isMakeContract}>
+                Create contract
+              </Button>
+            </CardActions>
+          </Card>
+          {items && items.length > 0 && (
+            <Card className='flex flex-col items-center p-2 gap-2'>
+              <Typography variant='h4' className='p-2'>
+                Activities log
               </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Card className='mb-5'>
-              <CardMedia
-                sx={{ height: 300 }}
-                image={fishSeed.image}
-                title='fish image'
-                className='bg-cover bg-no-repeat'
-              />
-              <CardContent className='flex flex-col gap-5'>
-                <div>
-                  <Typography gutterBottom variant='h3' component='div'>
-                    {fishSeed.speciesName}
-                  </Typography>
-                </div>
-                <div className='flex gap-3 items-center'>
-                  <Chip
-                    label={fishSeedCompanyService.handleMapGeographicOrigin(fishSeed?.geographicOrigin!).label}
-                    color={fishSeedCompanyService.handleMapGeographicOrigin(fishSeed?.geographicOrigin!).color as any}
-                  />
-                  <Chip
-                    label={fishSeedCompanyService.handleMapMethodOfReproduction(fishSeed?.methodOfReproduction!).label}
-                    color={
-                      fishSeedCompanyService.handleMapMethodOfReproduction(fishSeed?.methodOfReproduction!).color as any
-                    }
-                  />
-                </div>
-                <div className='flex gap-1 items-center'>
-                  <DeviceThermostat color='error' />
-                  <div>Water temperature in fish farming environment:</div>
-                  <div className='font-bold'>{fishSeed.waterTemperature}°C</div>
-                </div>
-                <div className='flex gap-1 items-center'>
-                  <SetMeal className='text-blue-600' />
-                  <div>Quantity available:</div>
-                  <div className='font-bold'>{fishSeed.quantity}kg</div>
-                </div>
-              </CardContent>
-              <CardActions className='flex justify-end'>
-                <Button
-                  size='small'
-                  onClick={() => setOpenUpdateFishSeedPopup(true)}
-                  disabled={fishSeed.isMakeContract}
-                >
-                  Edit
-                </Button>
-                <Button size='small' onClick={() => setOpenEnterQuantityPopup(true)} disabled={fishSeed.isMakeContract}>
-                  Create contract
-                </Button>
-              </CardActions>
-            </Card>
-            {items && items.length > 0 && (
-              <Card className='flex flex-col items-center p-2 gap-2'>
-                <Typography variant='h4' className='p-2'>
-                  Activities log
-                </Typography>
-                <div
-                  style={{ background: 'rgba(75, 85, 99, 100)', width: '100%', height: '1px', marginBottom: '10px' }}
-                ></div>
-                <div className='h-72 w-full overflow-auto'>
-                  {items.map((log, index) => (
-                    <div
-                      key={index}
-                      className='flex flex-col gap-2 w-full mb-2 p-2 rounded-xl hover:bg-primary-main cursor-pointer'
-                      onClick={() => {
-                        setOpenLogDetailPopup(true);
-                        setLogDetail({ oldData: log.oldData, newData: log.newData });
-                      }}
-                    >
-                      <div className='flex flex-row justify-between items-center'>
-                        <div className='flex flex-row gap-2 items-center'>
-                          <div
-                            className={`w-3 h-3 rounded-full ${
-                              logService.handleMapTransactionType(log.transactionType).color
-                            }`}
-                          />
-                          <Typography variant='h6' className='text-'>
-                            {log.title}
-                          </Typography>
-                        </div>
-                        <Typography variant='caption'>{formatTime(log.updatedAt)}</Typography>
+              <div
+                style={{ background: 'rgba(75, 85, 99, 100)', width: '100%', height: '1px', marginBottom: '10px' }}
+              ></div>
+              <div className='h-64 w-full overflow-auto'>
+                {items.map((log, index) => (
+                  <div
+                    key={index}
+                    className='flex flex-col gap-2 w-full mb-2 p-2 rounded-xl hover:bg-primary-main cursor-pointer'
+                    onClick={() => {
+                      setOpenLogDetailPopup(true);
+                      setLogDetail({ oldData: log.oldData, newData: log.newData });
+                    }}
+                  >
+                    <div className='flex flex-row justify-between items-center'>
+                      <div className='flex flex-row gap-2 items-center'>
+                        <div
+                          className={`w-3 h-3 rounded-full ${
+                            logService.handleMapTransactionType(log.transactionType).color
+                          }`}
+                        />
+                        <Typography variant='h6' className='text-'>
+                          {log.title}
+                        </Typography>
                       </div>
-                      <Typography variant='caption'>{log.message}</Typography>
+                      <Typography variant='caption'>{formatTime(log.updatedAt)}</Typography>
                     </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-          </Grid>
+                    <Typography variant='caption'>{log.message}</Typography>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
         </Grid>
-      </div>
+      </Grid>
 
       <Dialog open={openEnterQuantityPopup} fullWidth maxWidth='xs'>
         <DialogContent>
