@@ -66,7 +66,6 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
     },
   );
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
-  console.log(totalPage);
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
   const [desc, setDesc] = useState(query.desc || SORT_TYPES[0].desc);
   const [search, setSearch] = useState(query.search || '');

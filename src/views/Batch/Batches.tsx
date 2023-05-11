@@ -121,18 +121,35 @@ const Batches = () => {
                   <TableCell align='center'>{item.farmedFishId?.aquacultureWaterType}</TableCell>
                   <TableCell align='center'>{item.farmedFishId?.IPFSHash}</TableCell> */}
                   <TableCell align='center'>
-                    <Link to={privateRoute.contractDetail.url?.(item.farmedFishId)!}>
+                    {[RoleType.fishSeedCompanyRole, RoleType.fishFarmerRole].includes(role as RoleType) ? (
+                      <Link to={privateRoute.contractDetail.url?.(item.farmedFishId)!}>
+                        <ProcessStatus
+                          content={`${item.farmedFishId ? 'Completed' : 'Pending'}`}
+                          backgroundColor={`${item.farmedFishId ? 'green' : 'gray'}`}
+                        />
+                      </Link>
+                    ) : (
                       <ProcessStatus
                         content={`${item.farmedFishId ? 'Completed' : 'Pending'}`}
                         backgroundColor={`${item.farmedFishId ? 'green' : 'gray'}`}
                       />
-                    </Link>
+                    )}
                   </TableCell>
                   <TableCell align='center'>
-                    <ProcessStatus
-                      content={`${item.fishFarmerId ? 'Completed' : 'Pending'}`}
-                      backgroundColor={`${item.fishFarmerId ? 'green' : 'gray'}`}
-                    />
+                    {[RoleType.fishFarmerRole, RoleType.fishProcessorRole].includes(role as RoleType) &&
+                    item.fishFarmerId ? (
+                      <Link to={privateRoute.growthDetail.url?.(item.fishFarmerId)!}>
+                        <ProcessStatus
+                          content={`${item.fishFarmerId ? 'Completed' : 'Pending'}`}
+                          backgroundColor={`${item.fishFarmerId ? 'green' : 'gray'}`}
+                        />
+                      </Link>
+                    ) : (
+                      <ProcessStatus
+                        content={`${item.fishFarmerId ? 'Completed' : 'Pending'}`}
+                        backgroundColor={`${item.fishFarmerId ? 'green' : 'gray'}`}
+                      />
+                    )}
                   </TableCell>
                   <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.fishProcessorRole)}>
                     <ProcessStatus
@@ -173,10 +190,6 @@ const Batches = () => {
           onChange={(event, value) => onSearchChange({ page: value })}
         />
       </div>
-
-      <Dialog open={openPlaceFarmedFishPurchaseOrderPopup} fullWidth maxWidth='sm'>
-        <FarmedFishOrderPopup item={selectedBatch} onClose={() => setOpenPlaceFarmedFishPurchaseOrderPopup(false)} />
-      </Dialog>
 
       <Dialog open={openPlaceProcessedFishPurchaseOrderPopup} fullWidth maxWidth='sm'>
         <ProcessedFishOrderPopup

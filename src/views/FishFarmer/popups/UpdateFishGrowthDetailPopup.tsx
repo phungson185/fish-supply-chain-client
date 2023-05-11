@@ -65,12 +65,14 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
 
       await updateGrowthDetail({
         transactionHash: resChain.transactionHash,
+        farmedFishGrowthDetailsID:
+          resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.FarmedFishGrowthDetailsID,
         orderId: item.id,
-        waterTemperature: values.WaterTemperature,
-        fishWeight: values.FishWeight,
-        totalNumberOfFish: values.TotalNumberOfFish,
-        IPFSHash: values.IPFShash,
-        image: values.Image,
+        waterTemperature: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.waterTemperature,
+        fishWeight: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.FishWeight,
+        totalNumberOfFish: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.TotalNumberOfFish,
+        IPFSHash: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.IPFShash,
+        image: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.Image,
       } as UpdateGrowthDetailType);
     })();
   };
@@ -107,7 +109,6 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
 
   const handleChangeDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    console.log(file);
     const formData = new FormData();
     formData.append('file', file as Blob);
 

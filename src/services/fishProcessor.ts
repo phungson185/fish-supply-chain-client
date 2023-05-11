@@ -20,10 +20,16 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
 // contract methods
 const placeFarmedFishPurchaseOrder = async (body: PlaceFarmedFishPurchaseOrderType) => {
-  const { FarmedFishPurchaser, FarmedFishSeller, NumberOfFishOrdered, speciesname, farmedFishContractAddress } = body;
+  const {
+    FarmedFishPurchaser,
+    FarmedFishSeller,
+    NumberOfFishOrdered,
+    farmedFishContractAddress,
+    FarmedFishGrowthDetailsID,
+  } = body;
   const farmedFishContract = new web3.eth.Contract(FarmedFish.abi as AbiItem[], farmedFishContractAddress);
   const result = await farmedFishContract.methods
-    .PlaceFarmedFishPurchaseOrder(FarmedFishPurchaser, NumberOfFishOrdered, speciesname, FarmedFishSeller)
+    .PlaceFarmedFishPurchaseOrder(FarmedFishGrowthDetailsID, FarmedFishPurchaser, NumberOfFishOrdered, FarmedFishSeller)
     .send({
       from: FarmedFishPurchaser,
       gas: 3500000,
@@ -54,12 +60,29 @@ const receiveFarmedFishOrder = async (body: ReceiveFarmedFishOrderType) => {
 };
 
 const deployFishProcessingContract = async (body: ProcessingContractType) => {
-  const { sender, registration, dateOfProcessing, ipfsHash, processedSpeciesname, catchMethod, filletsInPacket, numberOfPackets } = body;
+  const {
+    sender,
+    registration,
+    dateOfProcessing,
+    ipfsHash,
+    processedSpeciesname,
+    catchMethod,
+    filletsInPacket,
+    numberOfPackets,
+  } = body;
   const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], sender);
   const result = await processingContract
     .deploy({
       data: FishProcessing.data.bytecode.object,
-      arguments: [registration, processedSpeciesname, ipfsHash, dateOfProcessing, catchMethod, filletsInPacket, numberOfPackets],
+      arguments: [
+        registration,
+        processedSpeciesname,
+        ipfsHash,
+        dateOfProcessing,
+        catchMethod,
+        filletsInPacket,
+        numberOfPackets,
+      ],
     })
     .send({
       from: sender,

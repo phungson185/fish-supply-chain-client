@@ -469,6 +469,7 @@ contract FarmedFish {
         bytes32 FarmedFishPurchaseOrderID,
         address FarmedFishPurchaser,
         address FarmedFishSeller,
+        uint256 TotalNumberOfFish,
         uint256 NumberOfFishOrdered,
         status FarmedFishPurchaseOrderDetailsStatus
     );
@@ -492,6 +493,10 @@ contract FarmedFish {
             RegistrationContract.FishProcessorExists(FarmedFishPurchaser),
             "FishProcessor not authorized."
         );
+        require(
+            NumberOfFishOrdered <= GetFarmedFishGrowthDetailsID[FarmedFishGrowthDetailsID].TotalNumberOfFish,
+            "Not enough fishs available."
+        );
         bytes32 temp1 = keccak256(
             abi.encodePacked(msg.sender, NumberOfFishOrdered)
         );
@@ -509,6 +514,8 @@ contract FarmedFish {
             temp1,
             FarmedFishPurchaser,
             FarmedFishSeller,
+            GetFarmedFishGrowthDetailsID[FarmedFishGrowthDetailsID]
+            .TotalNumberOfFish,
             NumberOfFishOrdered,
             status.Pending
         );

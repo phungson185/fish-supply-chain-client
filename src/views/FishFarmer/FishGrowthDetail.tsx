@@ -1,4 +1,12 @@
-import { BalanceOutlined, DeviceThermostat, SetMeal } from '@mui/icons-material';
+import {
+  Autorenew,
+  BalanceOutlined,
+  DeviceThermostat,
+  DoneAll,
+  DoneOutline,
+  DoneOutlined,
+  SetMeal,
+} from '@mui/icons-material';
 import {
   Avatar,
   Button,
@@ -22,23 +30,28 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
 import { fishFarmerService, fishSeedCompanyService, logService } from 'services';
-import { formatTime } from 'utils/common';
+import { formatTime, pinataUrl } from 'utils/common';
 // import UpdateContractPopup from './popups/UpdateContractPopup';
 import { LogPaginateType, TransactionType } from 'types/Log';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
 import { RoleType } from 'types/Auth';
-import { FishSeedsOrderPopup } from 'views/Batch/components';
+import { FarmedFishOrderPopup, FishSeedsOrderPopup } from 'views/Batch/components';
 import { UpdateFishGrowthDetailPopup } from './popups';
+import { useSnackbar } from 'notistack';
+import { UpdateGrowthDetailType } from 'types/FishFarmer';
 
 const FishGrowthDetail = () => {
   const { role } = useSelector(profileSelector);
   const params = useParams();
   const location = useLocation();
+  const { enqueueSnackbar } = useSnackbar();
   const [logs, setLogs] = useState<LogPaginateType | undefined>({} as LogPaginateType);
   const { tab, page = 1, size = 5, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page, size });
   const [openUpdatePopup, setOpenUpdatePopup] = useState(false);
+  const [openOrderPopup, setOpenOrderPopup] = useState(false);
+
   const {
     data: growth,
     isSuccess: getGrowthSuccess,
@@ -61,11 +74,28 @@ const FishGrowthDetail = () => {
     },
   );
 
+  const { mutate: updateGrowthDetail, isLoading } = useMutation(fishFarmerService.updateGrowthDetail, {
+    onSuccess: () => {
+      enqueueSnackbar('Update growth successfully', {
+        variant: 'success',
+      });
+      fetchGrowthDetail();
+    },
+    onError: (error: any) => {
+      enqueueSnackbar(error, { variant: 'error' });
+    },
+  });
+
   const { items = [], total, currentPage, pages: totalPage } = logs ?? {};
 
   useEffect(() => {
     onSearchChange({ ...params });
   }, [onSearchChange, params]);
+
+  const handleChangeOrderable = () => {
+    if (role === RoleType.fishFarmerRole)
+      updateGrowthDetail({ orderId: growth?.id, orderable: !growth?.orderable } as UpdateGrowthDetailType);
+  };
 
   if (!getGrowthSuccess) return <></>;
 
@@ -77,9 +107,40 @@ const FishGrowthDetail = () => {
             <div className='relative h-full'>
               <div className='flex items-center justify-between w-full mb-5'>
                 <div className='w-[70%]'>
-                  <Typography variant='h1'>{growth?.speciesName}</Typography>
+                  <div className='flex items-center gap-3'>
+                    <Typography variant='h1' className='mb-2'>
+                      {growth?.speciesName}
+                    </Typography>
+
+                    {growth.orderable ? (
+                      <Chip
+                        label='Orderable'
+                        color='success'
+                        deleteIcon={<DoneOutlined />}
+                        className='text-white mb-2'
+                        onDelete={handleChangeOrderable}
+                      />
+                    ) : (
+                      <Chip
+                        label='Not orderable'
+                        color='error'
+                        deleteIcon={<Autorenew />}
+                        className='text-white mb-2'
+                        onDelete={handleChangeOrderable}
+                      />
+                    )}
+                  </div>
                   <Typography variant='h6'>
                     Contract address: <span className='text-blue-600'>{growth?.farmedFishId.farmedFishContract}</span>
+                  </Typography>
+                  <Typography variant='h6'>
+                    Document:
+                    <span
+                      className='text-blue-600 cursor-pointer'
+                      onClick={() => window.open(pinataUrl(growth?.IPFSHash), '_blank')}
+                    >
+                      {growth?.IPFSHash}
+                    </span>
                   </Typography>
                 </div>
                 <Typography variant='caption' className='w-[30%]'>
@@ -129,12 +190,8 @@ const FishGrowthDetail = () => {
                 </Button>
               )}
 
-              {role === RoleType.fishProcessorRole && (
-                <Button
-                  className='absolute bottom-0 right-0'
-                  size='small'
-                  //   onClick={() => setOpenPlaceFishSeedsPurchaseOrderPopup(true)}
-                >
+              {role === RoleType.fishProcessorRole && growth.orderable && (
+                <Button className='absolute bottom-0 right-0' size='small' onClick={() => setOpenOrderPopup(true)}>
                   Make order
                 </Button>
               )}
@@ -202,6 +259,10 @@ const FishGrowthDetail = () => {
           refetch={fetchGrowthDetail}
           onClose={() => setOpenUpdatePopup(false)}
         />
+      </Dialog>
+
+      <Dialog maxWidth='sm' open={openOrderPopup} fullWidth>
+        <FarmedFishOrderPopup refetch={fetchGrowthDetail} item={growth} onClose={() => setOpenOrderPopup(false)} />
       </Dialog>
     </>
   );

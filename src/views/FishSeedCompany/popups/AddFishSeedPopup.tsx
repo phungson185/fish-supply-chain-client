@@ -91,7 +91,6 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
 
   const handleChangeDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    console.log(file);
     const formData = new FormData();
     formData.append('file', file as Blob);
 
@@ -99,8 +98,6 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
     fileService
       .uploadFile(formData)
       .then((url) => {
-        console.log(url);
-
         setValue('IPFShash', url.pinataUrl.split('/').pop() ?? '');
         clearErrors('IPFShash');
       })

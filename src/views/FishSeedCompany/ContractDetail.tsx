@@ -22,7 +22,7 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
 import { fishSeedCompanyService, logService } from 'services';
-import { formatTime } from 'utils/common';
+import { formatTime, pinataUrl } from 'utils/common';
 import UpdateContractPopup from './popups/UpdateContractPopup';
 import { LogPaginateType } from 'types/Log';
 import { useSelector } from 'react-redux';
@@ -71,13 +71,24 @@ const ContractDetail = () => {
             <div className='relative h-full'>
               <div className='flex items-center justify-between w-full mb-5'>
                 <div className='w-[70%]'>
-                  <Typography variant='h1'>{contract?.speciesName}</Typography>
+                  <Typography variant='h1' className='mb-2'>
+                    {contract?.speciesName}
+                  </Typography>
                   <Typography variant='h6'>
                     Contract address: <span className='text-blue-600'>{contract?.farmedFishContract}</span>
                   </Typography>
                 </div>
                 <Typography variant='caption' className='w-[30%]'>
                   Updated time: {formatTime(contract?.updatedAt)}
+                </Typography>
+                <Typography variant='h6'>
+                  Document:
+                  <span
+                    className='text-blue-600 cursor-pointer'
+                    onClick={() => window.open(pinataUrl(contract?.IPFSHash), '_blank')}
+                  >
+                    {contract?.IPFSHash}
+                  </span>
                 </Typography>
               </div>
               <div className='mb-1'>

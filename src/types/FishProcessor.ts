@@ -5,10 +5,10 @@ import { UserType } from './User';
 // contract types
 export type PlaceFarmedFishPurchaseOrderType = {
   farmedFishContractAddress: string;
+  FarmedFishGrowthDetailsID: string;
   FarmedFishPurchaser: string;
-  NumberOfFishOrdered: string;
-  speciesname: string;
   FarmedFishSeller: string;
+  NumberOfFishOrdered: string;
 };
 
 export type ConfirmFarmedFishPurchaseOrderType = {
@@ -61,8 +61,12 @@ export type CreateOrderType = {
   farmedFishPurchaser: string;
   farmedFishPurchaseOrderID: string;
   farmedFishSeller: string;
-  speciesName: string;
   numberOfFishOrdered: number;
+  geographicOrigin: number;
+  methodOfReproduction: number;
+  speciesName: string;
+  IPFSHash: string;
+  image: string;
 };
 
 export type ConfirmOrderType = {
@@ -81,7 +85,6 @@ export type CreateProcesingContractType = {
   processingContract: string;
   numberOfPackets: number;
 };
-
 
 export type FishFarmerFishProcessorOrderParamsType = PaginateParamsType & {};
 

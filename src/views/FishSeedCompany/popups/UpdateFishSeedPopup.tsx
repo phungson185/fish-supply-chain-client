@@ -98,7 +98,6 @@ const UpdateFishSeedPopup = ({ onClose, fetchFishSeed, fetchLogs, data }: PopupP
 
   const handleChangeDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    console.log(file);
     const formData = new FormData();
     formData.append('file', file as Blob);
 

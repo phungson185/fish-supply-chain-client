@@ -40,7 +40,6 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
   });
 
   const handleConfirm = async (accepted: boolean) => {
-    console.log(accepted, item.fishFarmerId.farmedFishId.farmedFishContract, address, item.farmedFishPurchaseOrderID)
     await fishProcessorService.confirmFarmedFishPurchaseOrder({
       Accepted: accepted,
       farmedFishContractAddress: item.fishFarmerId.farmedFishId.farmedFishContract,

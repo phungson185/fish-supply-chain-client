@@ -6,15 +6,17 @@ import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
-import { fishProcessorService } from 'services';
+import { fishFarmerService, fishProcessorService } from 'services';
 import { BatchType } from 'types/Batch';
 import { PopupController } from 'types/Common';
+import { FishSeedCompanyFishFarmerOrderType, UpdateGrowthDetailType } from 'types/FishFarmer';
 
 type PopupProps = PopupController & {
-  item: BatchType;
+  item: FishSeedCompanyFishFarmerOrderType;
+  refetch: () => void;
 };
 
-const FarmedFishOrderPopup = ({ item, onClose }: PopupProps) => {
+const FarmedFishOrderPopup = ({ item, refetch, onClose }: PopupProps) => {
   const { control, handleSubmit } = useForm({ mode: 'onChange' });
   const { address } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
@@ -33,23 +35,45 @@ const FarmedFishOrderPopup = ({ item, onClose }: PopupProps) => {
     },
   });
 
+  const { mutate: updateGrowthDetail } = useMutation(fishFarmerService.updateGrowthDetail, {
+    onSuccess: () => {
+      enqueueSnackbar('Update growth detail successfully', {
+        variant: 'success',
+      });
+      onClose();
+      refetch();
+    },
+    onError: (error: any) => {
+      enqueueSnackbar(error, { variant: 'error' });
+    },
+  });
+
   const handleOrder = () => {
     handleSubmit(async (values) => {
       const resChain = await fishProcessorService.placeFarmedFishPurchaseOrder({
         farmedFishContractAddress: item.farmedFishId.farmedFishContract,
+        FarmedFishGrowthDetailsID: item.farmedFishGrowthDetailsID,
         FarmedFishPurchaser: address,
-        FarmedFishSeller: item.fishFarmerId?.owner.address!,
+        FarmedFishSeller: item.fishSeedsPurchaser.address,
         NumberOfFishOrdered: values.NumberOfFishOrdered,
-        speciesname: item.fishFarmerId?.speciesName!,
       });
 
+      await updateGrowthDetail({
+        orderId: item.id,
+        totalNumberOfFish: resChain.events?.FarmedFishPurchaseOrderPlaced.returnValues.TotalNumberOfFish,
+      } as UpdateGrowthDetailType);
+
       await createOder({
-        fishFarmerId: item.fishFarmerId?.id!,
+        fishFarmerId: item.id,
         farmedFishPurchaseOrderID: resChain.events.FarmedFishPurchaseOrderPlaced.returnValues.FarmedFishPurchaseOrderID,
-        farmedFishPurchaser: address,
-        farmedFishSeller: item.fishFarmerId?.owner.address!,
-        numberOfFishOrdered: values.NumberOfFishOrdered,
-        speciesName: item.fishFarmerId?.speciesName!,
+        farmedFishPurchaser: resChain.events.FarmedFishPurchaseOrderPlaced.returnValues.FarmedFishPurchaser,
+        farmedFishSeller: resChain.events.FarmedFishPurchaseOrderPlaced.returnValues.FarmedFishSeller,
+        numberOfFishOrdered: resChain.events.FarmedFishPurchaseOrderPlaced.returnValues.NumberOfFishOrdered,
+        geographicOrigin: item.geographicOrigin,
+        image: item.image,
+        IPFSHash: item.IPFSHash,
+        methodOfReproduction: item.methodOfReproduction,
+        speciesName: item.speciesName,
       });
     })();
   };
@@ -62,19 +86,17 @@ const FarmedFishOrderPopup = ({ item, onClose }: PopupProps) => {
         </Typography>
 
         <div className='mt-6 mb-6 flex flex-col gap-6'>
-          <TextField required label='Fish seeds purchaser' value={address} disabled />
-          <TextField required label='Fish seeds seller' value={item.fishFarmerId?.owner.address} disabled />
-
-          <TextField required label='Species name' value={item.fishFarmerId?.speciesName} disabled />
+          <TextField required label='Fish purchaser' value={address} disabled />
+          <TextField required label='Fish seller' value={item.fishSeedsPurchaser.address} disabled />
 
           <Controller
             name='NumberOfFishOrdered'
             defaultValue=''
             control={control}
             rules={{
-              required: `Number of fish seeds available ranges from 1 to ${item.fishFarmerId?.totalNumberOfFish}`,
+              required: `Number of fish seeds available ranges from 1 to ${item.totalNumberOfFish}`,
               min: 1,
-              max: item.fishFarmerId?.totalNumberOfFish,
+              max: item.totalNumberOfFish,
             }}
             render={({ field, fieldState: { invalid, error } }) => (
               <TextField

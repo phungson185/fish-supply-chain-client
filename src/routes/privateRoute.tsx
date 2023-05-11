@@ -127,6 +127,12 @@ const fishProcessorRoute: PrivateRouteType = {
     name: 'Batches',
     element: <Batches />,
   },
+  growthDetail: {
+    path: '/fish-growth/:id',
+    name: 'Fish growth detail',
+    url: ({ id }: { id: string }) => `/fish-growth/${id}`,
+    element: <FishGrowthDetail />,
+  },
   fishFarmerFishProcessorOrders: {
     path: '/fishFarmerFishProcessorOrders',
     name: 'FishFarmer - FishProcessor - Orders',

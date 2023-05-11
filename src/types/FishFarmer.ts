@@ -62,6 +62,8 @@ export type FishSeedCompanyFishFarmerOrderType = BaseType & {
   IPFSHash: string;
   owner: UserType;
   updater?: UserType;
+  orderable: boolean;
+  farmedFishGrowthDetailsID: string;
 };
 
 export type ConfirmOrderType = {
@@ -71,13 +73,15 @@ export type ConfirmOrderType = {
 };
 
 export type UpdateGrowthDetailType = {
-  transactionHash: string;
-  orderId: string;
-  totalNumberOfFish: number;
-  fishWeight: number;
-  waterTemperature: number;
-  image: string;
-  IPFSHash: string;
+  transactionHash?: string;
+  orderId?: string;
+  totalNumberOfFish?: number;
+  fishWeight?: number;
+  waterTemperature?: number;
+  image?: string;
+  IPFSHash?: string;
+  orderable?: boolean;
+  farmedFishGrowthDetailsID?: string;
 };
 
 export type FishSeedCompanyFishFarmerOrderParamsType = PaginateParamsType & {
