@@ -144,7 +144,6 @@ const FishProcessor = () => {
             debounceChangeParams({ search: value });
           }}
         />
-
       </div>
       <TableContainer component={Paper}>
         <Spinner loading={isFetching}>
@@ -169,7 +168,6 @@ const FishProcessor = () => {
                   <TableCell align='center'>{item.speciesName}</TableCell>
                   <TableCell align='center'>{item.IPFSHash}</TableCell>
                   <TableCell align='center'>{moment(item.dateOfProcessing).format('DD/MM/YYYY')}</TableCell>
-                  <TableCell align='center'>{item.catchMethod}</TableCell>
                   <TableCell align='center'>{item.filletsInPacket}</TableCell>
                   <TableCell align='center'>{item.numberOfPackets}</TableCell>
                 </TableRow>

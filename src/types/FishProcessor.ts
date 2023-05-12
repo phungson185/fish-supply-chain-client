@@ -1,4 +1,4 @@
-import { PaginateParamsType, PaginateType } from './Common';
+import { BaseType, PaginateParamsType, PaginateType } from './Common';
 import { FishSeedCompanyFishFarmerOrderType } from './FishFarmer';
 import { UserType } from './User';
 
@@ -15,6 +15,7 @@ export type ConfirmFarmedFishPurchaseOrderType = {
   sender: string;
   farmedFishContractAddress: string;
   FarmedFishPurchaseOrderID: string;
+  FarmedFishGrowthDetailsID: string;
   Accepted: boolean;
 };
 
@@ -36,7 +37,7 @@ export type ProcessingContractType = {
 };
 
 // api types
-export type FishFarmerFishProcessorOrderType = {
+export type FishFarmerFishProcessorOrderType = BaseType & {
   id: string;
   fishFarmerId: FishSeedCompanyFishFarmerOrderType;
   farmedFishPurchaser: UserType;
@@ -49,11 +50,13 @@ export type FishFarmerFishProcessorOrderType = {
   fishProcessor: UserType;
   IPFSHash: string;
   dateOfProcessing: number;
-  catchMethod: string;
   filletsInPacket: number;
   processingContract: string;
   numberOfPackets: number;
   owner: UserType;
+  geographicOrigin: number;
+  methodOfReproduction: number;
+  image: string;
 };
 
 export type CreateOrderType = {
@@ -86,7 +89,11 @@ export type CreateProcesingContractType = {
   numberOfPackets: number;
 };
 
-export type FishFarmerFishProcessorOrderParamsType = PaginateParamsType & {};
+export type FishFarmerFishProcessorOrderParamsType = PaginateParamsType & {
+  status?: number;
+  farmedFishPurchaser?: string;
+  farmedFishSeller?: string;
+};
 
 export type FishFarmerFishProcessorOrderPaginateType = PaginateType & {
   items: FishFarmerFishProcessorOrderType[];

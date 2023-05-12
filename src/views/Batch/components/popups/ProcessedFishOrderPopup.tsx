@@ -52,7 +52,8 @@ const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
         orderer: address,
         receiver: item.fishProcessorId?.owner.address!,
         processedFishPackageId: processedFishPackageID,
-        processedFishPurchaseOrderId: resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.ProcessedFishPurchaseOrderID,
+        processedFishPurchaseOrderId:
+          resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.ProcessedFishPurchaseOrderID,
         processorId: item.fishProcessorId?.id!,
         quantityOfFishPackageOrdered: values.quantityoffishpackageordered,
       });
@@ -70,7 +71,6 @@ const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
           <TextField required label='Orderer' value={address} disabled />
           <TextField required label='Receiver' value={item.fishProcessorId?.owner.address} disabled />
           <TextField required label='Species name' value={item.fishProcessorId?.speciesName} disabled />
-          <TextField required label='Catch method' value={item.fishProcessorId?.catchMethod} disabled />
           <TextField
             required
             label='Date of processing'

@@ -1,62 +1,123 @@
-import { AccountBalanceWallet, Apartment, Home, LocalPhone } from '@mui/icons-material';
+import {
+  AccountBalanceWalletOutlined,
+  ApartmentOutlined,
+  BalanceOutlined,
+  DeviceThermostat,
+  HomeOutlined,
+  LocalPhoneOutlined,
+} from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Avatar, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
-import { ConfirmStatus } from 'components';
-import { statusStep } from 'components/ConfirmStatus';
+import {
+  Avatar,
+  Chip,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Step,
+  StepLabel,
+  Stepper,
+  Typography,
+} from '@mui/material';
+import { ProcessStatus, statusStep } from 'components/ConfirmStatus';
 import { useSnackbar } from 'notistack';
-import { useState } from 'react';
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from 'react-query';
+import { useEffect, useState } from 'react';
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
-import { fishProcessorService } from 'services';
+import { fishFarmerService, fishProcessorService, fishSeedCompanyService, logService } from 'services';
+import fishProcessor from 'services/fishProcessor';
 import { RoleType } from 'types/Auth';
 import { PopupController } from 'types/Common';
-import { FishFarmerFishProcessorOrderPaginateType, FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
-import { shorten } from 'utils/common';
+import { FishSeedCompanyFishFarmerOrderPaginateType, FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
+import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
+import { LogParamsType, TransactionType } from 'types/Log';
+import { formatTime, shorten } from 'utils/common';
+
+const steps = ['The request is being processed', 'The seller has accepted the request', 'The item has been received'];
 
 type PopupProps = PopupController & {
   item: FishFarmerFishProcessorOrderType;
-  refetch: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined,
-  ) => Promise<QueryObserverResult<FishFarmerFishProcessorOrderPaginateType, unknown>>;
+  refetch: () => void;
 };
 
 const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
   const [orderStatus, setOrderStatus] = useState(item.status);
   const { address, role } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
+  const [activeStep, setActiveStep] = useState<number>(0);
 
-  const { mutate: confirmOrder, isLoading } = useMutation(fishProcessorService.confirmOrder, {
+  const { mutate: confirmOrder, isLoading } = useMutation(fishProcessor.confirmOrder, {
     onSuccess: () => {
       enqueueSnackbar('Confirm order successfully', {
         variant: 'success',
       });
       refetch();
-      onClose();
+      fetchLogs();
     },
     onError: (error: any) => {
       enqueueSnackbar(error, { variant: 'error' });
     },
   });
 
+  const {
+    data: logs,
+    isSuccess: getLogsSuccess,
+    refetch: fetchLogs,
+  } = useQuery(['logService.getLogs', { id: item.id }], () =>
+    logService.getLogs({ objectId: item.id, transactionType: TransactionType.UPDATE_ORDER_STATUS } as LogParamsType),
+  );
+
+  const { mutate: updateGrowthDetail } = useMutation(fishFarmerService.updateGrowthDetail, {
+    onSuccess: () => {
+      enqueueSnackbar('Update growth detail successfully', {
+        variant: 'success',
+      });
+      onClose();
+      refetch();
+    },
+    onError: (error: any) => {
+      enqueueSnackbar(error, { variant: 'error' });
+    },
+  });
+
+  useEffect(() => {
+    if (getLogsSuccess) {
+      if (logs?.items?.length === 1) {
+        setActiveStep(0);
+      } else if (logs?.items?.length === 2) {
+        setActiveStep(1);
+      } else if (logs?.items?.length === 3) {
+        setActiveStep(2);
+      }
+    }
+  }, [getLogsSuccess, logs]);
+
   const handleConfirm = async (accepted: boolean) => {
-    await fishProcessorService.confirmFarmedFishPurchaseOrder({
+    const resChain = await fishProcessorService.confirmFarmedFishPurchaseOrder({
       Accepted: accepted,
       farmedFishContractAddress: item.fishFarmerId.farmedFishId.farmedFishContract,
       sender: address,
+      FarmedFishGrowthDetailsID: item.fishFarmerId.farmedFishGrowthDetailsID,
       FarmedFishPurchaseOrderID: item.farmedFishPurchaseOrderID,
     });
 
-    await confirmOrder({
-      orderId: item.id,
-      status: accepted ? 0 : 1,
+    updateGrowthDetail({
+      orderId: item.fishFarmerId.id,
+      totalNumberOfFish: Number(resChain.events.FarmedFishPurchaseOrderReceived.returnValues.TotalNumberOfFish),
     });
 
-    setOrderStatus(accepted ? 0 : 1);
+    confirmOrder({
+      orderId: item.id,
+      status: Number(resChain.events.FarmedFishPurchaseOrderReceived.returnValues.NEWStatus),
+    });
+
+    setOrderStatus(Number(resChain.events.FarmedFishPurchaseOrderReceived.returnValues.NEWStatus));
+    setActiveStep(activeStep + 1);
   };
 
   const handleRecieve = async () => {
-    await fishProcessorService.receiveFarmedFishOrder({
+    const resChain = await fishProcessor.receiveFarmedFishOrder({
       farmedFishContractAddress: item.fishFarmerId.farmedFishId.farmedFishContract,
       sender: address,
       FarmedFishPurchaseOrderID: item.farmedFishPurchaseOrderID,
@@ -64,95 +125,120 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
 
     await confirmOrder({
       orderId: item.id,
-      status: 4,
+      status: Number(resChain.events.FarmedFishOrderReceived.returnValues.NEWStatus),
     });
 
-    setOrderStatus(4);
+    setOrderStatus(Number(resChain.events.FarmedFishOrderReceived.returnValues.NEWStatus));
+    setActiveStep(activeStep + 1);
   };
-
   return (
     <>
-      <DialogTitle>Confirm fish order</DialogTitle>
+      <DialogTitle>Confirm fish seeds order</DialogTitle>
       <DialogContent>
-        <Grid container>
+        <Stepper activeStep={activeStep} className='mb-10'>
+          <Step completed={item.status == ProcessStatus.Pending}>
+            <StepLabel
+              optional={
+                activeStep >= 0 &&
+                formatTime(
+                  logs?.items?.filter((log) => log.newData == ProcessStatus.Pending.toString())?.[0]?.updatedAt ?? '',
+                )
+              }
+            >
+              The request is being processed
+            </StepLabel>
+          </Step>
+          <Step completed={item.status == ProcessStatus.Accepted || item.status == ProcessStatus.Rejected}>
+            <StepLabel
+              error={item.status == ProcessStatus.Rejected}
+              optional={
+                activeStep >= 1 &&
+                formatTime(
+                  logs?.items?.filter((log) =>
+                    [ProcessStatus.Accepted, ProcessStatus.Rejected].includes(Number(log.newData)),
+                  )?.[0]?.updatedAt ?? '',
+                )
+              }
+            >
+              The seller has accepted the request
+            </StepLabel>
+          </Step>
+          <Step completed={item.status == ProcessStatus.Received}>
+            <StepLabel
+              optional={
+                activeStep == 2 &&
+                formatTime(
+                  logs?.items?.filter((log) => log.newData == ProcessStatus.Received.toString())?.[0]?.updatedAt ?? '',
+                )
+              }
+            >
+              The item has been received
+            </StepLabel>
+          </Step>
+        </Stepper>
+        <Grid container spacing={5}>
           <Grid item xs={4}>
-            <Grid container spacing={5} border='medium'>
-              <Grid item xs={12} className='flex items-center gap-3'>
-                <Avatar src={item.farmedFishSeller.avatar} sx={{ width: 80, height: 80 }}></Avatar>
-                <div>
-                  <div className='flex items-center gap-2'>
-                    <AccountBalanceWallet />
-                    <div className='font-bold'>Wallet address: </div>
-                    <div>{shorten(item.farmedFishSeller.address)}</div>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <Apartment />
-                    <div className='font-bold'>Name: </div>
-                    <div>{item.farmedFishSeller.name}</div>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <Home />
-                    <div className='font-bold'>Address: </div>
-                    <div>{item.farmedFishSeller.userAddress}</div>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <LocalPhone />
-                    <div className='font-bold'>Phone number: </div>
-                    <div>{item.farmedFishSeller.phone}</div>
-                  </div>
-                </div>
-              </Grid>
-              <Grid item xs={12}>
-                <div className='flex flex-col items-center gap-4 '>
-                  <div className='font-medium text-lg'>Number of fish seeds available</div>
-                  <div className='text-7xl font-semibold'>{item.fishFarmerId.totalNumberOfFish}</div>
-                </div>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item xs={4}>
-            <div className='flex flex-col items-center gap-10'>
-              <div className='flex justify-between gap-5'>
-                <div className='font-medium'>Species name: </div>
-                <div>{item.speciesName}</div>
-              </div>
-              <ConfirmStatus index={orderStatus} />
+            <div className='flex flex-row gap-3 items-center mb-5'>
+              <Typography variant='h3'>Order ID: </Typography>
+              <div className='text-xl text-blue-500'>{shorten(item.farmedFishPurchaseOrderID)}</div>
             </div>
+            <Avatar variant='square' src={item.image} sx={{ width: '100%', height: 'auto' }} />
           </Grid>
-          <Grid item xs={4}>
-            <Grid container spacing={5}>
-              <Grid item xs={12} className='flex items-center gap-3'>
-                <Avatar src={item.farmedFishPurchaser.avatar} sx={{ width: 80, height: 80 }}></Avatar>
-                <div>
-                  <div className='flex items-center gap-2'>
-                    <AccountBalanceWallet />
-                    <div className='font-bold'>Wallet address: </div>
-                    <div>{shorten(item.farmedFishPurchaser.address)}</div>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <Apartment />
-                    <div className='font-bold'>Name: </div>
-                    <div>{item.farmedFishPurchaser.name}</div>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <Home />
-                    <div className='font-bold'>Address: </div>
-                    <div>{item.farmedFishPurchaser.userAddress}</div>
-                  </div>
-                  <div className='flex items-center gap-2'>
-                    <LocalPhone />
-                    <div className='font-bold'>Phone number: </div>
-                    <div>{item.farmedFishPurchaser.phone}</div>
-                  </div>
-                </div>
-              </Grid>
-              <Grid item xs={12}>
-                <div className='flex flex-col items-center gap-4 '>
-                  <div className='font-medium text-lg'>Number of fish seeds ordered</div>
-                  <div className='text-7xl font-semibold'>{item.numberOfFishOrdered}</div>
-                </div>
-              </Grid>
-            </Grid>
+          <Grid item xs={8}>
+            <div className='pb-5 border-b-2 border-solid border-gray-200 w-fit mb-5'>
+              <Typography variant='h3' className='mb-5 '>
+                Shipping address
+              </Typography>
+              <div className='flex items-center gap-2 mb-1'>
+                <AccountBalanceWalletOutlined className='' />
+                <div className=''>Wallet address: </div>
+                <div>{shorten(item.farmedFishPurchaser.address)}</div>
+              </div>
+              <div className='flex items-center gap-2 mb-1'>
+                <ApartmentOutlined className='' />
+                <div className=''>Name: </div>
+                <div>{item.farmedFishPurchaser.name}</div>
+              </div>
+              <div className='flex items-center gap-2 mb-1'>
+                <HomeOutlined className='' />
+                <div className=''>Address: </div>
+                <div>{item.farmedFishPurchaser.userAddress}</div>
+              </div>
+              <div className='flex items-center gap-2 mb-1'>
+                <LocalPhoneOutlined className='' />
+                <div className=''>Phone number: </div>
+                <div>{item.farmedFishPurchaser.phone}</div>
+              </div>
+            </div>
+
+            <div className='pb-5'>
+              <Typography variant='h3' className='mb-5'>
+                Order details
+              </Typography>
+              <div className='mb-1'>
+                <span>Name: </span>
+                <span className='mb-5'>{item.speciesName}</span>
+              </div>
+              <div className='mb-1'>
+                <span className='mr-2'>Geopraphic origin: </span>
+                <Chip
+                  label={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).label}
+                  color={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).color as any}
+                />
+              </div>
+              <div className='mb-1'>
+                <span className='mr-2'>Method of reproduction: </span>
+                <Chip
+                  label={fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).label}
+                  color={fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).color as any}
+                />
+              </div>
+              <div className=''>
+                <div className='inline-block mr-1'>Number of fishs ordered: </div>
+                <div className='inline-block mr-1'>{item.numberOfFishOrdered}kg</div>
+                <BalanceOutlined className='inline-block' color='primary' />
+              </div>
+            </div>
           </Grid>
         </Grid>
       </DialogContent>

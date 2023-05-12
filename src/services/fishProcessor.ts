@@ -38,10 +38,10 @@ const placeFarmedFishPurchaseOrder = async (body: PlaceFarmedFishPurchaseOrderTy
 };
 
 const confirmFarmedFishPurchaseOrder = async (body: ConfirmFarmedFishPurchaseOrderType) => {
-  const { sender, farmedFishContractAddress, Accepted, FarmedFishPurchaseOrderID } = body;
+  const { sender, farmedFishContractAddress, Accepted, FarmedFishPurchaseOrderID, FarmedFishGrowthDetailsID } = body;
   const farmedFishContract = new web3.eth.Contract(FarmedFish.abi as AbiItem[], farmedFishContractAddress);
   const result = await farmedFishContract.methods
-    .ConfirmFarmedFishPurchaseOrder(FarmedFishPurchaseOrderID, Accepted)
+    .ConfirmFarmedFishPurchaseOrder(FarmedFishPurchaseOrderID, FarmedFishGrowthDetailsID, Accepted)
     .send({
       from: sender,
       gas: 3500000,

@@ -66,15 +66,24 @@ const DistributorOfFishOrderPopup = ({ item, onClose }: PopupProps) => {
           <TextField required label='Buyer' value={address} disabled />
           <TextField required label='Seller' value={item.distributorId?.owner.address} disabled />
           <TextField required label='Species name' value={item.distributorId?.processorId?.speciesName} disabled />
-          <TextField required label='Catch method' value={item.distributorId?.processorId?.catchMethod} disabled />
           <TextField
             required
             label='Date of processing'
             value={moment(item.distributorId?.processorId?.dateOfProcessing).format('DD/MM/YYYY')}
             disabled
           />
-          <TextField required label='Fillet in packet' value={item.distributorId?.processorId?.filletsInPacket} disabled />
-          <TextField required label='Number of packets' value={item.distributorId?.quantityOfFishPackageOrdered} disabled />
+          <TextField
+            required
+            label='Fillet in packet'
+            value={item.distributorId?.processorId?.filletsInPacket}
+            disabled
+          />
+          <TextField
+            required
+            label='Number of packets'
+            value={item.distributorId?.quantityOfFishPackageOrdered}
+            disabled
+          />
 
           <Controller
             name='NumberOfFishPackagesOrdered'
