@@ -494,7 +494,9 @@ contract FarmedFish {
             "FishProcessor not authorized."
         );
         require(
-            NumberOfFishOrdered <= GetFarmedFishGrowthDetailsID[FarmedFishGrowthDetailsID].TotalNumberOfFish,
+            NumberOfFishOrdered <=
+                GetFarmedFishGrowthDetailsID[FarmedFishGrowthDetailsID]
+                    .TotalNumberOfFish,
             "Not enough fishs available."
         );
         bytes32 temp1 = keccak256(
@@ -515,7 +517,7 @@ contract FarmedFish {
             FarmedFishPurchaser,
             FarmedFishSeller,
             GetFarmedFishGrowthDetailsID[FarmedFishGrowthDetailsID]
-            .TotalNumberOfFish,
+                .TotalNumberOfFish,
             NumberOfFishOrdered,
             status.Pending
         );
@@ -791,20 +793,20 @@ contract WildCaughtFish {
 contract FishProcessing {
     string public ProcessedSpeciesName;
     string public IPFS_Hash;
-    string public CatchMethod;
     uint256 public FilletsInPacket;
     uint256 public NumberOfPackets;
     uint256 public DateOfProcessing;
+    uint256 public DateOfExpiry;
     address registrationContract;
     address public FishProcessor;
     bytes32 ProcessedFishPackageID;
-    bytes32 PackageId;
+    bytes32 FarmedFishPurchaseOrderID;
+    string public Image;
 
     Registration RegistrationContract;
 
     struct ProcessedFishPackageDetails {
         string SpeciesName;
-        string CatchMethod;
         uint256 FilletsInPacket;
         uint256 NumberOfPackets;
     }
@@ -824,70 +826,114 @@ contract FishProcessing {
         );
         _;
     }
-    mapping(bytes32 => ProcessedFishPackageDetails) ProcessedFishpackageId;
+
     event ProcessedFishPackageIDCreated(
+        bytes32 FarmedFishPurchaseOrderID,
         bytes32 ProcessedFishpackageId,
         string ProcessedSpeciesName,
         string IPFS_Hash,
         uint256 DateOfProcessing,
-        string CatchMethod,
+        uint256 DateOfExpiry,
         uint256 FilletsInPacket,
-        uint256 NumberOfPackets
+        uint256 NumberOfPackets,
+        string Image
     );
 
     constructor(
+        bytes32 farmedFishPurchaseOrderID,
         address registration,
         string memory processedSpeciesname,
         string memory ipfsHash,
         uint256 dateOfProcessing,
-        string memory catchMethod,
+        uint256 dateOfExpiry,
         uint256 filletsInPacket,
-        uint256 numberOfPackets
+        uint256 numberOfPackets,
+        string memory image
     ) public {
         RegistrationContract = Registration(registration);
 
         if (!RegistrationContract.FishProcessorExists(msg.sender))
             revert("Sender not authorized");
+
+        if (dateOfExpiry < dateOfProcessing)
+            revert("Date of expiry cannot be before date of processing");
+
         registrationContract = registration;
         FishProcessor = msg.sender;
         ProcessedSpeciesName = processedSpeciesname;
         IPFS_Hash = ipfsHash;
         DateOfProcessing = dateOfProcessing;
-        CatchMethod = catchMethod;
+        DateOfExpiry = dateOfExpiry;
         FilletsInPacket = filletsInPacket;
         NumberOfPackets = numberOfPackets;
+        FarmedFishPurchaseOrderID = farmedFishPurchaseOrderID;
+        Image = image;
 
         bytes32 tenp = keccak256(
             abi.encodePacked(
                 msg.sender,
                 processedSpeciesname,
-                catchMethod,
                 filletsInPacket,
                 numberOfPackets
             )
         );
 
-        ProcessedFishpackageId[tenp] = ProcessedFishPackageDetails(
-            processedSpeciesname,
-            catchMethod,
-            filletsInPacket,
-            numberOfPackets
-        );
-        PackageId = tenp;
-
         emit ProcessedFishPackageIDCreated(
+            FarmedFishPurchaseOrderID,
             tenp,
             ProcessedSpeciesName,
             IPFS_Hash,
             DateOfProcessing,
-            CatchMethod,
+            DateOfExpiry,
             FilletsInPacket,
-            NumberOfPackets
+            NumberOfPackets,
+            Image
         );
     }
 
-    function GetProcessedFishPackageID() public view returns (bytes32) {
-        return PackageId;
+    function UpdateFishProcessing(
+        string memory processedSpeciesname,
+        string memory ipfsHash,
+        uint256 dateOfProcessing,
+        uint256 dateOfExpiry,
+        uint256 filletsInPacket,
+        uint256 numberOfPackets,
+        string memory image
+    ) public onlyProcessor {
+        if (!RegistrationContract.FishProcessorExists(msg.sender))
+            revert("Sender not authorized");
+
+        if (dateOfExpiry < dateOfProcessing)
+            revert("Date of expiry cannot be before date of processing");
+
+        ProcessedSpeciesName = processedSpeciesname;
+        IPFS_Hash = ipfsHash;
+        DateOfProcessing = dateOfProcessing;
+        DateOfExpiry = dateOfExpiry;
+        FilletsInPacket = filletsInPacket;
+        NumberOfPackets = numberOfPackets;
+        Image = image;
+
+        bytes32 newPackageId = keccak256(
+            abi.encodePacked(
+                msg.sender,
+                processedSpeciesname,
+                filletsInPacket,
+                numberOfPackets
+            )
+        );
+
+        emit ProcessedFishPackageIDCreated(
+            FarmedFishPurchaseOrderID,
+            newPackageId,
+            ProcessedSpeciesName,
+            IPFS_Hash,
+            DateOfProcessing,
+            DateOfExpiry,
+            FilletsInPacket,
+            NumberOfPackets,
+            Image
+        );
     }
 
     modifier onlyOrderer() {
@@ -919,11 +965,13 @@ contract FishProcessing {
         address ReceiverEA,
         bytes32 ProcessedFishPackageID,
         uint256 quantityoffishpackageordered,
-        address OrdererEA
+        address OrdererEA,
+        uint256 NumberOfPackets
     );
 
     event ConfirmProcessedFishPurchaseOrderStatus(
         bytes32 ProcessedFishPurchaseOrderID,
+        uint256 NumberOfPackets,
         status NewStatus
     );
 
@@ -953,6 +1001,7 @@ contract FishProcessing {
                 Receiver
             )
         );
+
         GetProcessedFishPurchaseOrderID[temp] = ProcessedFishPurchaseOrder(
             Receiver,
             ProcessedFishPackageId,
@@ -961,12 +1010,15 @@ contract FishProcessing {
             status.Pending
         );
 
+        NumberOfPackets -= quantityoffishpackageordered;
+
         emit ProcessedFishPuchaseOrderPlaced(
             temp,
             Receiver,
             ProcessedFishPackageId,
             quantityoffishpackageordered,
-            msg.sender
+            msg.sender,
+            NumberOfPackets
         );
     }
 
@@ -989,9 +1041,16 @@ contract FishProcessing {
         } else {
             GetProcessedFishPurchaseOrderID[ProcessedFishPurchaseOrderID]
                 .ProcessedFishPurchaseOrderStatus = status.Rejected;
+
+            uint256 QuantityofFishPackageOrdered = GetProcessedFishPurchaseOrderID[
+                    ProcessedFishPurchaseOrderID
+                ].QuantityofFishPackageOrdered;
+
+            NumberOfPackets += QuantityofFishPackageOrdered;
         }
         emit ConfirmProcessedFishPurchaseOrderStatus(
             ProcessedFishPurchaseOrderID,
+            NumberOfPackets,
             GetProcessedFishPurchaseOrderID[ProcessedFishPurchaseOrderID]
                 .ProcessedFishPurchaseOrderStatus
         );

@@ -62,39 +62,37 @@ const receiveFarmedFishOrder = async (body: ReceiveFarmedFishOrderType) => {
 const deployFishProcessingContract = async (body: ProcessingContractType) => {
   const {
     sender,
+    farmedFishPurchaseOrderID,
     registration,
     dateOfProcessing,
+    dateOfExpiry,
     ipfsHash,
     processedSpeciesname,
-    catchMethod,
     filletsInPacket,
     numberOfPackets,
+    image,
   } = body;
   const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], sender);
   const result = await processingContract
     .deploy({
       data: FishProcessing.data.bytecode.object,
       arguments: [
+        farmedFishPurchaseOrderID,
         registration,
         processedSpeciesname,
         ipfsHash,
         dateOfProcessing,
-        catchMethod,
+        dateOfExpiry,
         filletsInPacket,
         numberOfPackets,
+        image,
       ],
     })
     .send({
       from: sender,
-      gas: 3500000,
+      gas: 4000000,
     });
 
-  return result;
-};
-
-const getProcessedFishPackageID = async (processingContractAddress: string) => {
-  const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], processingContractAddress);
-  const result = await processingContract.methods.GetProcessedFishPackageID().call();
   return result;
 };
 
@@ -109,14 +107,13 @@ const confirmOrder = async ({ orderId, ...body }: ConfirmOrderType) =>
   client.put(`/fishprocessor/orders/${orderId}/confirm`, body);
 
 const createProcessingContract = async (body: CreateProcesingContractType) =>
-  client.post('/fishprocessor/createProcessingContract', body);
+  client.post('/fishprocessor/create-processing-contract', body);
 
 export default {
   placeFarmedFishPurchaseOrder,
   confirmFarmedFishPurchaseOrder,
   receiveFarmedFishOrder,
   deployFishProcessingContract,
-  getProcessedFishPackageID,
 
   createOder,
   getOrders,

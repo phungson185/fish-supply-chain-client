@@ -4,7 +4,7 @@ import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer
 import { RegistrationView } from 'views/Registration';
 import { ProfileUpdate } from 'views/Profile';
 import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
-import { FishProcessor } from 'views/FishProcessor';
+import { FishProcessor, Fishes } from 'views/FishProcessor';
 import { FishProcessorDistributorOrders } from 'views/FishProcessor - Distributor - Orders';
 import { DistributorRetailerOrders } from 'views/Distributor-Retailer-Orders';
 import { FishGrowthDetail, FishGrowths } from 'views/FishFarmer';
@@ -126,6 +126,11 @@ const fishProcessorRoute: PrivateRouteType = {
     path: '/batches',
     name: 'Batches',
     element: <Batches />,
+  },
+  fishes: {
+    path: '/fishes',
+    name: 'Fishes',
+    element: <Fishes />,
   },
   growthDetail: {
     path: '/fish-growth/:id',
