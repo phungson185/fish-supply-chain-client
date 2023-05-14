@@ -203,10 +203,10 @@ const Inventory = () => {
                       </Typography>
                     </div>
                     <Typography variant='body2' className='mb-1'>
-                      Fillets in Packet: <span className='font-bold'>{item.filletsInPacket}</span> fillets
+                      Fillets in packet: <span className='font-bold'>{item.filletsInPacket}</span> fillets
                     </Typography>
                     <Typography variant='body2'>
-                      Number of Packets: <span className='font-bold'>{item.numberOfPackets}</span> packets
+                      Number of packets: <span className='font-bold'>{item.numberOfPackets}</span> packets
                     </Typography>
                   </CardContent>
                   <CardActions className='flex flex-row gap-1'>

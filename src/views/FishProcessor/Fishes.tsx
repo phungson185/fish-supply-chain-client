@@ -1,10 +1,12 @@
-import { Article, ArticleOutlined, Assignment, Visibility } from '@mui/icons-material';
+import { ArticleOutlined, Assignment, KeyboardArrowDownOutlined, KeyboardArrowUpOutlined } from '@mui/icons-material';
 
 import {
   Avatar,
-  Button,
+  Box,
   Chip,
+  Collapse,
   Dialog,
+  IconButton,
   Pagination,
   Paper,
   Table,
@@ -13,6 +15,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
   debounce,
 } from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
@@ -22,13 +25,13 @@ import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { getRoute } from 'routes';
 import { fishProcessorService, fishSeedCompanyService } from 'services';
-import { pinataUrl } from 'utils/common';
-import CreateContractPopup from './popups/CreateContractPopup';
 import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
+import { formatTimeDate, pinataUrl } from 'utils/common';
+import CreateContractPopup from './popups/CreateContractPopup';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -76,6 +79,11 @@ const Fishes = () => {
   const [search, setSearch] = useState(query.search || '');
   const [params, setParams] = useState({ search, page });
 
+  const { data: getProcessingContracts, isLoading: isProcessingContracts } = useQuery(
+    ['fishProcessorService.getProcessingContracts', selectedFish],
+    () => fishProcessorService.getProcessingContracts({ page: 1, fishProcessor: selectedFish.id, size: 100 }),
+  );
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceChangeParams = useCallback(
     debounce((values) => {
@@ -86,6 +94,111 @@ const Fishes = () => {
   useEffect(() => {
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
+
+  function Row(props: { row: FishFarmerFishProcessorOrderType }) {
+    const { row } = props;
+    const [openCollapse, setOpenCollapse] = useState(false);
+
+    return (
+      <>
+        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+          <TableCell>
+            <IconButton
+              aria-label='expand row'
+              size='small'
+              onClick={() => {
+                setOpenCollapse(!openCollapse);
+                setSelectedFish(row);
+              }}
+            >
+              {openCollapse ? <KeyboardArrowUpOutlined /> : <KeyboardArrowDownOutlined />}
+            </IconButton>
+          </TableCell>
+          <TableCell align='center'>{row.id}</TableCell>
+          <TableCell align='center'>{row.speciesName}</TableCell>
+          <TableCell align='center'>
+            <Avatar src={row.image} variant='square'>
+              <Assignment />
+            </Avatar>
+          </TableCell>
+          <TableCell align='center'>
+            <Chip
+              label={fishSeedCompanyService.handleMapGeographicOrigin(row?.geographicOrigin!).label}
+              color={fishSeedCompanyService.handleMapGeographicOrigin(row?.geographicOrigin!).color as any}
+            />
+          </TableCell>
+          <TableCell align='center'>
+            <Chip
+              label={fishSeedCompanyService.handleMapMethodOfReproduction(row?.methodOfReproduction!).label}
+              color={fishSeedCompanyService.handleMapMethodOfReproduction(row?.methodOfReproduction!).color as any}
+            />
+          </TableCell>
+          <TableCell align='center'>{row.numberOfFishOrdered}kg</TableCell>
+          <TableCell
+            align='center'
+            className='cursor-pointer hover:text-blue-500'
+            onClick={() => window.open(pinataUrl(row.IPFSHash), '_blank')}
+          >
+            {row.IPFSHash}
+          </TableCell>
+          <TableCell align='center'>
+            <div
+              className='cursor-pointer'
+              onClick={() => {
+                setOpenCreateContractPopup(true);
+                setSelectedFish(row);
+              }}
+            >
+              <ArticleOutlined />
+            </div>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
+            <Collapse in={openCollapse} timeout='auto' unmountOnExit>
+              <Box sx={{ margin: 1 }}>
+                <Typography variant='h2' gutterBottom component='div'>
+                  Inventory
+                </Typography>
+                <Table size='small' aria-label='purchases'>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align='center'>Contract address</TableCell>
+                      <TableCell align='center'>Species name</TableCell>
+                      <TableCell align='center'>Image</TableCell>
+                      <TableCell align='center'>Date of processing</TableCell>
+                      <TableCell align='center'>Date of expiry</TableCell>
+                      <TableCell align='right'>Fillets in packet</TableCell>
+                      <TableCell align='right'>Number of packets</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {getProcessingContracts &&
+                      getProcessingContracts.items.length > 0 &&
+                      getProcessingContracts.items.map((contract) => (
+                        <TableRow key={contract.id}>
+                          <TableCell align='center'>{contract.processingContract}</TableCell>
+                          <TableCell align='center'>{contract.processedSpeciesName}</TableCell>
+                          <TableCell align='center'>
+                            <Avatar src={contract.image} variant='square'>
+                              <Assignment />
+                            </Avatar>
+                          </TableCell>
+                          <TableCell align='center'>{formatTimeDate(contract.dateOfProcessing)}</TableCell>
+                          <TableCell align='center'>{formatTimeDate(contract.dateOfExpiry)}</TableCell>
+                          <TableCell align='right'>{contract.filletsInPacket} fillets</TableCell>
+                          <TableCell align='right'>{contract.numberOfPackets} packets</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      </>
+    );
+  }
 
   return (
     <>
@@ -180,6 +293,7 @@ const Fishes = () => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell />
                 <TableCell>Id</TableCell>
                 <TableCell>Species name</TableCell>
                 <TableCell>Image</TableCell>
@@ -192,48 +306,7 @@ const Fishes = () => {
             </TableHead>
             <TableBody>
               {items.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell align='center'>{item.id}</TableCell>
-                  <TableCell align='center'>{item.speciesName}</TableCell>
-                  <TableCell align='center'>
-                    <Avatar src={item.image} variant='square'>
-                      <Assignment />
-                    </Avatar>
-                  </TableCell>
-                  <TableCell align='center'>
-                    <Chip
-                      label={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).label}
-                      color={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).color as any}
-                    />
-                  </TableCell>
-                  <TableCell align='center'>
-                    <Chip
-                      label={fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).label}
-                      color={
-                        fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).color as any
-                      }
-                    />
-                  </TableCell>
-                  <TableCell align='center'>{item.numberOfFishOrdered}kg</TableCell>
-                  <TableCell
-                    align='center'
-                    className='cursor-pointer hover:text-blue-500'
-                    onClick={() => window.open(pinataUrl(item.IPFSHash), '_blank')}
-                  >
-                    {item.IPFSHash}
-                  </TableCell>
-                  <TableCell align='center'>
-                    <div
-                      className='cursor-pointer'
-                      onClick={() => {
-                        setOpenCreateContractPopup(true);
-                        setSelectedFish(item);
-                      }}
-                    >
-                      <ArticleOutlined />
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <Row key={item.id} row={item} />
               ))}
               <TableRowEmpty visible={!isFetching && items.length === 0} />
             </TableBody>
