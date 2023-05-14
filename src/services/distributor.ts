@@ -16,11 +16,10 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
 // contract methods
 const placeProcessedFishPurchaseOrder = async (body: PlaceProcessedFishPurchaseOrderType) => {
-  const { ProcessedFishPackageId, Receiver, orderer, quantityoffishpackageordered, fishProcessorContractAddress } =
-    body;
-  const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], fishProcessorContractAddress);
+  const { Receiver, orderer, quantityoffishpackageordered, fishProcessingContractAddress } = body;
+  const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], fishProcessingContractAddress);
   const result = await processingContract.methods
-    .PlaceProcessedFishPurchaseOrder(orderer, ProcessedFishPackageId, quantityoffishpackageordered, Receiver)
+    .PlaceProcessedFishPurchaseOrder(orderer, quantityoffishpackageordered, Receiver)
     .send({
       from: orderer,
       gas: 3500000,

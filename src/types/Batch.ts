@@ -10,7 +10,7 @@ export type BatchType = {
   type: number;
   farmedFishId: FarmedFishType;
   fishFarmerId?: FishSeedCompanyFishFarmerOrderType;
-  fishProcessorId?: FishFarmerFishProcessorOrderType;
+  fishProcessingId?: FishFarmerFishProcessorOrderType;
   distributorId?: FishProcessorDistributorOrderType;
   retailerId?: DistributorRetailerOrderType;
   updatedAt: string;

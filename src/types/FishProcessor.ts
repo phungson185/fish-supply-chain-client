@@ -38,6 +38,18 @@ export type ProcessingContractType = {
   image: string;
 };
 
+export type UpdateProcessingContractType = {
+  processedSpeciesname?: string;
+  ipfsHash?: string;
+  dateOfProcessing?: number;
+  dateOfExpiry?: number;
+  filletsInPacket?: number;
+  numberOfPackets?: number;
+  image?: string;
+  transactionHash?: string;
+  status?: number;
+};
+
 // api types
 export type FishFarmerFishProcessorOrderType = BaseType & {
   id: string;
@@ -88,11 +100,15 @@ export type CreateProcesingContractType = {
   dateOfProcessing: number;
   dateOfExpiry: number;
   farmedFishPurchaseOrderID: string;
-  processedFishPackageID?: string;
   filletsInPacket: number;
   numberOfPackets: number;
   processingContract: string;
   image: string;
+};
+
+export type ProfileInventoryType = {
+  user: UserType;
+  fishProcessing: number;
 };
 
 export type FishFarmerFishProcessorOrderParamsType = PaginateParamsType & {

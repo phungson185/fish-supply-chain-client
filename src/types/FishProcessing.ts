@@ -1,0 +1,27 @@
+import { BaseType, PaginateParamsType, PaginateType } from './Common';
+import { FishFarmerFishProcessorOrderType } from './FishProcessor';
+import { UserType } from './User';
+
+export type FishProcessingType = BaseType & {
+  id: string;
+  fishProcessorId: FishFarmerFishProcessorOrderType;
+  processedSpeciesName: string;
+  registrationContract: string;
+  fishProcessor: UserType;
+  IPFSHash: string;
+  dateOfProcessing: number;
+  dateOfExpiry: number;
+  farmedFishPurchaseOrderID: string;
+  filletsInPacket: number;
+  numberOfPackets: number;
+  processingContract: string;
+  image: string;
+};
+
+export type ProcessingContractParamsType = PaginateParamsType & {
+  fishProcessor: string;
+};
+
+export type ProcessingContractPaginateType = PaginateType & {
+  items: FishProcessingType[];
+};

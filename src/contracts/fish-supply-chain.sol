@@ -799,7 +799,6 @@ contract FishProcessing {
     uint256 public DateOfExpiry;
     address registrationContract;
     address public FishProcessor;
-    bytes32 ProcessedFishPackageID;
     bytes32 FarmedFishPurchaseOrderID;
     string public Image;
 
@@ -829,7 +828,6 @@ contract FishProcessing {
 
     event ProcessedFishPackageIDCreated(
         bytes32 FarmedFishPurchaseOrderID,
-        bytes32 ProcessedFishpackageId,
         string ProcessedSpeciesName,
         string IPFS_Hash,
         uint256 DateOfProcessing,
@@ -869,18 +867,8 @@ contract FishProcessing {
         FarmedFishPurchaseOrderID = farmedFishPurchaseOrderID;
         Image = image;
 
-        bytes32 tenp = keccak256(
-            abi.encodePacked(
-                msg.sender,
-                processedSpeciesname,
-                filletsInPacket,
-                numberOfPackets
-            )
-        );
-
         emit ProcessedFishPackageIDCreated(
             FarmedFishPurchaseOrderID,
-            tenp,
             ProcessedSpeciesName,
             IPFS_Hash,
             DateOfProcessing,
@@ -914,18 +902,8 @@ contract FishProcessing {
         NumberOfPackets = numberOfPackets;
         Image = image;
 
-        bytes32 newPackageId = keccak256(
-            abi.encodePacked(
-                msg.sender,
-                processedSpeciesname,
-                filletsInPacket,
-                numberOfPackets
-            )
-        );
-
         emit ProcessedFishPackageIDCreated(
             FarmedFishPurchaseOrderID,
-            newPackageId,
             ProcessedSpeciesName,
             IPFS_Hash,
             DateOfProcessing,
@@ -954,7 +932,6 @@ contract FishProcessing {
 
     struct ProcessedFishPurchaseOrder {
         address receiver;
-        bytes32 ProcessedFishPackageID;
         address orderer;
         uint256 QuantityofFishPackageOrdered;
         status ProcessedFishPurchaseOrderStatus;
@@ -963,7 +940,6 @@ contract FishProcessing {
     event ProcessedFishPuchaseOrderPlaced(
         bytes32 ProcessedFishPurchaseOrderID,
         address ReceiverEA,
-        bytes32 ProcessedFishPackageID,
         uint256 quantityoffishpackageordered,
         address OrdererEA,
         uint256 NumberOfPackets
@@ -982,7 +958,6 @@ contract FishProcessing {
 
     function PlaceProcessedFishPurchaseOrder(
         address orderer,
-        bytes32 ProcessedFishPackageId,
         uint256 quantityoffishpackageordered,
         address Receiver
     ) public onlyOrderer {
@@ -991,12 +966,18 @@ contract FishProcessing {
             "Distributor’s address is not valid"
         );
 
+        require(
+            quantityoffishpackageordered <= NumberOfPackets,
+            "Not enough packets available."
+        );
+
+        require(now <= DateOfExpiry, "Date of expiry has passed.");
+
         bytes32 temp = keccak256(
             abi.encodePacked(
                 msg.sender,
                 now,
                 address(this),
-                ProcessedFishPackageId,
                 quantityoffishpackageordered,
                 Receiver
             )
@@ -1004,7 +985,6 @@ contract FishProcessing {
 
         GetProcessedFishPurchaseOrderID[temp] = ProcessedFishPurchaseOrder(
             Receiver,
-            ProcessedFishPackageId,
             msg.sender,
             quantityoffishpackageordered,
             status.Pending
@@ -1015,7 +995,6 @@ contract FishProcessing {
         emit ProcessedFishPuchaseOrderPlaced(
             temp,
             Receiver,
-            ProcessedFishPackageId,
             quantityoffishpackageordered,
             msg.sender,
             NumberOfPackets

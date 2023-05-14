@@ -7,7 +7,9 @@ import {
   FishFarmerFishProcessorOrderParamsType,
   PlaceFarmedFishPurchaseOrderType,
   ProcessingContractType,
+  ProfileInventoryType,
   ReceiveFarmedFishOrderType,
+  UpdateProcessingContractType,
 } from 'types/FishProcessor';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -15,6 +17,7 @@ import FarmedFish from '../contracts/abis/FarmedFish.json';
 import FishProcessing from '../contracts/abis/FishProcessing.json';
 
 import { client } from './axios';
+import { ProcessingContractPaginateType, ProcessingContractParamsType } from 'types/FishProcessing';
 
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
@@ -109,14 +112,31 @@ const confirmOrder = async ({ orderId, ...body }: ConfirmOrderType) =>
 const createProcessingContract = async (body: CreateProcesingContractType) =>
   client.post('/fishprocessor/create-processing-contract', body);
 
+const getProcessingContracts = async (params?: ProcessingContractParamsType): Promise<ProcessingContractPaginateType> =>
+  client.get('/fishprocessor/get-processing-contracts', { params });
+
+const updateProcessingContract = async ({
+  id,
+  body,
+}: {
+  id: string;
+  body?: UpdateProcessingContractType;
+}): Promise<ProcessingContractPaginateType> => client.put(`/fishprocessor/processing-contract/${id}`, body);
+
+const getProfileInventory = async ({ id }: { id?: string }): Promise<ProfileInventoryType> =>
+  client.get(`/fishprocessor/get-profile-inventory/${id}`);
+
 export default {
   placeFarmedFishPurchaseOrder,
   confirmFarmedFishPurchaseOrder,
   receiveFarmedFishOrder,
   deployFishProcessingContract,
+  updateProcessingContract,
 
   createOder,
   getOrders,
   confirmOrder,
   createProcessingContract,
+  getProcessingContracts,
+  getProfileInventory,
 };

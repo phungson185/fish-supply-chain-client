@@ -151,11 +151,21 @@ const Batches = () => {
                       />
                     )}
                   </TableCell>
-                  <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.fishProcessorRole)}>
-                    <ProcessStatus
-                      content={`${item.fishProcessorId ? 'Completed' : 'Pending'}`}
-                      backgroundColor={`${item.fishProcessorId ? 'green' : 'gray'}`}
-                    />
+                  <TableCell align='center'>
+                    {[RoleType.fishProcessorRole, RoleType.distributorRole].includes(role as RoleType) &&
+                    item.fishProcessingId ? (
+                      <Link to={privateRoute.inventory.url?.(item.fishProcessingId)!}>
+                        <ProcessStatus
+                          content={`${item.fishProcessingId ? 'Completed' : 'Pending'}`}
+                          backgroundColor={`${item.fishProcessingId ? 'green' : 'gray'}`}
+                        />
+                      </Link>
+                    ) : (
+                      <ProcessStatus
+                        content={`${item.fishProcessingId ? 'Completed' : 'Pending'}`}
+                        backgroundColor={`${item.fishProcessingId ? 'green' : 'gray'}`}
+                      />
+                    )}
                   </TableCell>
                   <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.distributorRole)}>
                     <ProcessStatus
@@ -190,13 +200,6 @@ const Batches = () => {
           onChange={(event, value) => onSearchChange({ page: value })}
         />
       </div>
-
-      <Dialog open={openPlaceProcessedFishPurchaseOrderPopup} fullWidth maxWidth='sm'>
-        <ProcessedFishOrderPopup
-          item={selectedBatch}
-          onClose={() => setOpenPlaceProcessedFishPurchaseOrderPopup(false)}
-        />
-      </Dialog>
 
       <Dialog open={openPlaceRetailerPurchaseOrderPopup} fullWidth maxWidth='sm'>
         <DistributorOfFishOrderPopup

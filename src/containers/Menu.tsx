@@ -32,8 +32,6 @@ const MenuItem = ({ name, path }: MenuItemProps) => {
   );
 };
 
-const notShowItem = ['Profile', 'Batch detail', 'Fish seed detail', 'Contract detail', 'Fish growth detail'];
-
 const Menu = () => {
   const { isLoggedIn, role } = useSelector(profileSelector);
   const privateRoute = getRoute(role);
@@ -43,7 +41,7 @@ const Menu = () => {
       {isLoggedIn ? (
         <List className='flex flex-col gap-1'>
           {Object.values(privateRoute)
-            .filter((item) => item.name && !notShowItem.includes(item.name))
+            .filter((item) => item.name && !item.disabled)
             .map(({ name, path }) => (
               <MenuItem key={path} name={name} path={path} />
             ))}

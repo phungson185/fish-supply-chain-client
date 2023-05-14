@@ -78,8 +78,6 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
         image: values.image,
       });
 
-      console.log(item);
-
       createProcessingContract({
         farmedFishPurchaseOrderID: item.farmedFishPurchaseOrderID,
         image: values.image,

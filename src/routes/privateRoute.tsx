@@ -4,7 +4,7 @@ import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer
 import { RegistrationView } from 'views/Registration';
 import { ProfileUpdate } from 'views/Profile';
 import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
-import { FishProcessor, Fishes } from 'views/FishProcessor';
+import { FishProcessor, Fishes, Inventory } from 'views/FishProcessor';
 import { FishProcessorDistributorOrders } from 'views/FishProcessor - Distributor - Orders';
 import { DistributorRetailerOrders } from 'views/Distributor-Retailer-Orders';
 import { FishGrowthDetail, FishGrowths } from 'views/FishFarmer';
@@ -14,6 +14,7 @@ type RouteType = {
   url?: (query: any) => string;
   name: string;
   element: JSX.Element;
+  disabled?: boolean;
 };
 
 type PrivateRouteType = {
@@ -30,12 +31,14 @@ const baseRoute: PrivateRouteType = {
     path: '/profile',
     name: 'Profile',
     element: <ProfileUpdate />,
+    disabled: true,
   },
   batchDetail: {
     path: '/batch/:id',
     name: 'Batch detail',
     url: ({ id }: { id: string }) => `/batch/${id}`,
     element: <BatchDetail />,
+    disabled: true,
   },
 };
 
@@ -76,6 +79,7 @@ const fishSeedCompanyRoute: PrivateRouteType = {
     name: 'Fish seed detail',
     url: ({ id }: { id: string }) => `/fish-seed/${id}`,
     element: <FishSeedDetail />,
+    disabled: true,
   },
   orders: {
     path: '/orders',
@@ -107,6 +111,7 @@ const fishFarmerRoute: PrivateRouteType = {
     name: 'Contract detail',
     url: ({ id }: { id: string }) => `/contract/${id}`,
     element: <ContractDetail />,
+    disabled: true,
   },
   fishSeedCompanyFishFarmerOrders: {
     path: '/fishSeedCompanyFishFarmerOrders',
@@ -132,11 +137,17 @@ const fishProcessorRoute: PrivateRouteType = {
     name: 'Fishes',
     element: <Fishes />,
   },
+  inventory: {
+    path: '/inventory',
+    name: 'Inventory',
+    element: <Inventory />,
+  },
   growthDetail: {
     path: '/fish-growth/:id',
     name: 'Fish growth detail',
     url: ({ id }: { id: string }) => `/fish-growth/${id}`,
     element: <FishGrowthDetail />,
+    disabled: true,
   },
   fishFarmerFishProcessorOrders: {
     path: '/fishFarmerFishProcessorOrders',
@@ -148,11 +159,11 @@ const fishProcessorRoute: PrivateRouteType = {
     name: 'Distributor - FishProcessor - Orders',
     element: <FishProcessorDistributorOrders />,
   },
-  processingContract: {
-    path: '/processingContract',
-    name: 'Processing Contract',
-    element: <FishProcessor />,
-  },
+  // processingContract: {
+  //   path: '/processingContract',
+  //   name: 'Processing Contract',
+  //   element: <FishProcessor />,
+  // },
 };
 
 const distributorRoute: PrivateRouteType = {
@@ -161,6 +172,13 @@ const distributorRoute: PrivateRouteType = {
     path: '/batches',
     name: 'Batches',
     element: <Batches />,
+  },
+  inventory: {
+    path: '/inventory/:fishProcessor',
+    name: 'Inventory',
+    url: ({ fishProcessor }: { fishProcessor: any }) => `/inventory/${fishProcessor.id}`,
+    element: <Inventory />,
+    disabled: true,
   },
   distributorFishProcessorOrders: {
     path: '/distributorFishProcessorOrders',

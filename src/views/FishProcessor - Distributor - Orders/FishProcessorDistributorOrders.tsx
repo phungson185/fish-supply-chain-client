@@ -1,208 +1,43 @@
-import { CategoryOutlined } from '@mui/icons-material';
-import {
-  Button,
-  Dialog,
-  Menu,
-  MenuItem,
-  Pagination,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from '@mui/material';
-import { Spinner, TableRowEmpty } from 'components';
-import { statusStep } from 'components/ConfirmStatus';
-import { useAnchor, useSearch } from 'hooks';
-import { parse } from 'qs';
-import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
-import { useLocation } from 'react-router-dom';
-import { distributorService } from 'services';
-import { FishProcessorDistributorOrderType } from 'types/Distributor';
-import { ConfirmPopup } from './popups';
-
-const FILTERS = [{ label: 'Quantity of fish package ordered', orderBy: 'quantityOfFishPackageOrdered' }];
-
-const SORT_TYPES = [
-  { label: 'Low to High', desc: 'false' },
-  { label: 'High to Low', desc: 'true' },
-];
+import { Container, Tab, Tabs } from '@mui/material';
+import { ProcessStatus } from 'components/ConfirmStatus';
+import useTabs, { TabType } from 'hooks/useTabs';
+import OrdersTab from './OrdersTab';
 
 const FishProcessorDistributorOrders = () => {
-  const location = useLocation();
-  const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
-  const [dataSearch, onSearchChange] = useSearch({ page });
-  const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
-  const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
+  const tabs = ([] as TabType[])
+    .concat([{ code: 'all', label: 'All orders', component: <OrdersTab status={ProcessStatus.All} /> }])
+    .concat([{ code: 'pending', label: 'Pending orders', component: <OrdersTab status={ProcessStatus.Pending} /> }])
+    .concat([{ code: 'accepted', label: 'Accepted orders', component: <OrdersTab status={ProcessStatus.Accepted} /> }])
+    .concat([{ code: 'rejected', label: 'Rejected orders', component: <OrdersTab status={ProcessStatus.Rejected} /> }])
+    .concat([{ code: 'received', label: 'Received orders', component: <OrdersTab status={ProcessStatus.Received} /> }]);
 
-  const { data, isFetching, refetch } = useQuery(
-    ['distributorService.getOrders', dataSearch],
-    () => distributorService.getOrders(dataSearch),
-    {
-      keepPreviousData: true,
-      staleTime: 0,
-    },
-  );
+  const [activeTab, onTabChange] = useTabs(tabs);
 
-  const { items = [], total, currentPage, pages: totalPage } = data ?? {};
-  const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
-  const [desc, setDesc] = useState(query.desc || SORT_TYPES[0].desc);
-  const [search, setSearch] = useState(query.search || '');
-  const [params, setParams] = useState({ search, page });
-  const [openConfirmPopup, setOpenConfirmPopup] = useState(false);
-  const [openCreateContractPopup, setOpenCreateContractPopup] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<FishProcessorDistributorOrderType>(
-    {} as FishProcessorDistributorOrderType,
-  );
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   const debounceChangeParams = useCallback(
-  //     debounce((values) => {
-  //       setParams((prev) => ({ ...prev, ...values }));
-  //     }, 300),
-  //     [],
-  //   );
-  useEffect(() => {
-    onSearchChange({ orderBy, desc, ...params });
-  }, [onSearchChange, orderBy, desc, params]);
+  // useEffect(() => {
+  //   onTabChange({} as SyntheticEvent<Element, Event>, 'account');
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return (
     <>
-      <div className='flex items-center justify-between'>
-        <div className='flex justify-between gap-2'>
-          <Button
-            variant='text'
-            color='inherit'
-            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
-            startIcon={<CategoryOutlined />}
-            onClick={onOpenFilter}
-          >
-            {FILTERS.find((item) => item.orderBy === orderBy)?.label ?? FILTERS[0].label}
-          </Button>
-          <Menu
-            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-            anchorEl={anchorFilter}
-            open={openFilter}
-            onClose={onCloseFilter}
-            onClick={onCloseFilter}
-          >
-            {FILTERS.map((item, index) => (
-              <MenuItem
-                key={index}
-                classes={{ selected: 'bg-info-light' }}
-                selected={item.orderBy === orderBy}
-                onClick={() => {
-                  setOrderBy(item.orderBy);
-                }}
-              >
-                {item.label}
-              </MenuItem>
-            ))}
-          </Menu>
-
-          <Button
-            variant='text'
-            color='inherit'
-            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
-            startIcon={<CategoryOutlined />}
-            onClick={onOpenSort}
-          >
-            {SORT_TYPES.find((item) => item.desc === desc)?.label ?? SORT_TYPES[0].label}
-          </Button>
-          <Menu
-            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-            anchorEl={anchorSort}
-            open={openSort}
-            onClose={onCloseSort}
-            onClick={onCloseSort}
-          >
-            {SORT_TYPES.map((item, index) => (
-              <MenuItem
-                key={index}
-                classes={{ selected: 'bg-info-light' }}
-                selected={item.desc === desc}
-                onClick={() => {
-                  setDesc(item.desc);
-                }}
-              >
-                {item.label}
-              </MenuItem>
-            ))}
-          </Menu>
-        </div>
-
-        {/* <TextField
-              placeholder='Search...'
-              InputProps={{ className: 'bg-white text-black' }}
-              value={search}
-              sx={{ width: '30%' }}
-              onChange={(event) => {
-                const { value } = event.target;
-                setSearch(value);
-                debounceChangeParams({ search: value });
-              }}
-            /> */}
-      </div>
-      <TableContainer component={Paper}>
-        <Spinner loading={isFetching}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Order ID</TableCell>
-                <TableCell>Orderer</TableCell>
-                <TableCell>Receiver</TableCell>
-                <TableCell>Quantity of fish package ordered (packages)</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell align='center'>{item.id}</TableCell>
-                  <TableCell align='center'>{item.orderer.address}</TableCell>
-                  <TableCell align='center'>{item.receiver.address}</TableCell>
-                  <TableCell align='center'>{item.quantityOfFishPackageOrdered}</TableCell>
-                  <TableCell align='center'>
-                    <Button
-                      variant='contained'
-                      sx={{
-                        backgroundColor: `${statusStep[item.status].color}`,
-                        color: 'white',
-                      }}
-                      onClick={() => {
-                        setSelectedOrder(item);
-                        setOpenConfirmPopup(true);
-                      }}
-                      disabled={item.status === 6}
-                    >
-                      {`${statusStep[item.status].label}`}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-              <TableRowEmpty visible={!isFetching && items.length === 0} />
-            </TableBody>
-            <caption className='font-bold border-t'>{total ?? 0} Contracts</caption>
-          </Table>
-        </Spinner>
-      </TableContainer>
-
-      <div className='flex justify-center'>
-        <Pagination
-          page={currentPage ?? 1}
-          count={totalPage}
-          onChange={(event, value) => onSearchChange({ page: value })}
-        />
-      </div>
-
-      <Dialog maxWidth='lg' open={openConfirmPopup} fullWidth>
-        <ConfirmPopup item={selectedOrder} refetch={refetch} onClose={() => setOpenConfirmPopup(false)} />
-      </Dialog>
+      <Container>
+        <Tabs value={activeTab} onChange={onTabChange} classes={{ flexContainer: 'justify-center' }} className='mb-5'>
+          {tabs.map((tab) => (
+            <Tab
+              key={tab.code}
+              className='w-[120px] sm:w-[180px] border-none text-xl'
+              style={{ wordBreak: 'break-word' }}
+              label={tab.label}
+              value={tab.code}
+            />
+          ))}
+        </Tabs>
+        {tabs.map((tab) => (
+          <div key={tab.code} hidden={tab.code !== activeTab} className=''>
+            {tab.component}
+          </div>
+        ))}
+      </Container>
     </>
   );
 };

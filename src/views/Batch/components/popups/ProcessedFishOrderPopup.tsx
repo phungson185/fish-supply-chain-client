@@ -10,14 +10,15 @@ import { profileSelector } from 'reducers/profile';
 import { distributorService, fishProcessorService } from 'services';
 import { BatchType } from 'types/Batch';
 import { PopupController } from 'types/Common';
+import { FishProcessingType } from 'types/FishProcessing';
 
 type PopupProps = PopupController & {
-  item: BatchType;
+  item: FishProcessingType;
 };
 
 const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
   const { control, handleSubmit } = useForm({ mode: 'onChange' });
-  const { address } = useSelector(profileSelector);
+  const { address, id } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
@@ -34,28 +35,40 @@ const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
     },
   });
 
+  const { mutate: updateContract } = useMutation(fishProcessorService.updateProcessingContract);
+
   const handleOrder = () => {
     handleSubmit(async (values) => {
-      const processedFishPackageID = await fishProcessorService.getProcessedFishPackageID(
-        item.fishProcessorId?.processingContract!,
-      );
-
       const resChain = await distributorService.placeProcessedFishPurchaseOrder({
-        fishProcessorContractAddress: item.fishProcessorId?.processingContract!,
+        fishProcessingContractAddress: item.processingContract,
         orderer: address,
-        Receiver: item.fishProcessorId?.owner.address!,
+        Receiver: item.fishProcessor.address,
         quantityoffishpackageordered: values.quantityoffishpackageordered,
-        ProcessedFishPackageId: processedFishPackageID,
+      });
+
+      updateContract({
+        id: item.id,
+        body: {
+          transactionHash: resChain.transactionHash,
+          numberOfPackets: resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.NumberOfPackets,
+        },
       });
 
       await createOder({
-        orderer: address,
-        receiver: item.fishProcessorId?.owner.address!,
-        processedFishPackageId: processedFishPackageID,
+        orderer: id as string,
+        receiver: item.fishProcessor.id,
+        speciesName: item.processedSpeciesName,
         processedFishPurchaseOrderId:
           resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.ProcessedFishPurchaseOrderID,
-        processorId: item.fishProcessorId?.id!,
-        quantityOfFishPackageOrdered: values.quantityoffishpackageordered,
+        quantityOfFishPackageOrdered:
+          resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.quantityoffishpackageordered,
+        fishProcessingId: item.id,
+        dateOfExpiry: item.dateOfExpiry,
+        dateOfProcessing: item.dateOfProcessing,
+        filletsInPacket: item.filletsInPacket,
+        image: item.image,
+        IPFSHash: item.IPFSHash,
+        status: resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.N,
       });
     })();
   };
@@ -68,26 +81,16 @@ const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
         </Typography>
 
         <div className='mt-6 mb-6 flex flex-col gap-6'>
-          <TextField required label='Orderer' value={address} disabled />
-          <TextField required label='Receiver' value={item.fishProcessorId?.owner.address} disabled />
-          <TextField required label='Species name' value={item.fishProcessorId?.speciesName} disabled />
-          <TextField
-            required
-            label='Date of processing'
-            value={moment(item.fishProcessorId?.dateOfProcessing).format('DD/MM/YYYY')}
-            disabled
-          />
-          <TextField required label='Fillet in packet' value={item.fishProcessorId?.filletsInPacket} disabled />
-          <TextField required label='Number of packets' value={item.fishProcessorId?.numberOfPackets} disabled />
-
+          <TextField required label='Buyer' value={address} disabled />
+          <TextField required label='Seller' value={item.fishProcessor.address} disabled />
           <Controller
             name='quantityoffishpackageordered'
             defaultValue=''
             control={control}
             rules={{
-              required: `Quantity of fish package available ranges from 0 to ${item.fishProcessorId?.numberOfPackets}`,
-              min: 0,
-              max: item.fishProcessorId?.numberOfPackets,
+              required: `Quantity of fish package available ranges from 0 to ${item.numberOfPackets}`,
+              min: 1,
+              max: item.numberOfPackets,
             }}
             render={({ field, fieldState: { invalid, error } }) => (
               <TextField

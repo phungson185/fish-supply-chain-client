@@ -1,12 +1,13 @@
+import { BaseType } from './Common';
 import { PaginateParamsType, PaginateType } from './Common';
+import { FishProcessingType } from './FishProcessing';
 import { FishFarmerFishProcessorOrderType } from './FishProcessor';
 import { UserType } from './User';
 
 // contract types
 export type PlaceProcessedFishPurchaseOrderType = {
-  fishProcessorContractAddress: string;
+  fishProcessingContractAddress: string;
   orderer: string;
-  ProcessedFishPackageId: string;
   quantityoffishpackageordered: number;
   Receiver: string;
 };
@@ -26,24 +27,36 @@ export type ReceiveProcessedFishOrderType = {
 
 // api types
 export type CreateOrderType = {
+  fishProcessingId: string;
+  speciesName: string;
+  quantityOfFishPackageOrdered: number;
+  filletsInPacket: number;
+  processedFishPurchaseOrderId: string;
   orderer: string;
   receiver: string;
-  processedFishPackageId: string;
-  quantityOfFishPackageOrdered: number;
-  processedFishPurchaseOrderId: string;
-  processorId: string;
+  status: number;
+  dateOfProcessing: number;
+  dateOfExpiry: number;
+  IPFSHash: string;
+  image: string;
 };
 
-export type FishProcessorDistributorOrderType = {
+export type FishProcessorDistributorOrderType = BaseType & {
   id: string;
-  processorId: FishFarmerFishProcessorOrderType;
+  fishProcessingId: FishProcessingType;
+  speciesName: string;
   quantityOfFishPackageOrdered: number;
-  processedFishPackageId: string;
+  processedFishPurchaseOrderId: string;
   orderer: UserType;
   receiver: UserType;
   owner: UserType;
   status: number;
-  processedFishPurchaseOrderId: string;
+  dateOfProcessing: number;
+  dateOfExpiry: number;
+  numberOfPackets: number;
+  filletsInPacket: number;
+  IPFSHash: string;
+  image: string;
 };
 
 export type ConfirmOrderType = {
@@ -51,7 +64,11 @@ export type ConfirmOrderType = {
   status: number;
 };
 
-export type FishProcessorDistributorOrderParamsType = PaginateParamsType & {};
+export type FishProcessorDistributorOrderParamsType = PaginateParamsType & {
+  status?: number;
+  orderer?: string;
+  receiver?: string;
+};
 
 export type FishProcessorDistributorOrderPaginateType = PaginateType & {
   items: FishProcessorDistributorOrderType[];
