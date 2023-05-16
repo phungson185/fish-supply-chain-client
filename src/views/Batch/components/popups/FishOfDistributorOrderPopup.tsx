@@ -15,7 +15,7 @@ type PopupProps = PopupController & {
   item: BatchType;
 };
 
-const DistributorOfFishOrderPopup = ({ item, onClose }: PopupProps) => {
+const FishOfDistributorOrderPopup = ({ item, onClose }: PopupProps) => {
   const { control, handleSubmit } = useForm({ mode: 'onChange' });
   const { address } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
@@ -123,4 +123,4 @@ const DistributorOfFishOrderPopup = ({ item, onClose }: PopupProps) => {
   );
 };
 
-export default DistributorOfFishOrderPopup;
+export default FishOfDistributorOrderPopup;

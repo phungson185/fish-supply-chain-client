@@ -1,13 +1,14 @@
-import { Batches, BatchDetail } from 'views/Batch';
-import { ContractDetail, Contracts, FishSeedDetail, FishSeeds } from 'views/FishSeedCompany';
-import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
-import { RegistrationView } from 'views/Registration';
-import { ProfileUpdate } from 'views/Profile';
-import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
-import { FishProcessor, Fishes, Inventory } from 'views/FishProcessor';
-import { FishProcessorDistributorOrders } from 'views/FishProcessor - Distributor - Orders';
+import { BatchDetail, Batches } from 'views/Batch';
+import { DistributorInventory } from 'views/Distributor';
 import { DistributorRetailerOrders } from 'views/Distributor-Retailer-Orders';
 import { FishGrowthDetail, FishGrowths } from 'views/FishFarmer';
+import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
+import { Fishes, ProcessorInventory, ProcessorProducts } from 'views/FishProcessor';
+import { FishProcessorDistributorOrders } from 'views/FishProcessor - Distributor - Orders';
+import { ContractDetail, Contracts, FishSeedDetail, FishSeeds } from 'views/FishSeedCompany';
+import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
+import { ProfileUpdate } from 'views/Profile';
+import { RegistrationView } from 'views/Registration';
 
 type RouteType = {
   path: string;
@@ -137,10 +138,15 @@ const fishProcessorRoute: PrivateRouteType = {
     name: 'Fishes',
     element: <Fishes />,
   },
-  inventory: {
+  processorProducts: {
+    path: '/products',
+    name: 'Products',
+    element: <ProcessorProducts />,
+  },
+  processorInventory: {
     path: '/inventory',
     name: 'Inventory',
-    element: <Inventory />,
+    element: <ProcessorInventory />,
   },
   growthDetail: {
     path: '/fish-growth/:id',
@@ -173,12 +179,17 @@ const distributorRoute: PrivateRouteType = {
     name: 'Batches',
     element: <Batches />,
   },
-  inventory: {
-    path: '/inventory/:fishProcessor',
+  processorProducts: {
+    path: '/products/:fishProcessor',
     name: 'Inventory',
-    url: ({ fishProcessor }: { fishProcessor: any }) => `/inventory/${fishProcessor.id}`,
-    element: <Inventory />,
+    url: ({ fishProcessor }: { fishProcessor: any }) => `/products/${fishProcessor.id}`,
+    element: <ProcessorProducts />,
     disabled: true,
+  },
+  distributorInventory: {
+    path: '/inventory',
+    name: 'Inventory',
+    element: <DistributorInventory />,
   },
   distributorFishProcessorOrders: {
     path: '/distributorFishProcessorOrders',

@@ -48,7 +48,7 @@ const SORT_TYPES = [
   { label: 'High to Low', desc: 'true' },
 ];
 
-const Inventory = () => {
+const Products = () => {
   const { role, id } = useSelector(profileSelector);
   const param = useParams();
   const location = useLocation();
@@ -57,6 +57,8 @@ const Inventory = () => {
     page,
     size: 4,
     fishProcessor: param.fishProcessor,
+    disable: false,
+    isHavePackets: true,
   });
 
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
@@ -65,6 +67,13 @@ const Inventory = () => {
   const [params, setParams] = useState({ search, page });
   const [openOrderPopup, setOpenOrderPopup] = useState(false);
   const [selectedFish, setSelectedFish] = useState<FishProcessingType>({} as FishProcessingType);
+
+  const { data: profile, isSuccess: isSuccessProfile } = useQuery('fishProcessorService.getProfileInventory', () =>
+    fishProcessorService.getProfileInventory({ id: param.fishProcessor ?? id }),
+  ) as {
+    data: ProfileInventoryType;
+    isSuccess: boolean;
+  };
 
   const {
     data: inventory,
@@ -92,21 +101,78 @@ const Inventory = () => {
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
 
-  if (isFetchingInventory) return <></>;
+  if (!isSuccessProfile || isFetchingInventory) return <></>;
   return (
     <>
+      <Container className='bg-white p-5 rounded mb-10'>
+        <Grid container spacing={2} alignItems={'center'}>
+          <Grid item xs={4} className='relative'>
+            <>
+              <div className='relative'>
+                <div className='bg-cover bg-center rounded-lg h-48 w-96 m-auto overflow-hidden'>
+                  <img
+                    className='w-full h-full object-cover'
+                    src={profile.user.cover}
+                    style={{ filter: 'blur(3px)' }}
+                    alt='Cover Photo'
+                  />
+                </div>
+                <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>
+                  <div className='bg-white rounded-full border-1 border-white h-32 w-32'>
+                    <img className='rounded-full w-full h-full object-cover' src={profile.user.avatar} alt='Avatar' />
+                  </div>
+                </div>
+              </div>
+            </>
+          </Grid>
+          <Grid item xs={8}>
+            <div className='flex flex-row justify-between p-10'>
+              <div>
+                <div className='flex items-center gap-2 mb-5'>
+                  <AccountBalanceWalletOutlined className='' />
+                  <div className=''>Wallet address: </div>
+                  <div className='text-primary-main'>{shorten(profile.user.address)}</div>
+                </div>
+                <div className='flex items-center gap-2 mb-5'>
+                  <ApartmentOutlined className='' />
+                  <div className=''>Name: </div>
+                  <div className='text-primary-main'>{profile.user.name}</div>
+                </div>
+                <div className='flex items-center gap-2 mb-5'>
+                  <HomeOutlined className='' />
+                  <div className=''>Address: </div>
+                  <div className='text-primary-main'>{profile.user.userAddress}</div>
+                </div>
+              </div>
+              <div>
+                <div className='flex items-center gap-2 mb-5'>
+                  <LocalPhoneOutlined className='' />
+                  <div className=''>Phone number: </div>
+                  <div className='text-primary-main'>{profile.user.phone}</div>
+                </div>
+                <div className='flex items-center gap-2 mb-5'>
+                  <EmailOutlined className='' />
+                  <div className=''>Email: </div>
+                  <div className='text-primary-main'>{profile.user.email}</div>
+                </div>
+                <div className='flex items-center gap-2 mb-5'>
+                  <Inventory2Outlined className='' />
+                  <div className=''>Contracts: </div>
+                  <div className='text-primary-main'>{profile.fishProcessing}</div>
+                </div>
+              </div>
+            </div>
+          </Grid>
+        </Grid>
+      </Container>
+
       {items && items.length > 0 && (
         <Container className='bg-white p-5 rounded'>
           <Grid container spacing={2} justifyContent={items.length % 4 === 0 ? 'center' : 'left'} className='mb-10'>
             {items.map((item) => (
-              <Grid item key={item.id}>
+              <Grid item>
                 <Card sx={{ width: 272, height: '100%' }}>
-                  <CardMedia
-                    sx={{ height: 200 }}
-                    style={item.disable || item.numberOfPackets === 0 ? { filter: 'blur(3px)' } : {}}
-                    image={item.image}
-                    title='green iguana'
-                  />
+                  <CardMedia sx={{ height: 200 }} image={item.image} title='green iguana' />
                   <CardContent>
                     <div className='flex flex-row gap-2 items-center mb-2'>
                       <Typography variant='h5'>{item.processedSpeciesName}</Typography>
@@ -117,10 +183,8 @@ const Inventory = () => {
                             .label
                         }
                         color={
-                          item.disable || item.numberOfPackets === 0
-                            ? 'default'
-                            : (fishSeedCompanyService.handleMapGeographicOrigin(item?.fishProcessorId.geographicOrigin!)
-                                .color as any)
+                          fishSeedCompanyService.handleMapGeographicOrigin(item?.fishProcessorId.geographicOrigin!)
+                            .color as any
                         }
                       />
                       <Chip
@@ -129,11 +193,8 @@ const Inventory = () => {
                             .label
                         }
                         color={
-                          item.disable || item.numberOfPackets === 0
-                            ? 'default'
-                            : (fishSeedCompanyService.handleMapMethodOfReproduction(
-                                item?.fishProcessorId.geographicOrigin!,
-                              ).color as any)
+                          fishSeedCompanyService.handleMapMethodOfReproduction(item?.fishProcessorId.geographicOrigin!)
+                            .color as any
                         }
                       />
                     </div>
@@ -155,21 +216,15 @@ const Inventory = () => {
                       size='small'
                       variant='contained'
                       color='info'
-                      disabled={item.disable || item.numberOfPackets === 0}
                       onClick={() => window.open(pinataUrl(item.IPFSHash), '_blank')}
                     >
                       Document
                     </Button>
-                    <Button
-                      size='small'
-                      variant='contained'
-                      color='secondary'
-                      disabled={item.disable || item.numberOfPackets === 0}
-                    >
+                    <Button size='small' variant='contained' color='secondary'>
                       Contract
                     </Button>
                     <div className='flex-1'></div>
-                    {role === RoleType.fishProcessorRole && (
+                    {role === RoleType.distributorRole && (
                       <Button
                         size='small'
                         variant='contained'
@@ -177,9 +232,8 @@ const Inventory = () => {
                           setSelectedFish(item);
                           setOpenOrderPopup(true);
                         }}
-                        disabled={item.disable || item.numberOfPackets === 0}
                       >
-                        Update
+                        Order
                       </Button>
                     )}
                   </CardActions>
@@ -205,4 +259,4 @@ const Inventory = () => {
   );
 };
 
-export default Inventory;
+export default Products;

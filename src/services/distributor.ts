@@ -5,6 +5,7 @@ import {
   FishProcessorDistributorOrderPaginateType,
   FishProcessorDistributorOrderParamsType,
   PlaceProcessedFishPurchaseOrderType,
+  ProfileInventoryType,
   ReceiveProcessedFishOrderType,
 } from 'types/Distributor';
 import Web3 from 'web3';
@@ -59,10 +60,14 @@ const getOrders = async (
 const confirmOrder = async ({ orderId, ...body }: ConfirmOrderType) =>
   client.put(`/distributor/orders/${orderId}/confirm`, body);
 
+const getProfileInventory = async ({ id }: { id?: string }): Promise<ProfileInventoryType> =>
+  client.get(`/distributor/get-profile-inventory/${id}`);
+
 export default {
   placeProcessedFishPurchaseOrder,
   confirmProcessedFishPurchaseOrder,
   receiveProcessedFishOrder,
+  getProfileInventory,
 
   createOder,
   getOrders,

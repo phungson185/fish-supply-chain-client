@@ -70,6 +70,11 @@ export type FishProcessorDistributorOrderParamsType = PaginateParamsType & {
   receiver?: string;
 };
 
+export type ProfileInventoryType = {
+  user: UserType;
+  distributor: number;
+};
+
 export type FishProcessorDistributorOrderPaginateType = PaginateType & {
   items: FishProcessorDistributorOrderType[];
 };

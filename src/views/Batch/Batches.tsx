@@ -1,15 +1,5 @@
 import { Visibility } from '@mui/icons-material';
-import {
-  Dialog,
-  Pagination,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from '@mui/material';
+import { Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
 import { useSearch } from 'hooks';
 import { useSnackbar } from 'notistack';
@@ -23,13 +13,7 @@ import { getRoute } from 'routes';
 import { fishSeedCompanyService } from 'services';
 import { RoleType } from 'types/Auth';
 import { BatchType } from 'types/Batch';
-import {
-  DistributorOfFishOrderPopup,
-  FarmedFishOrderPopup,
-  FishSeedsOrderPopup,
-  ProcessedFishOrderPopup,
-  ProcessStatus,
-} from './components';
+import { ProcessStatus } from './components';
 
 const Batches = () => {
   const location = useLocation();
@@ -154,7 +138,7 @@ const Batches = () => {
                   <TableCell align='center'>
                     {[RoleType.fishProcessorRole, RoleType.distributorRole].includes(role as RoleType) &&
                     item.fishProcessingId ? (
-                      <Link to={privateRoute.inventory.url?.(item.fishProcessingId)!}>
+                      <Link to={privateRoute.processorProducts.url?.(item.fishProcessingId)!}>
                         <ProcessStatus
                           content={`${item.fishProcessingId ? 'Completed' : 'Pending'}`}
                           backgroundColor={`${item.fishProcessingId ? 'green' : 'gray'}`}
@@ -200,13 +184,6 @@ const Batches = () => {
           onChange={(event, value) => onSearchChange({ page: value })}
         />
       </div>
-
-      <Dialog open={openPlaceRetailerPurchaseOrderPopup} fullWidth maxWidth='sm'>
-        <DistributorOfFishOrderPopup
-          item={selectedBatch}
-          onClose={() => setOpenPlaceRetailerPurchaseOrderPopup(false)}
-        />
-      </Dialog>
     </>
   );
 };

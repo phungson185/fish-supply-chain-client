@@ -79,9 +79,9 @@ const Fishes = () => {
   const [search, setSearch] = useState(query.search || '');
   const [params, setParams] = useState({ search, page });
 
-  const { data: getProcessingContracts, isLoading: isProcessingContracts } = useQuery(
+  const { data: getProcessingContracts, isLoading: isLoadingProcessingContracts } = useQuery(
     ['fishProcessorService.getProcessingContracts', selectedFish],
-    () => fishProcessorService.getProcessingContracts({ page: 1, fishProcessor: selectedFish.id, size: 100 }),
+    () => fishProcessorService.getProcessingContracts({ page: 1, fishProcessorId: selectedFish.id, size: 100 }),
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,6 +95,8 @@ const Fishes = () => {
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
 
+  console.log(getProcessingContracts);
+
   function Row(props: { row: FishFarmerFishProcessorOrderType }) {
     const { row } = props;
     const [openCollapse, setOpenCollapse] = useState(false);
@@ -107,8 +109,8 @@ const Fishes = () => {
               aria-label='expand row'
               size='small'
               onClick={() => {
-                setOpenCollapse(!openCollapse);
                 setSelectedFish(row);
+                setOpenCollapse(!openCollapse);
               }}
             >
               {openCollapse ? <KeyboardArrowUpOutlined /> : <KeyboardArrowDownOutlined />}
@@ -190,6 +192,9 @@ const Fishes = () => {
                           <TableCell align='right'>{contract.numberOfPackets} packets</TableCell>
                         </TableRow>
                       ))}
+                    <TableRowEmpty
+                      visible={!isLoadingProcessingContracts && getProcessingContracts?.items.length === 0}
+                    />
                   </TableBody>
                 </Table>
               </Box>
