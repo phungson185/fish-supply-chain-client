@@ -36,6 +36,7 @@ import { profileSelector } from 'reducers/profile';
 import { RoleType } from 'types/Auth';
 import { FishProcessorDistributorOrderType, ProfileInventoryType } from 'types/Distributor';
 import { useSnackbar } from 'notistack';
+import ProductDetail from './popups/ProductDetail';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -103,8 +104,15 @@ const Inventory = () => {
         <Container className='bg-white p-5 rounded'>
           <Grid container spacing={2} justifyContent={items.length % 4 === 0 ? 'center' : 'left'} className='mb-10'>
             {items.map((item) => (
-              <Grid item>
-                <Card sx={{ width: 272, height: '100%' }}>
+              <Grid item key={item.id}>
+                <Card
+                  sx={{ width: 272, height: '100%' }}
+                  onClick={() => {
+                    setSelectedFish(item);
+                    setOpenOrderPopup(true);
+                  }}
+                  className='cursor-pointer'
+                >
                   <CardMedia sx={{ height: 200 }} image={item.image} title='green iguana' />
                   <CardContent>
                     <div className='flex flex-row gap-2 items-center mb-2'>
@@ -129,11 +137,17 @@ const Inventory = () => {
                       size='small'
                       variant='contained'
                       color='info'
+                      disabled={item.disable || item.numberOfPackets === 0}
                       onClick={() => window.open(pinataUrl(item.IPFSHash), '_blank')}
                     >
                       Document
                     </Button>
-                    <Button size='small' variant='contained' color='secondary'>
+                    <Button
+                      size='small'
+                      variant='contained'
+                      color='secondary'
+                      disabled={item.disable || item.numberOfPackets === 0}
+                    >
                       Contract
                     </Button>
                     <div className='flex-1'></div>
@@ -142,6 +156,7 @@ const Inventory = () => {
                         size='small'
                         className='whitespace-nowrap'
                         variant='contained'
+                        disabled={item.disable || item.numberOfPackets === 0}
                         onClick={() => {
                           setSelectedFish(item);
                           updateFish({
@@ -170,9 +185,9 @@ const Inventory = () => {
         </Container>
       )}
 
-      {/* <Dialog open={openOrderPopup} fullWidth maxWidth='xs'>
-        <ProcessedFishOrderPopup onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
-      </Dialog> */}
+      <Dialog open={openOrderPopup} fullWidth maxWidth='md'>
+        <ProductDetail onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
+      </Dialog>
     </>
   );
 };

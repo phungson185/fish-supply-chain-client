@@ -59,6 +59,7 @@ export type FishProcessorDistributorOrderType = BaseType & {
   image: string;
   disable: boolean;
   listing: boolean;
+  description: string;
 };
 
 export type ConfirmOrderType = {

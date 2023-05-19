@@ -36,6 +36,7 @@ import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
 import { RoleType } from 'types/Auth';
 import { FishProcessorDistributorOrderType } from 'types/Distributor';
+import ProductDetail from './popups/ProductDetail';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -170,8 +171,15 @@ const Products = () => {
         <Container className='bg-white p-5 rounded'>
           <Grid container spacing={2} justifyContent={items.length % 4 === 0 ? 'center' : 'left'} className='mb-10'>
             {items.map((item) => (
-              <Grid item>
-                <Card sx={{ width: 272, height: '100%' }}>
+              <Grid item key={item.id}>
+                <Card
+                  sx={{ width: 272, height: '100%' }}
+                  onClick={() => {
+                    setSelectedFish(item);
+                    setOpenOrderPopup(true);
+                  }}
+                  className='cursor-pointer'
+                >
                   <CardMedia sx={{ height: 200 }} image={item.image} title='green iguana' />
                   <CardContent>
                     <div className='flex flex-row gap-2 items-center mb-2'>
@@ -232,9 +240,9 @@ const Products = () => {
         </Container>
       )}
 
-      {/* <Dialog open={openOrderPopup} fullWidth maxWidth='xs'>
-        <ProcessedFishOrderPopup onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
-      </Dialog> */}
+      <Dialog open={openOrderPopup} fullWidth maxWidth='md'>
+        <ProductDetail onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
+      </Dialog>
     </>
   );
 };
