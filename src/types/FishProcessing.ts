@@ -16,6 +16,8 @@ export type FishProcessingType = BaseType & {
   numberOfPackets: number;
   processingContract: string;
   image: string;
+  description: string;
+  listing: boolean;
   disable: boolean;
 };
 
@@ -24,6 +26,7 @@ export type ProcessingContractParamsType = PaginateParamsType & {
   fishProcessor?: string;
   fishProcessorId?: string;
   disable?: boolean;
+  listing?: boolean;
 };
 
 export type ProcessingContractPaginateType = PaginateType & {

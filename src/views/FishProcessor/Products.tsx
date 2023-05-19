@@ -59,6 +59,7 @@ const Products = () => {
     fishProcessor: param.fishProcessor,
     disable: false,
     isHavePackets: true,
+    listing: true,
   });
 
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);

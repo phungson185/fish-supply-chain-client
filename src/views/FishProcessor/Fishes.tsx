@@ -95,8 +95,6 @@ const Fishes = () => {
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
 
-  console.log(getProcessingContracts);
-
   function Row(props: { row: FishFarmerFishProcessorOrderType }) {
     const { row } = props;
     const [openCollapse, setOpenCollapse] = useState(false);
@@ -328,7 +326,7 @@ const Fishes = () => {
         />
       </div>
 
-      <Dialog open={openCreateContractPopup} fullWidth maxWidth='sm'>
+      <Dialog open={openCreateContractPopup} fullWidth maxWidth='lg'>
         <CreateContractPopup item={selectedFish} refetch={refetch} onClose={() => setOpenCreateContractPopup(false)} />
       </Dialog>
     </>

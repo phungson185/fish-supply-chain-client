@@ -1,10 +1,20 @@
 import { LoadingButton } from '@mui/lab';
-import { DialogActions, DialogContent, DialogTitle, FormControl, TextField, Typography } from '@mui/material';
+import {
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { DesktopDatePicker, DesktopDateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
 import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from 'react-query';
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
@@ -16,26 +26,26 @@ import { useEffect, useState } from 'react';
 import { UploadLabel } from 'views/Registration/components';
 import { getBase64 } from 'utils/common';
 import TextEditor from 'components/TextEditor';
+import { FishProcessingType } from 'types/FishProcessing';
 
 type PopupProps = PopupController & {
-  item: FishFarmerFishProcessorOrderType;
+  item: FishProcessingType;
   refetch: () => void;
 };
 
-const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
+const UpdateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
   const systemConfig = useSelector(systemSelector);
   const { control, handleSubmit, setValue, clearErrors } = useForm({
     mode: 'onChange',
   });
-  const { address, id } = useSelector(profileSelector);
+  const { address } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate();
   const [imageLoading, setImageLoading] = useState(false);
   const [documentLoading, setDocumentLoading] = useState(false);
   const [image, setImage] = useState('');
-  const { mutate: createProcessingContract, isLoading } = useMutation(fishProcessorService.createProcessingContract, {
+  const { mutate: updateProcessingContract, isLoading } = useMutation(fishProcessorService.updateProcessingContract, {
     onSuccess: () => {
-      enqueueSnackbar('Deploy contract successfully', {
+      enqueueSnackbar('Update contract successfully', {
         variant: 'success',
       });
       refetch();
@@ -48,13 +58,21 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
 
   useEffect(() => {
     if (item) {
-      setValue('processedSpeciesname', item.speciesName);
+      setValue('image', item.image);
+      setImage(item.image);
+      setValue('registration', item.registrationContract);
+      setValue('processedSpeciesname', item.processedSpeciesName);
       setValue('ipfsHash', item.IPFSHash);
-      setValue('registration', systemConfig?.registrationContract);
+      setValue('dateOfProcessing', item.dateOfProcessing);
+      setValue('dateOfExpiry', item.dateOfExpiry);
+      setValue('filletsInPacket', item.filletsInPacket);
+      setValue('numberOfPackets', item.numberOfPackets);
+      setValue('description', item.description);
+      setValue('listing', item.listing);
     }
   }, []);
 
-  const handleDeployContract = () => {
+  const handleUpdateContract = () => {
     handleSubmit(async (values) => {
       if (DateTime.fromISO(values.dateOfProcessing.ts) < DateTime.now()) {
         enqueueSnackbar('Date of processing must be from current date', { variant: 'error' });
@@ -66,33 +84,34 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
         return;
       }
 
-      const resChain = await fishProcessorService.deployFishProcessingContract({
+      const resChain = await fishProcessorService.updateFishProcessingContract({
         sender: address,
-        dateOfProcessing: values.dateOfProcessing.ts,
-        dateOfExpiry: values.dateOfExpiry.ts,
+        dateOfProcessing: new Date(values.dateOfProcessing).getTime(),
+        dateOfExpiry: new Date(values.dateOfExpiry).getTime(),
         ipfsHash: values.ipfsHash,
         processedSpeciesname: values.processedSpeciesname,
-        registration: systemConfig?.registrationContract,
         filletsInPacket: values.filletsInPacket,
         numberOfPackets: values.numberOfPackets,
-        farmedFishPurchaseOrderID: item.farmedFishPurchaseOrderID,
         image: values.image,
+        fishProcessingContractAddress: item.processingContract,
       });
 
-      createProcessingContract({
-        farmedFishPurchaseOrderID: item.farmedFishPurchaseOrderID,
-        image: values.image,
-        dateOfProcessing: values.dateOfProcessing.ts,
-        dateOfExpiry: values.dateOfExpiry.ts,
-        fishProcessorId: item.id,
-        fishProcessor: id as string,
-        IPFSHash: values.ipfsHash,
-        registrationContract: systemConfig?.registrationContract,
-        filletsInPacket: values.filletsInPacket,
-        processingContract: resChain.options.address,
-        numberOfPackets: values.numberOfPackets,
-        processedSpeciesName: values.processedSpeciesname,
-        description: values.description,
+      let dataChain = resChain.events.ProcessedFishPackageIDCreated.returnValues;
+
+      updateProcessingContract({
+        id: item.id,
+        body: {
+          image: dataChain.Image,
+          dateOfProcessing: Number(dataChain.DateOfProcessing),
+          dateOfExpiry: Number(dataChain.DateOfExpiry),
+          ipfsHash: dataChain.IPFS_Hash,
+          filletsInPacket: Number(dataChain.FilletsInPacket),
+          numberOfPackets: Number(dataChain.NumberOfPackets),
+          description: values.description,
+          processedSpeciesname: dataChain.ProcessedSpeciesName,
+          listing: values.listing,
+          transactionHash: resChain.transactionHash,
+        },
       });
     })();
   };
@@ -103,7 +122,6 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
 
     const formData = new FormData();
     formData.append('file', file as Blob);
-
     setImageLoading(true);
     fileService
       .uploadFile(formData)
@@ -137,11 +155,23 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
     <>
       <DialogTitle>Fish processing contract</DialogTitle>
       <DialogContent>
-        <Typography variant='h4' className='mb-4'>
-          Contract Information
-        </Typography>
-
-        {/* <div className='mt-6 mb-6 flex flex-col gap-6'> */}
+        <div className='flex flex-row gap-3 items-center mb-4'>
+          <Typography variant='h4'>Contract Information</Typography>
+          <Controller
+            name='listing'
+            defaultValue=''
+            control={control}
+            // rules={{ required: 'Image of packets is required' }}
+            render={({ field: { value, onChange }, fieldState: { invalid, error } }) => (
+              <FormGroup>
+                <FormControlLabel
+                  control={<Switch checked={value} onChange={(e) => setValue('listing', e.target.checked)} />}
+                  label='Listing'
+                />
+              </FormGroup>
+            )}
+          />
+        </div>
         <div>
           <div className='flex flex-row gap-5 w-full'>
             <div className='w-full max-w-[30%]'>
@@ -152,7 +182,6 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
                 rules={{ required: 'Image of packets is required' }}
                 render={({ fieldState: { invalid } }) => (
                   <FormControl fullWidth className='mb-4'>
-                    <Typography variant='subtitle1'>Image</Typography>
                     <input hidden type='file' id='cover' accept='image/*' onChange={handleChangeImage} />
                     <UploadLabel
                       {...{ htmlFor: 'cover', variant: 'rounded', image: image }}
@@ -323,12 +352,12 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
         <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
           Cancel
         </LoadingButton>
-        <LoadingButton variant='contained' onClick={handleDeployContract} loading={isLoading}>
-          Deploy
+        <LoadingButton variant='contained' onClick={handleUpdateContract} loading={isLoading}>
+          Update
         </LoadingButton>
       </DialogActions>
     </>
   );
 };
 
-export default CreateContractPopup;
+export default UpdateContractPopup;

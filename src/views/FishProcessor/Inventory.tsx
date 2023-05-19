@@ -35,6 +35,7 @@ import { FishProcessingType } from 'types/FishProcessing';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
 import { RoleType } from 'types/Auth';
+import UpdateContractPopup from './popups/UpdateContractPopup';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -65,18 +66,14 @@ const Inventory = () => {
   const [params, setParams] = useState({ search, page });
   const [openOrderPopup, setOpenOrderPopup] = useState(false);
   const [selectedFish, setSelectedFish] = useState<FishProcessingType>({} as FishProcessingType);
+  const [openUpdateContractPopup, setOpenUpdateContractPopup] = useState(false);
 
   const {
     data: inventory,
     isFetching: isFetchingInventory,
     refetch: refetchInventory,
-  } = useQuery(
-    ['fishProcessorService.getProcessingContracts', dataSearch],
-    () => fishProcessorService.getProcessingContracts(dataSearch),
-    {
-      keepPreviousData: false,
-      staleTime: 0,
-    },
+  } = useQuery(['fishProcessorService.getProcessingContracts', dataSearch], () =>
+    fishProcessorService.getProcessingContracts(dataSearch),
   );
 
   const { items = [], total, currentPage, pages: totalPage } = inventory ?? {};
@@ -175,7 +172,7 @@ const Inventory = () => {
                         variant='contained'
                         onClick={() => {
                           setSelectedFish(item);
-                          setOpenOrderPopup(true);
+                          setOpenUpdateContractPopup(true);
                         }}
                         disabled={item.disable || item.numberOfPackets === 0}
                       >
@@ -200,6 +197,14 @@ const Inventory = () => {
 
       <Dialog open={openOrderPopup} fullWidth maxWidth='xs'>
         <ProcessedFishOrderPopup onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
+      </Dialog>
+
+      <Dialog open={openUpdateContractPopup} fullWidth maxWidth='lg'>
+        <UpdateContractPopup
+          item={selectedFish}
+          refetch={refetchInventory}
+          onClose={() => setOpenUpdateContractPopup(false)}
+        />
       </Dialog>
     </>
   );

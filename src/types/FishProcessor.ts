@@ -38,6 +38,18 @@ export type ProcessingContractType = {
   image: string;
 };
 
+export type UpdateFishProcessingContractType = {
+  sender: string;
+  fishProcessingContractAddress: string;
+  processedSpeciesname: string;
+  ipfsHash: string;
+  dateOfProcessing: number;
+  dateOfExpiry: number;
+  filletsInPacket: number;
+  numberOfPackets: number;
+  image: number;
+};
+
 export type UpdateProcessingContractType = {
   processedSpeciesname?: string;
   ipfsHash?: string;
@@ -48,6 +60,8 @@ export type UpdateProcessingContractType = {
   image?: string;
   transactionHash?: string;
   status?: number;
+  listing?: boolean;
+  description?: string;
 };
 
 // api types
@@ -92,6 +106,7 @@ export type ConfirmOrderType = {
 };
 
 export type CreateProcesingContractType = {
+  description: string;
   fishProcessorId: string;
   processedSpeciesName: string;
   registrationContract: string;

@@ -9,6 +9,7 @@ import {
   ProcessingContractType,
   ProfileInventoryType,
   ReceiveFarmedFishOrderType,
+  UpdateFishProcessingContractType,
   UpdateProcessingContractType,
 } from 'types/FishProcessor';
 import Web3 from 'web3';
@@ -99,6 +100,37 @@ const deployFishProcessingContract = async (body: ProcessingContractType) => {
   return result;
 };
 
+const updateFishProcessingContract = async (body: UpdateFishProcessingContractType) => {
+  const {
+    sender,
+    dateOfProcessing,
+    dateOfExpiry,
+    ipfsHash,
+    processedSpeciesname,
+    filletsInPacket,
+    numberOfPackets,
+    image,
+    fishProcessingContractAddress,
+  } = body;
+  const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], fishProcessingContractAddress);
+  const result = await processingContract.methods
+    .UpdateFishProcessing(
+      processedSpeciesname,
+      ipfsHash,
+      dateOfProcessing,
+      dateOfExpiry,
+      filletsInPacket,
+      numberOfPackets,
+      image,
+    )
+    .send({
+      from: sender,
+      gas: 4000000,
+    });
+
+  return result;
+};
+
 // api methods
 const createOder = async (body: CreateOrderType) => client.post('/fishprocessor/order', body);
 
@@ -132,6 +164,7 @@ export default {
   receiveFarmedFishOrder,
   deployFishProcessingContract,
   updateProcessingContract,
+  updateFishProcessingContract,
 
   createOder,
   getOrders,
