@@ -148,7 +148,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
               </Grid>
               <Grid item xs={12}>
                 <div className='flex flex-col items-center gap-4 '>
-                  <div className='font-medium text-lg'>Number of fish packages ordered</div>
+                  <div className='font-medium text-lg'>Number of fish packets ordered</div>
                   <div className='text-7xl font-semibold'>{item.numberOfFishPackagesOrdered}</div>
                 </div>
               </Grid>

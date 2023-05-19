@@ -1,5 +1,5 @@
 import { BatchDetail, Batches } from 'views/Batch';
-import { DistributorInventory } from 'views/Distributor';
+import { DistributorInventory, DistributorProducts } from 'views/Distributor';
 import { DistributorRetailerOrders } from 'views/Distributor-Retailer-Orders';
 import { FishGrowthDetail, FishGrowths } from 'views/FishFarmer';
 import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
@@ -165,11 +165,6 @@ const fishProcessorRoute: PrivateRouteType = {
     name: 'Distributor - FishProcessor - Orders',
     element: <FishProcessorDistributorOrders />,
   },
-  // processingContract: {
-  //   path: '/processingContract',
-  //   name: 'Processing Contract',
-  //   element: <FishProcessor />,
-  // },
 };
 
 const distributorRoute: PrivateRouteType = {
@@ -185,6 +180,11 @@ const distributorRoute: PrivateRouteType = {
     url: ({ fishProcessor }: { fishProcessor: any }) => `/products/${fishProcessor.id}`,
     element: <ProcessorProducts />,
     disabled: true,
+  },
+  distributorProducts: {
+    path: '/products',
+    name: 'Products',
+    element: <DistributorProducts />,
   },
   distributorInventory: {
     path: '/inventory',

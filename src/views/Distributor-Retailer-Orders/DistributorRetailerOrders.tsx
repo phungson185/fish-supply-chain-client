@@ -24,7 +24,7 @@ import { retailerService } from 'services';
 import { DistributorRetailerOrderType } from 'types/Retailer';
 import { ConfirmPopup } from './popups';
 
-const FILTERS = [{ label: 'Number of fish packages ordered', orderBy: 'numberOfFishPackagesOrdered' }];
+const FILTERS = [{ label: 'Number of fish packets ordered', orderBy: 'numberOfFishPackagesOrdered' }];
 
 const SORT_TYPES = [
   { label: 'Low to High', desc: 'false' },
@@ -54,9 +54,7 @@ const DistributorRetailerOrders = () => {
   const [params, setParams] = useState({ search, page });
   const [openConfirmPopup, setOpenConfirmPopup] = useState(false);
   const [openCreateContractPopup, setOpenCreateContractPopup] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<DistributorRetailerOrderType>(
-    {} as DistributorRetailerOrderType,
-  );
+  const [selectedOrder, setSelectedOrder] = useState<DistributorRetailerOrderType>({} as DistributorRetailerOrderType);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   //   const debounceChangeParams = useCallback(
@@ -156,7 +154,7 @@ const DistributorRetailerOrders = () => {
                 <TableCell>Order ID</TableCell>
                 <TableCell>Buyer</TableCell>
                 <TableCell>Seller</TableCell>
-                <TableCell>Number of fish package ordered (packages)</TableCell>
+                <TableCell>Number of fish packet ordered (packages)</TableCell>
                 <TableCell>Status</TableCell>
               </TableRow>
             </TableHead>

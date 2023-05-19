@@ -41,7 +41,9 @@ const BatchComponentInfo = ({ item }: PopupProps) => {
 
                     {item?.owner?.role === RoleType.fishProcessorRole && (
                       <>
-                        <Typography variant='subtitle2'>Number of fish processed: {item?.numberOfFishOrdered} kg</Typography>
+                        <Typography variant='subtitle2'>
+                          Number of fish processed: {item?.numberOfFishOrdered} kg
+                        </Typography>
                         <Typography variant='subtitle2'>Catch method: {item?.catchMethod}</Typography>
                         <Typography variant='subtitle2'>Fillets in packet: {item?.filletsInPacket}</Typography>
                         <Typography variant='subtitle2'>Number of packets: {item?.numberOfPackets}</Typography>
@@ -50,12 +52,16 @@ const BatchComponentInfo = ({ item }: PopupProps) => {
                     )}
                     {item?.owner?.role === RoleType.distributorRole && (
                       <>
-                        <Typography variant='subtitle2'>Quantity of fish package ordered: {item?.quantityOfFishPackageOrdered} packages</Typography>
+                        <Typography variant='subtitle2'>
+                          Quantity of fish packet ordered: {item?.quantityOfFishPackageOrdered} packages
+                        </Typography>
                       </>
                     )}
                     {item?.owner?.role === RoleType.retailerRole && (
                       <>
-                        <Typography variant='subtitle2'>Number of fish package ordered: {item?.numberOfFishPackagesOrdered} packages</Typography>
+                        <Typography variant='subtitle2'>
+                          Number of fish packet ordered: {item?.numberOfFishPackagesOrdered} packages
+                        </Typography>
                       </>
                     )}
                   </>

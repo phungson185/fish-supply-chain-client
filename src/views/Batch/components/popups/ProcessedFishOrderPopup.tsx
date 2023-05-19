@@ -68,7 +68,7 @@ const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
         filletsInPacket: item.filletsInPacket,
         image: item.image,
         IPFSHash: item.IPFSHash,
-        status: resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.N,
+        description: item.description,
       });
     })();
   };
@@ -88,7 +88,7 @@ const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
             defaultValue=''
             control={control}
             rules={{
-              required: `Quantity of fish package available ranges from 0 to ${item.numberOfPackets}`,
+              required: `Quantity of fish packet available ranges from 1 to ${item.numberOfPackets}`,
               min: 1,
               max: item.numberOfPackets,
             }}
@@ -96,7 +96,7 @@ const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
               <TextField
                 {...field}
                 required
-                label='Quantity of fish package'
+                label='Quantity of fish packet'
                 error={invalid}
                 helperText={error?.message}
                 type='number'

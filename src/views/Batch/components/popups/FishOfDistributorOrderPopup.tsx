@@ -90,7 +90,7 @@ const FishOfDistributorOrderPopup = ({ item, onClose }: PopupProps) => {
             defaultValue=''
             control={control}
             rules={{
-              required: `Number of fish package available ranges from 0 to ${item.distributorId?.quantityOfFishPackageOrdered}`,
+              required: `Number of fish packet available ranges from 0 to ${item.distributorId?.quantityOfFishPackageOrdered}`,
               min: 0,
               max: item.distributorId?.quantityOfFishPackageOrdered,
             }}
@@ -98,7 +98,7 @@ const FishOfDistributorOrderPopup = ({ item, onClose }: PopupProps) => {
               <TextField
                 {...field}
                 required
-                label='Number of fish package'
+                label='Number of fish packet'
                 error={invalid}
                 helperText={error?.message}
                 type='number'

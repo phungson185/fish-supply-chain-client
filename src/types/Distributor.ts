@@ -34,11 +34,11 @@ export type CreateOrderType = {
   processedFishPurchaseOrderId: string;
   orderer: string;
   receiver: string;
-  status: number;
   dateOfProcessing: number;
   dateOfExpiry: number;
   IPFSHash: string;
   image: string;
+  description: string;
 };
 
 export type FishProcessorDistributorOrderType = BaseType & {
@@ -57,6 +57,8 @@ export type FishProcessorDistributorOrderType = BaseType & {
   filletsInPacket: number;
   IPFSHash: string;
   image: string;
+  disable: boolean;
+  listing: boolean;
 };
 
 export type ConfirmOrderType = {
@@ -64,10 +66,18 @@ export type ConfirmOrderType = {
   status: number;
 };
 
+export type UpdateOrderType = {
+  orderId: string;
+  listing: boolean;
+};
+
 export type FishProcessorDistributorOrderParamsType = PaginateParamsType & {
   status?: number;
   orderer?: string;
   receiver?: string;
+  disable?: boolean;
+  listing?: boolean;
+  isHavePackets?: boolean;
 };
 
 export type ProfileInventoryType = {

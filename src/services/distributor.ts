@@ -7,6 +7,7 @@ import {
   PlaceProcessedFishPurchaseOrderType,
   ProfileInventoryType,
   ReceiveProcessedFishOrderType,
+  UpdateOrderType,
 } from 'types/Distributor';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -60,6 +61,9 @@ const getOrders = async (
 const confirmOrder = async ({ orderId, ...body }: ConfirmOrderType) =>
   client.put(`/distributor/orders/${orderId}/confirm`, body);
 
+const updateOrder = async ({ orderId, ...body }: UpdateOrderType) =>
+  client.put(`/distributor/orders/${orderId}/update`, body);
+
 const getProfileInventory = async ({ id }: { id?: string }): Promise<ProfileInventoryType> =>
   client.get(`/distributor/get-profile-inventory/${id}`);
 
@@ -72,4 +76,5 @@ export default {
   createOder,
   getOrders,
   confirmOrder,
+  updateOrder,
 };
