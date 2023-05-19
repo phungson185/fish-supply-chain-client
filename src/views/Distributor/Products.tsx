@@ -172,15 +172,17 @@ const Products = () => {
           <Grid container spacing={2} justifyContent={items.length % 4 === 0 ? 'center' : 'left'} className='mb-10'>
             {items.map((item) => (
               <Grid item key={item.id}>
-                <Card
-                  sx={{ width: 272, height: '100%' }}
-                  onClick={() => {
-                    setSelectedFish(item);
-                    setOpenOrderPopup(true);
-                  }}
-                  className='cursor-pointer'
-                >
-                  <CardMedia sx={{ height: 200 }} image={item.image} title='green iguana' />
+                <Card sx={{ width: 272, height: '100%' }}>
+                  <CardMedia
+                    onClick={() => {
+                      setSelectedFish(item);
+                      setOpenOrderPopup(true);
+                    }}
+                    className='cursor-pointer'
+                    sx={{ height: 200 }}
+                    image={item.image}
+                    title='green iguana'
+                  />
                   <CardContent>
                     <div className='flex flex-row gap-2 items-center mb-2'>
                       <Typography variant='h5'>{item.speciesName}</Typography>
