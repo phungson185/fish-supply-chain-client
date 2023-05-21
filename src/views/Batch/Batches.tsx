@@ -151,11 +151,21 @@ const Batches = () => {
                       />
                     )}
                   </TableCell>
-                  <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.distributorRole)}>
-                    <ProcessStatus
-                      content={`${item.distributorId ? 'Completed' : 'Pending'}`}
-                      backgroundColor={`${item.distributorId ? 'green' : 'gray'}`}
-                    />
+                  <TableCell align='center'>
+                    {[RoleType.distributorRole, RoleType.retailerRole].includes(role as RoleType) &&
+                    item.distributorId ? (
+                      <Link to={privateRoute.distributorProducts.url?.(item.distributorId)!}>
+                        <ProcessStatus
+                          content={`${item.distributorId ? 'Completed' : 'Pending'}`}
+                          backgroundColor={`${item.distributorId ? 'green' : 'gray'}`}
+                        />
+                      </Link>
+                    ) : (
+                      <ProcessStatus
+                        content={`${item.distributorId ? 'Completed' : 'Pending'}`}
+                        backgroundColor={`${item.distributorId ? 'green' : 'gray'}`}
+                      />
+                    )}
                   </TableCell>
                   <TableCell align='center' onClick={() => handleOrderPopup(item, RoleType.retailerRole)}>
                     <ProcessStatus

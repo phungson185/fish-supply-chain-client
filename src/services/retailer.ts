@@ -1,11 +1,13 @@
 import {
-    ConfirmOrderType,
+  ConfirmOrderType,
   ConfirmRetailerPurchaseOrderType,
   CreateOrderType,
   DistributorRetailerOrderPaginateType,
   DistributorRetailerOrderParamsType,
   PlaceRetailerPurchaseOrderType,
+  ProfileInventoryType,
   ReceiveRetailerOrderType,
+  UpdateOrderType,
 } from 'types/Retailer';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -15,10 +17,10 @@ import { client } from './axios';
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
 // contract methods
-const placeProcessedFishPurchaseOrder = async (body: PlaceRetailerPurchaseOrderType) => {
-  const { NumberOfFishPackagesOrdered, ProcessedFishPurchaseOrderID, buyer, fishProcessorContractAddress, seller } =
-  body;
-  const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], fishProcessorContractAddress);
+const placeRetailerPurchaseOrder = async (body: PlaceRetailerPurchaseOrderType) => {
+  const { NumberOfFishPackagesOrdered, ProcessedFishPurchaseOrderID, buyer, fishProcessingContractAddress, seller } =
+    body;
+  const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], fishProcessingContractAddress);
   const result = await processingContract.methods
     .PlaceRetailerPurchaseOrder(buyer, seller, ProcessedFishPurchaseOrderID, NumberOfFishPackagesOrdered)
     .send({
@@ -29,12 +31,15 @@ const placeProcessedFishPurchaseOrder = async (body: PlaceRetailerPurchaseOrderT
 };
 
 const confirmRetailerPurchaseOrder = async (body: ConfirmRetailerPurchaseOrderType) => {
-  const { sender, RetailerPurchaseOrderID, accepted, fishProcessingContractAddress } = body;
+  const { sender, RetailerPurchaseOrderID, accepted, fishProcessingContractAddress, ProcessedFishPurchaseOrderID } =
+    body;
   const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], fishProcessingContractAddress);
-  const result = await processingContract.methods.ConfirmRetailerPurchaseOrder(RetailerPurchaseOrderID, accepted).send({
-    from: sender,
-    gas: 3500000,
-  });
+  const result = await processingContract.methods
+    .ConfirmRetailerPurchaseOrder(RetailerPurchaseOrderID, ProcessedFishPurchaseOrderID, accepted)
+    .send({
+      from: sender,
+      gas: 3500000,
+    });
   return result;
 };
 
@@ -57,12 +62,20 @@ const getOrders = async (params?: DistributorRetailerOrderParamsType): Promise<D
 const confirmOrder = async ({ orderId, ...body }: ConfirmOrderType) =>
   client.put(`/retailer/orders/${orderId}/confirm`, body);
 
+const updateOrder = async ({ orderId, ...body }: UpdateOrderType) =>
+  client.put(`/retailer/orders/${orderId}/update`, body);
+
+const getProfileInventory = async ({ id }: { id?: string }): Promise<ProfileInventoryType> =>
+  client.get(`/retailer/get-profile-inventory/${id}`);
+
 export default {
-  placeProcessedFishPurchaseOrder,
+  placeRetailerPurchaseOrder,
   confirmRetailerPurchaseOrder,
   receiveRetailerOrder,
 
   createOder,
   getOrders,
   confirmOrder,
+  updateOrder,
+  getProfileInventory,
 };

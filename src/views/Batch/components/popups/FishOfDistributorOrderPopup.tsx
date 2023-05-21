@@ -7,17 +7,21 @@ import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
-import { retailerService } from 'services';
+import { distributorService, fishProcessorService, retailerService } from 'services';
+import retailer from 'services/retailer';
 import { BatchType } from 'types/Batch';
 import { PopupController } from 'types/Common';
+import { FishProcessorDistributorOrderType } from 'types/Distributor';
+import { FishProcessingType } from 'types/FishProcessing';
+import { DistributorRetailerOrderType } from 'types/Retailer';
 
 type PopupProps = PopupController & {
-  item: BatchType;
+  item: FishProcessorDistributorOrderType;
 };
 
 const FishOfDistributorOrderPopup = ({ item, onClose }: PopupProps) => {
   const { control, handleSubmit } = useForm({ mode: 'onChange' });
-  const { address } = useSelector(profileSelector);
+  const { address, id } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
@@ -27,30 +31,47 @@ const FishOfDistributorOrderPopup = ({ item, onClose }: PopupProps) => {
         variant: 'success',
       });
       onClose();
-      navigate('/retailerDistributionOrders');
     },
     onError: (error: any) => {
       enqueueSnackbar(error, { variant: 'error' });
     },
   });
 
+  const { mutate: updateDistributorProducts } = useMutation(distributorService.updateOrder);
+
   const handleOrder = () => {
     handleSubmit(async (values) => {
-      const resChain = await retailerService.placeProcessedFishPurchaseOrder({
+      console.log(item.owner.address);
+      const resChain = await retailerService.placeRetailerPurchaseOrder({
         buyer: address,
-        seller: item.distributorId?.owner.address!,
-        fishProcessorContractAddress: item.distributorId?.processorId?.processingContract!,
-        NumberOfFishPackagesOrdered: values.NumberOfFishPackagesOrdered,
-        ProcessedFishPurchaseOrderID: item.distributorId?.processedFishPurchaseOrderId!,
+        seller: item.owner.address,
+        fishProcessingContractAddress: item.fishProcessingId.processingContract,
+        NumberOfFishPackagesOrdered: values.quantityoffishpackageordered,
+        ProcessedFishPurchaseOrderID: item.processedFishPurchaseOrderId,
+      });
+
+      let dataResChain = resChain.events.RetailerPuchaseOrderPlaced.returnValues;
+
+      updateDistributorProducts({
+        orderId: item.id,
+        numberOfPackets: dataResChain.NumberOfFishPackages,
       });
 
       await createOder({
-        buyer: address,
-        seller: item.distributorId?.owner.address!,
-        distributorId: item.distributorId?.id!,
-        numberOfFishPackagesOrdered: values.NumberOfFishPackagesOrdered,
-        processedFishPurchaseOrderID: item.distributorId?.processedFishPurchaseOrderId!,
-        retailerPurchaseOrderID: resChain.events.RetailerPuchaseOrderPlaced.returnValues.RetailerPurchaseOrderID,
+        buyer: id as string,
+        seller: item.owner.id,
+        retailerPurchaseOrderID: dataResChain.RetailerPurchaseOrderID,
+        processedFishPurchaseOrderID: dataResChain.ProcessedFishPurchaseOrderID,
+        numberOfFishPackagesOrdered: dataResChain.NumberOfFishPackagesOrdered,
+        dateOfExpiry: item.dateOfExpiry,
+        dateOfProcessing: item.dateOfProcessing,
+        description: item.description,
+        distributorId: item.id,
+        filletsInPacket: item.filletsInPacket,
+        image: item.image,
+        numberOfPackets: item.numberOfPackets,
+        IPFSHash: item.IPFSHash,
+        speciesName: item.speciesName,
       });
     })();
   };
@@ -59,46 +80,26 @@ const FishOfDistributorOrderPopup = ({ item, onClose }: PopupProps) => {
       <DialogTitle>Fish retailer</DialogTitle>
       <DialogContent>
         <Typography variant='h4' className='mb-4'>
-          Processed fish order
+          Fish of distributor order
         </Typography>
 
         <div className='mt-6 mb-6 flex flex-col gap-6'>
           <TextField required label='Buyer' value={address} disabled />
-          <TextField required label='Seller' value={item.distributorId?.owner.address} disabled />
-          <TextField required label='Species name' value={item.distributorId?.processorId?.speciesName} disabled />
-          <TextField
-            required
-            label='Date of processing'
-            value={moment(item.distributorId?.processorId?.dateOfProcessing).format('DD/MM/YYYY')}
-            disabled
-          />
-          <TextField
-            required
-            label='Fillet in packet'
-            value={item.distributorId?.processorId?.filletsInPacket}
-            disabled
-          />
-          <TextField
-            required
-            label='Number of packets'
-            value={item.distributorId?.quantityOfFishPackageOrdered}
-            disabled
-          />
-
+          <TextField required label='Seller' value={item.owner.address} disabled />
           <Controller
-            name='NumberOfFishPackagesOrdered'
+            name='quantityoffishpackageordered'
             defaultValue=''
             control={control}
             rules={{
-              required: `Number of fish packet available ranges from 0 to ${item.distributorId?.quantityOfFishPackageOrdered}`,
-              min: 0,
-              max: item.distributorId?.quantityOfFishPackageOrdered,
+              required: `Quantity of fish packet available ranges from 1 to ${item.numberOfPackets}`,
+              min: 1,
+              // max: item.numberOfPackets,
             }}
             render={({ field, fieldState: { invalid, error } }) => (
               <TextField
                 {...field}
                 required
-                label='Number of fish packet'
+                label='Quantity of fish packet'
                 error={invalid}
                 helperText={error?.message}
                 type='number'

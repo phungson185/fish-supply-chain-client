@@ -2,7 +2,7 @@ import { useSearch } from 'hooks';
 import { parse } from 'qs';
 import { useQuery } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
-import { distributorService, fishProcessorService, fishSeedCompanyService } from 'services';
+import { distributorService, fishProcessorService, fishSeedCompanyService, retailerService } from 'services';
 import { ProfileInventoryType } from 'types/FishProcessor';
 import { useCallback, useEffect, useState } from 'react';
 import {
@@ -37,6 +37,7 @@ import { profileSelector } from 'reducers/profile';
 import { RoleType } from 'types/Auth';
 import { FishProcessorDistributorOrderType } from 'types/Distributor';
 import ProductDetail from './popups/ProductDetail';
+import { DistributorRetailerOrderType } from 'types/Retailer';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -70,12 +71,10 @@ const Products = () => {
   const [params, setParams] = useState({ search, page });
   const [openProductDetailPop, setOpenProductDetailPop] = useState(false);
   const [openOrderPopup, setOpenOrderPopup] = useState(false);
-  const [selectedFish, setSelectedFish] = useState<FishProcessorDistributorOrderType>(
-    {} as FishProcessorDistributorOrderType,
-  );
+  const [selectedFish, setSelectedFish] = useState<DistributorRetailerOrderType>({} as DistributorRetailerOrderType);
 
-  const { data: profile, isSuccess: isSuccessProfile } = useQuery('distributorService.getProfileInventory', () =>
-    distributorService.getProfileInventory({ id: param.distributor ?? id }),
+  const { data: profile, isSuccess: isSuccessProfile } = useQuery('retailerService.getProfileInventory', () =>
+    retailerService.getProfileInventory({ id: param.distributor ?? id }),
   ) as {
     data: ProfileInventoryType;
     isSuccess: boolean;
@@ -85,7 +84,7 @@ const Products = () => {
     data: inventory,
     isFetching: isFetchingInventory,
     refetch: refetchInventory,
-  } = useQuery(['distributorService.getOrders', dataSearch], () => distributorService.getOrders(dataSearch), {
+  } = useQuery(['retailerService.getOrders', dataSearch], () => retailerService.getOrders(dataSearch), {
     keepPreviousData: false,
     staleTime: 0,
   });
@@ -247,9 +246,9 @@ const Products = () => {
         <ProductDetail onClose={() => setOpenProductDetailPop(false)} item={selectedFish} />
       </Dialog>
 
-      <Dialog open={openOrderPopup} fullWidth maxWidth='xs'>
+      {/* <Dialog open={openOrderPopup} fullWidth maxWidth='xs'>
         <FishOfDistributorOrderPopup onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
-      </Dialog>
+      </Dialog> */}
     </>
   );
 };

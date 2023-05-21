@@ -1,10 +1,10 @@
-import { PaginateParamsType, PaginateType } from './Common';
+import { BaseType, PaginateParamsType, PaginateType } from './Common';
 import { FishProcessorDistributorOrderType } from './Distributor';
 import { UserType } from './User';
 
 // contract types
 export type PlaceRetailerPurchaseOrderType = {
-  fishProcessorContractAddress: string;
+  fishProcessingContractAddress: string;
   buyer: string;
   seller: string;
   ProcessedFishPurchaseOrderID: string;
@@ -15,6 +15,7 @@ export type ConfirmRetailerPurchaseOrderType = {
   sender: string;
   fishProcessingContractAddress: string;
   RetailerPurchaseOrderID: string;
+  ProcessedFishPurchaseOrderID: string;
   accepted: boolean;
 };
 
@@ -33,9 +34,17 @@ export type CreateOrderType = {
   numberOfFishPackagesOrdered: number;
   processedFishPurchaseOrderID: string;
   distributorId: string;
+  speciesName: string;
+  description: string;
+  dateOfProcessing: number;
+  dateOfExpiry: number;
+  numberOfPackets: number;
+  filletsInPacket: number;
+  IPFSHash: string;
+  image: string;
 };
 
-export type DistributorRetailerOrderType = {
+export type DistributorRetailerOrderType = BaseType & {
   id: string;
   distributorId: FishProcessorDistributorOrderType;
   numberOfFishPackagesOrdered: number;
@@ -45,11 +54,31 @@ export type DistributorRetailerOrderType = {
   owner: UserType;
   status: number;
   processedFishPurchaseOrderID: string;
+  speciesName: string;
+  dateOfProcessing: number;
+  dateOfExpiry: number;
+  numberOfPackets: number;
+  filletsInPacket: number;
+  IPFSHash: string;
+  image: string;
+  disable: boolean;
+  listing: boolean;
+  description: string;
 };
 
 export type ConfirmOrderType = {
   orderId: string;
   status: number;
+};
+
+export type UpdateOrderType = {
+  orderId: string;
+  listing: boolean;
+};
+
+export type ProfileInventoryType = {
+  user: UserType;
+  retailer: number;
 };
 
 export type DistributorRetailerOrderParamsType = PaginateParamsType & {};

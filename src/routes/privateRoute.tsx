@@ -9,6 +9,7 @@ import { ContractDetail, Contracts, FishSeedDetail, FishSeeds } from 'views/Fish
 import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
 import { ProfileUpdate } from 'views/Profile';
 import { RegistrationView } from 'views/Registration';
+import { RetailerInventory, RetailerProducts } from 'views/Retailer';
 
 type RouteType = {
   path: string;
@@ -209,6 +210,23 @@ const retailerRoute: PrivateRouteType = {
     path: '/batches',
     name: 'Batches',
     element: <Batches />,
+  },
+  distributorProducts: {
+    path: '/products/:id',
+    name: 'Inventory',
+    url: ({ id }: { id: string }) => `/products/${id}`,
+    element: <DistributorProducts />,
+    disabled: true,
+  },
+  retailerProducts: {
+    path: '/products',
+    name: 'Products',
+    element: <RetailerProducts />,
+  },
+  retailerInventory: {
+    path: '/inventory',
+    name: 'Inventory',
+    element: <RetailerInventory />,
   },
   retailerDistributionOrders: {
     path: '/retailerDistributionOrders',

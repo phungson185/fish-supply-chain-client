@@ -69,7 +69,8 @@ export type ConfirmOrderType = {
 
 export type UpdateOrderType = {
   orderId: string;
-  listing: boolean;
+  listing?: boolean;
+  numberOfPackets?: number;
 };
 
 export type FishProcessorDistributorOrderParamsType = PaginateParamsType & {

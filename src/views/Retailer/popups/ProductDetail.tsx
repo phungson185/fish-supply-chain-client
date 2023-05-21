@@ -37,13 +37,13 @@ import {
   LocalPhoneOutlined,
   SetMealOutlined,
 } from '@mui/icons-material';
+import { DistributorRetailerOrderType } from 'types/Retailer';
 
 type PopupProps = PopupController & {
-  item: FishProcessorDistributorOrderType;
+  item: DistributorRetailerOrderType;
 };
 
 const ProductDetail = ({ item, onClose }: PopupProps) => {
-  console.log(item);
   return (
     <>
       <DialogTitle>{item.speciesName}</DialogTitle>
@@ -87,22 +87,22 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
               <div className='flex items-center gap-2 mb-1'>
                 <AccountBalanceWalletOutlined className='' />
                 <div className=''>Wallet address: </div>
-                <div>{shorten(item.orderer.address)}</div>
+                <div>{shorten(item.buyer.address)}</div>
               </div>
               <div className='flex items-center gap-2 mb-1'>
                 <ApartmentOutlined className='' />
                 <div className=''>Name: </div>
-                <div>{item.orderer.name}</div>
+                <div>{item.buyer.name}</div>
               </div>
               <div className='flex items-center gap-2 mb-1'>
                 <HomeOutlined className='' />
                 <div className=''>Address: </div>
-                <div>{item.orderer.userAddress}</div>
+                <div>{item.buyer.userAddress}</div>
               </div>
               <div className='flex items-center gap-2 mb-1'>
                 <LocalPhoneOutlined className='' />
                 <div className=''>Phone number: </div>
-                <div>{item.orderer.phone}</div>
+                <div>{item.buyer.phone}</div>
               </div>
             </div>
 
