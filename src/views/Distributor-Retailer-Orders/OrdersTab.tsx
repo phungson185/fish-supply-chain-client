@@ -33,7 +33,7 @@ import { useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { retailerService, fishFarmerService, fishProcessorService } from 'services';
 import { FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
-import { formatTime } from 'utils/common';
+import { formatTime, formatTimeDate } from 'utils/common';
 import { ConfirmPopup } from './popups';
 import { RoleType } from 'types/Auth';
 import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
@@ -204,7 +204,7 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
                 <div className='mb-5 text-gray-400 text-sm'>
                   <span className='mr-2'>Expired: </span>
                   <span>
-                    {formatTime(item.dateOfProcessing)} ~{formatTime(item.dateOfExpiry)}{' '}
+                    {formatTimeDate(item.dateOfProcessing)} ~ {formatTimeDate(item.dateOfExpiry)}{' '}
                   </span>
                 </div>
                 <div className='flex-1'></div>
@@ -223,7 +223,7 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
 
             <div className='flex flex-row justify-between items-center'>
               <Typography variant='caption' className='block'>
-                Transaction hash: {item.retailerPurchaseOrderID}
+                Transaction hash: {item.transactionHash}
               </Typography>
               <Typography variant='caption' className='block'>
                 Updated time: {formatTime(item.updatedAt)}

@@ -37,6 +37,7 @@ import { RoleType } from 'types/Auth';
 import { FishProcessorDistributorOrderType, ProfileInventoryType } from 'types/Distributor';
 import { useSnackbar } from 'notistack';
 import ProductDetail from './popups/ProductDetail';
+import { ProcessStatus } from 'components/ConfirmStatus';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -60,6 +61,7 @@ const Inventory = () => {
     page,
     size: 4,
     owner: id,
+    status: ProcessStatus.Received,
   });
 
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);

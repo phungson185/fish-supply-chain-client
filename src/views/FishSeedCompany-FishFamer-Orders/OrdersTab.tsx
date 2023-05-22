@@ -224,7 +224,7 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
 
             <div className='flex flex-row justify-between items-center'>
               <Typography variant='caption' className='block'>
-                Transaction hash: {item.fishSeedPurchaseOrderId}
+                Transaction hash: {item.transactionHash}
               </Typography>
               <Typography variant='caption' className='block'>
                 Updated time: {formatTime(item.updatedAt)}

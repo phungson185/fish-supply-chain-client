@@ -36,6 +36,7 @@ import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
 import { RoleType } from 'types/Auth';
 import UpdateContractPopup from './popups/UpdateContractPopup';
+import ProductDetail from './popups/ProductDetail';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -199,7 +200,7 @@ const Inventory = () => {
         <ProcessedFishOrderPopup onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
       </Dialog>
 
-      <Dialog open={openUpdateContractPopup} fullWidth maxWidth='lg'>
+      <Dialog open={openUpdateContractPopup} fullWidth maxWidth='xl'>
         <UpdateContractPopup
           item={selectedFish}
           refetch={refetchInventory}

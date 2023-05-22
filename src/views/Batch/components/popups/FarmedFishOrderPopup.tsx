@@ -61,6 +61,7 @@ const FarmedFishOrderPopup = ({ item, refetch, onClose }: PopupProps) => {
       await updateGrowthDetail({
         orderId: item.id,
         totalNumberOfFish: resChain.events?.FarmedFishPurchaseOrderPlaced.returnValues.TotalNumberOfFish,
+        transactionHash: resChain.transactionHash,
       } as UpdateGrowthDetailType);
 
       await createOder({
@@ -74,6 +75,7 @@ const FarmedFishOrderPopup = ({ item, refetch, onClose }: PopupProps) => {
         IPFSHash: item.IPFSHash,
         methodOfReproduction: item.methodOfReproduction,
         speciesName: item.speciesName,
+        transactionHash: resChain.transactionHash,
       });
     })();
   };

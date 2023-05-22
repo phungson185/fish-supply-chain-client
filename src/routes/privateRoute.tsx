@@ -70,6 +70,7 @@ const fishSeedCompanyRoute: PrivateRouteType = {
     name: 'Contract detail',
     url: ({ id }: { id: string }) => `/contract/${id}`,
     element: <ContractDetail />,
+    disabled: true,
   },
   fishSeeds: {
     path: '/fish-seeds',
@@ -107,6 +108,7 @@ const fishFarmerRoute: PrivateRouteType = {
     name: 'Fish growth detail',
     url: ({ id }: { id: string }) => `/fish-growth/${id}`,
     element: <FishGrowthDetail />,
+    disabled: true,
   },
   contractDetail: {
     path: '/contract/:id',

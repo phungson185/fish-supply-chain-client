@@ -69,6 +69,7 @@ const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
         image: item.image,
         IPFSHash: item.IPFSHash,
         description: item.description,
+        transactionHash: resChain.transactionHash,
       });
     })();
   };

@@ -42,6 +42,7 @@ export type CreateOrderType = {
   filletsInPacket: number;
   IPFSHash: string;
   image: string;
+  transactionHash: string;
 };
 
 export type DistributorRetailerOrderType = BaseType & {
@@ -64,11 +65,13 @@ export type DistributorRetailerOrderType = BaseType & {
   disable: boolean;
   listing: boolean;
   description: string;
+  transactionHash: string;
 };
 
 export type ConfirmOrderType = {
   orderId: string;
   status: number;
+  transactionHash: string;
 };
 
 export type UpdateOrderType = {
@@ -81,7 +84,14 @@ export type ProfileInventoryType = {
   retailer: number;
 };
 
-export type DistributorRetailerOrderParamsType = PaginateParamsType & {};
+export type DistributorRetailerOrderParamsType = PaginateParamsType & {
+  status?: number;
+  buyer?: string;
+  seller?: string;
+  disable?: boolean;
+  listing?: boolean;
+  isHavePackets?: boolean;
+};
 
 export type DistributorRetailerOrderPaginateType = PaginateType & {
   items: DistributorRetailerOrderType[];

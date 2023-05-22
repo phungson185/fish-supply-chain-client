@@ -42,6 +42,7 @@ export type CreateOrderType = {
   fishSeedsSeller: string;
   numberOfFishSeedsOrdered: number;
   fishSeedsPurchaseOrderDetailsStatus: string;
+  transactionHash: string;
 };
 
 export type FishSeedCompanyFishFarmerOrderType = BaseType & {
@@ -64,12 +65,14 @@ export type FishSeedCompanyFishFarmerOrderType = BaseType & {
   updater?: UserType;
   orderable: boolean;
   farmedFishGrowthDetailsID: string;
+  transactionHash?: string;
 };
 
 export type ConfirmOrderType = {
   orderId: string;
   status: number;
   numberOfFishSeedsAvailable: number;
+  transactionHash: string;
 };
 
 export type UpdateGrowthDetailType = {

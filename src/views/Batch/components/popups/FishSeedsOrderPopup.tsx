@@ -62,6 +62,7 @@ const FishSeedsOrderPopup = ({ item, onClose }: PopupProps) => {
         numberOfFishSeedsOrdered: resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.NumberOfFishSeedsOrdered,
         fishSeedsPurchaseOrderDetailsStatus:
           resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.FishSeedsPurchaseOrderDetailsStatus,
+        transactionHash: resChain.transactionHash,
       });
     })();
   };

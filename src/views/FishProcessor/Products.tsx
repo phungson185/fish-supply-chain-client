@@ -35,6 +35,7 @@ import { FishProcessingType } from 'types/FishProcessing';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
 import { RoleType } from 'types/Auth';
+import ProductDetail from './popups/ProductDetail';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -68,6 +69,7 @@ const Products = () => {
   const [params, setParams] = useState({ search, page });
   const [openOrderPopup, setOpenOrderPopup] = useState(false);
   const [selectedFish, setSelectedFish] = useState<FishProcessingType>({} as FishProcessingType);
+  const [openProductDetailPop, setOpenProductDetailPop] = useState(false);
 
   const { data: profile, isSuccess: isSuccessProfile } = useQuery('fishProcessorService.getProfileInventory', () =>
     fishProcessorService.getProfileInventory({ id: param.fishProcessor ?? id }),
@@ -173,7 +175,15 @@ const Products = () => {
             {items.map((item) => (
               <Grid item>
                 <Card sx={{ width: 272, height: '100%' }}>
-                  <CardMedia sx={{ height: 200 }} image={item.image} title='green iguana' />
+                  <CardMedia
+                    sx={{ height: 200 }}
+                    image={item.image}
+                    title='green iguana'
+                    onClick={() => {
+                      setSelectedFish(item);
+                      setOpenProductDetailPop(true);
+                    }}
+                  />
                   <CardContent>
                     <div className='flex flex-row gap-2 items-center mb-2'>
                       <Typography variant='h5'>{item.processedSpeciesName}</Typography>
@@ -255,6 +265,10 @@ const Products = () => {
 
       <Dialog open={openOrderPopup} fullWidth maxWidth='xs'>
         <ProcessedFishOrderPopup onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
+      </Dialog>
+
+      <Dialog open={openProductDetailPop} fullWidth maxWidth='xl'>
+        <ProductDetail onClose={() => setOpenProductDetailPop(false)} item={selectedFish} />
       </Dialog>
     </>
   );

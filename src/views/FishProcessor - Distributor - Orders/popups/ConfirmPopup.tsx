@@ -74,7 +74,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     isSuccess: getLogsSuccess,
     refetch: fetchLogs,
   } = useQuery(['logService.getLogs', { id: item.id }], () =>
-    logService.getLogs({ objectId: item.id, transactionType: TransactionType.UPDATE_ORDER_STATUS } as LogParamsType),
+    logService.getLogs({ objectId: item.id, transactionType: TransactionType.ORDER } as LogParamsType),
   );
 
   const { mutate: updateProcessingContract } = useMutation(fishProcessor.updateProcessingContract, {
@@ -117,6 +117,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     confirmOrder({
       orderId: item.id,
       status: Number(resChain.events.ConfirmProcessedFishPurchaseOrderStatus.returnValues.NewStatus),
+      transactionHash: resChain.transactionHash,
     });
 
     setOrderStatus(Number(resChain.events.ConfirmProcessedFishPurchaseOrderStatus.returnValues.NewStatus));
@@ -124,7 +125,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
   };
 
   const handleRecieve = async () => {
-    await distributorService.receiveProcessedFishOrder({
+    const resChain = await distributorService.receiveProcessedFishOrder({
       sender: address,
       fishProcessingContractAddress: item.fishProcessingId.processingContract,
       ProcessedFishPurchaseOrderID: item.processedFishPurchaseOrderId,
@@ -133,6 +134,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     confirmOrder({
       orderId: item.id,
       status: ProcessStatus.Received,
+      transactionHash: resChain.transactionHash,
     });
 
     setOrderStatus(ProcessStatus.Received);

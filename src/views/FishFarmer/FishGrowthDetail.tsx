@@ -65,7 +65,7 @@ const FishGrowthDetail = () => {
           await logService.getLogs({
             ...dataSearch,
             objectId: res?.id,
-            transactionType: TransactionType.UPDATE_FISH_GROWTH,
+            transactionType: TransactionType.FISH_GROWTH,
           }),
         );
       },
@@ -105,7 +105,7 @@ const FishGrowthDetail = () => {
         <Grid container spacing={2}>
           <Grid item xs={8} className='w-full'>
             <div className='relative h-full'>
-              <div className='flex items-center justify-between w-full mb-5'>
+              <div className='flex items-center justify-between w-full mb-1'>
                 <div className='w-[70%]'>
                   <div className='flex items-center gap-3'>
                     <Typography variant='h1' className='mb-2'>
@@ -180,7 +180,7 @@ const FishGrowthDetail = () => {
                 <div className='font-bold'>{growth?.totalNumberOfFish}kg</div>
                 <BalanceOutlined color='primary' />
               </div>
-              <Typography variant='caption' className='absolute bottom-0 left-0'>
+              <Typography variant='caption' className='absolute -bottom-1 left-0'>
                 {growth?.owner.name + ' / ' + growth?.owner.userAddress + ' / ' + growth?.owner.phone}
               </Typography>
 

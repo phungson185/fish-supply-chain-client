@@ -65,14 +65,11 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     isSuccess: getLogsSuccess,
     refetch: fetchLogs,
   } = useQuery(['logService.getLogs', { id: item.id }], () =>
-    logService.getLogs({ objectId: item.id, transactionType: TransactionType.UPDATE_ORDER_STATUS } as LogParamsType),
+    logService.getLogs({ objectId: item.id, transactionType: TransactionType.ORDER } as LogParamsType),
   );
 
   const { mutate: updateGrowthDetail } = useMutation(fishFarmerService.updateGrowthDetail, {
     onSuccess: () => {
-      enqueueSnackbar('Update growth detail successfully', {
-        variant: 'success',
-      });
       onClose();
       refetch();
     },
@@ -105,11 +102,13 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     updateGrowthDetail({
       orderId: item.fishFarmerId.id,
       totalNumberOfFish: Number(resChain.events.FarmedFishPurchaseOrderReceived.returnValues.TotalNumberOfFish),
+      transactionHash: resChain.transactionHash,
     });
 
     confirmOrder({
       orderId: item.id,
       status: Number(resChain.events.FarmedFishPurchaseOrderReceived.returnValues.NEWStatus),
+      transactionHash: resChain.transactionHash,
     });
 
     setOrderStatus(Number(resChain.events.FarmedFishPurchaseOrderReceived.returnValues.NEWStatus));
@@ -126,6 +125,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     await confirmOrder({
       orderId: item.id,
       status: Number(resChain.events.FarmedFishOrderReceived.returnValues.NEWStatus),
+      transactionHash: resChain.transactionHash,
     });
 
     setOrderStatus(Number(resChain.events.FarmedFishOrderReceived.returnValues.NEWStatus));

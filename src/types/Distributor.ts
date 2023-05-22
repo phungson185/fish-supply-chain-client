@@ -39,6 +39,7 @@ export type CreateOrderType = {
   IPFSHash: string;
   image: string;
   description: string;
+  transactionHash: string;
 };
 
 export type FishProcessorDistributorOrderType = BaseType & {
@@ -60,11 +61,13 @@ export type FishProcessorDistributorOrderType = BaseType & {
   disable: boolean;
   listing: boolean;
   description: string;
+  transactionHash: string;
 };
 
 export type ConfirmOrderType = {
   orderId: string;
   status: number;
+  transactionHash: string;
 };
 
 export type UpdateOrderType = {

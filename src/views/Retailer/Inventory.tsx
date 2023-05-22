@@ -2,7 +2,7 @@ import { useSearch } from 'hooks';
 import { parse } from 'qs';
 import { useMutation, useQuery } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
-import { distributorService, fishProcessorService, fishSeedCompanyService } from 'services';
+import { distributorService, fishProcessorService, fishSeedCompanyService, retailerService } from 'services';
 import { useCallback, useEffect, useState } from 'react';
 import {
   Avatar,
@@ -39,6 +39,7 @@ import { useSnackbar } from 'notistack';
 import ProductDetail from './popups/ProductDetail';
 import retailer from 'services/retailer';
 import { DistributorRetailerOrderType } from 'types/Retailer';
+import { ProcessStatus } from 'components/ConfirmStatus';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -62,6 +63,7 @@ const Inventory = () => {
     page,
     size: 4,
     owner: id,
+    status: ProcessStatus.Received,
   });
 
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
@@ -71,7 +73,7 @@ const Inventory = () => {
   const [openOrderPopup, setOpenOrderPopup] = useState(false);
   const [selectedFish, setSelectedFish] = useState<DistributorRetailerOrderType>({} as DistributorRetailerOrderType);
 
-  const { mutate: updateFish } = useMutation(retailer.updateOrder, {
+  const { mutate: updateFish } = useMutation(retailerService.updateOrder, {
     onSuccess: () => {
       enqueueSnackbar('Update sale status successfully', { variant: 'success' });
       refetchInventory();
@@ -82,7 +84,7 @@ const Inventory = () => {
     data: inventory,
     isFetching: isFetchingInventory,
     refetch: refetchInventory,
-  } = useQuery(['retailer.getOrders', dataSearch], () => retailer.getOrders(dataSearch));
+  } = useQuery(['retailerService.getOrders', dataSearch], () => retailerService.getOrders(dataSearch));
 
   const { items = [], total, currentPage, pages: totalPage } = inventory ?? {};
 
@@ -153,7 +155,7 @@ const Inventory = () => {
                       Contract
                     </Button>
                     <div className='flex-1'></div>
-                    {role === RoleType.distributorRole && (
+                    {role === RoleType.retailerRole && (
                       <Button
                         size='small'
                         className='whitespace-nowrap'

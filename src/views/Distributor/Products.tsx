@@ -37,6 +37,7 @@ import { profileSelector } from 'reducers/profile';
 import { RoleType } from 'types/Auth';
 import { FishProcessorDistributorOrderType } from 'types/Distributor';
 import ProductDetail from './popups/ProductDetail';
+import { ProcessStatus } from 'components/ConfirmStatus';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -58,6 +59,7 @@ const Products = () => {
   const [dataSearch, onSearchChange] = useSearch({
     page,
     size: 4,
+    status: ProcessStatus.Received,
     owner: param.distributor,
     disable: false,
     isHavePackets: true,
@@ -248,7 +250,11 @@ const Products = () => {
       </Dialog>
 
       <Dialog open={openOrderPopup} fullWidth maxWidth='xs'>
-        <FishOfDistributorOrderPopup onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
+        <FishOfDistributorOrderPopup
+          refetch={refetchInventory}
+          onClose={() => setOpenOrderPopup(false)}
+          item={selectedFish}
+        />
       </Dialog>
     </>
   );

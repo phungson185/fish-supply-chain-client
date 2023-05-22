@@ -26,6 +26,7 @@ import {
 import { UploadLabel } from 'views/Registration/components';
 import { useEffect, useState } from 'react';
 import { getBase64 } from 'utils/common';
+import TextEditor from 'components/TextEditor';
 
 type PopupProps = PopupController & {
   refetch?: <TPageData>(
@@ -136,8 +137,15 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
             defaultValue=''
             control={control}
             rules={{ required: 'Description is required' }}
-            render={({ field, fieldState: { invalid, error } }) => (
-              <TextField {...field} multiline label='Description' error={invalid} helperText={error?.message} />
+            render={({ field: { value, onChange }, fieldState: { invalid, error } }) => (
+              <FormControl fullWidth className='mb-4' error={invalid}>
+                <Typography variant='subtitle1'>Description</Typography>
+                <TextEditor
+                  name='description'
+                  onChange={(value: any) => onChange({ target: { value } })}
+                  value={value}
+                />{' '}
+              </FormControl>
             )}
           />
 
@@ -275,7 +283,12 @@ const AddFishSeedPopup = ({ refetch, onClose }: PopupProps) => {
         <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
           Cancel
         </LoadingButton>
-        <LoadingButton variant='contained' onClick={handleFishSeed} loading={addLoading}>
+        <LoadingButton
+          variant='contained'
+          onClick={handleFishSeed}
+          loading={addLoading}
+          disabled={documentLoading || imageLoading}
+        >
           Add
         </LoadingButton>
       </DialogActions>

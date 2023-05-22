@@ -17,9 +17,10 @@ import { DistributorRetailerOrderType } from 'types/Retailer';
 
 type PopupProps = PopupController & {
   item: FishProcessorDistributorOrderType;
+  refetch: () => void;
 };
 
-const FishOfDistributorOrderPopup = ({ item, onClose }: PopupProps) => {
+const FishOfDistributorOrderPopup = ({ item, refetch, onClose }: PopupProps) => {
   const { control, handleSubmit } = useForm({ mode: 'onChange' });
   const { address, id } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
@@ -31,6 +32,8 @@ const FishOfDistributorOrderPopup = ({ item, onClose }: PopupProps) => {
         variant: 'success',
       });
       onClose();
+      refetch();
+      navigate('/retailerDistributionOrders');
     },
     onError: (error: any) => {
       enqueueSnackbar(error, { variant: 'error' });
@@ -72,6 +75,7 @@ const FishOfDistributorOrderPopup = ({ item, onClose }: PopupProps) => {
         numberOfPackets: item.numberOfPackets,
         IPFSHash: item.IPFSHash,
         speciesName: item.speciesName,
+        transactionHash: resChain.transactionHash,
       });
     })();
   };

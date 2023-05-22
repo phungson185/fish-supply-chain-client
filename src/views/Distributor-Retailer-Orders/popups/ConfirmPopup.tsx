@@ -44,7 +44,7 @@ import { FishSeedCompanyFishFarmerOrderPaginateType, FishSeedCompanyFishFarmerOr
 import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { LogParamsType, TransactionType } from 'types/Log';
 import { DistributorRetailerOrderType } from 'types/Retailer';
-import { formatTime, shorten } from 'utils/common';
+import { formatTime, formatTimeDate, shorten } from 'utils/common';
 
 const steps = ['The request is being processed', 'The seller has accepted the request', 'The item has been received'];
 
@@ -77,7 +77,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     isSuccess: getLogsSuccess,
     refetch: fetchLogs,
   } = useQuery(['logService.getLogs', { id: item.id }], () =>
-    logService.getLogs({ objectId: item.id, transactionType: 6 } as LogParamsType),
+    logService.getLogs({ objectId: item.id, transactionType: TransactionType.ORDER } as LogParamsType),
   );
 
   const { mutate: updateDistributorProducts } = useMutation(distributorService.updateOrder);
@@ -113,6 +113,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     confirmOrder({
       orderId: item.id,
       status: Number(resChain.events.RetailerPurchaseOrderConfirmed.returnValues.newstatuS),
+      transactionHash: resChain.transactionHash,
     });
 
     setOrderStatus(Number(resChain.events.RetailerPurchaseOrderConfirmed.returnValues.newstatuS));
@@ -120,7 +121,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
   };
 
   const handleRecieve = async () => {
-    await retailerService.receiveRetailerOrder({
+    const resChain = await retailerService.receiveRetailerOrder({
       sender: address,
       fishProcessingContractAddress: item.distributorId.fishProcessingId.processingContract,
       RetailerPurchaseOrderID: item.retailerPurchaseOrderID,
@@ -129,6 +130,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     confirmOrder({
       orderId: item.id,
       status: ProcessStatus.Received,
+      transactionHash: resChain.transactionHash,
     });
 
     setOrderStatus(ProcessStatus.Received);
@@ -219,7 +221,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
               <div className='mb-5 text-gray-400 text-sm'>
                 <span className='mr-2'>Expired: </span>
                 <span>
-                  {formatTime(item.dateOfProcessing)} ~ {formatTime(item.dateOfExpiry)}{' '}
+                  {formatTimeDate(item.dateOfProcessing)} ~ {formatTimeDate(item.dateOfExpiry)}{' '}
                 </span>
               </div>
               <div className='flex-1'></div>

@@ -64,14 +64,14 @@ const Fishes = () => {
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
   const privateRoute = getRoute(role);
 
-  const { data, isFetching, refetch } = useQuery(
-    ['fishProcessorService.getOrders', dataSearch],
-    () => fishProcessorService.getOrders(dataSearch),
-    {
-      keepPreviousData: false,
-      staleTime: 0,
-    },
-  );
+  const {
+    data,
+    isFetching,
+    refetch: refetchFishes,
+  } = useQuery(['fishProcessorService.getOrders', dataSearch], () => fishProcessorService.getOrders(dataSearch), {
+    keepPreviousData: false,
+    staleTime: 0,
+  });
 
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
@@ -79,10 +79,18 @@ const Fishes = () => {
   const [search, setSearch] = useState(query.search || '');
   const [params, setParams] = useState({ search, page });
 
-  const { data: getProcessingContracts, isLoading: isLoadingProcessingContracts } = useQuery(
-    ['fishProcessorService.getProcessingContracts', selectedFish],
-    () => fishProcessorService.getProcessingContracts({ page: 1, fishProcessorId: selectedFish.id, size: 100 }),
+  const {
+    data: getProcessingContracts,
+    isLoading: isLoadingProcessingContracts,
+    refetch: refetchProcessingContracts,
+  } = useQuery(['fishProcessorService.getProcessingContracts', selectedFish], () =>
+    fishProcessorService.getProcessingContracts({ page: 1, fishProcessorId: selectedFish.id, size: 100 }),
   );
+
+  const refetch = () => {
+    refetchFishes();
+    refetchProcessingContracts();
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceChangeParams = useCallback(

@@ -75,20 +75,20 @@ const ContractDetail = () => {
                     {contract?.speciesName}
                   </Typography>
                   <Typography variant='h6'>
-                    Contract address: <span className='text-blue-600'>{contract?.farmedFishContract}</span>
+                    Contract address:&nbsp;<span className='text-blue-600'>{contract?.farmedFishContract}</span>
+                  </Typography>
+                  <Typography variant='h6'>
+                    Document: &nbsp;
+                    <span
+                      className='text-blue-600 cursor-pointer'
+                      onClick={() => window.open(pinataUrl(contract?.IPFSHash), '_blank')}
+                    >
+                      {contract?.IPFSHash}
+                    </span>
                   </Typography>
                 </div>
                 <Typography variant='caption' className='w-[30%]'>
                   Updated time: {formatTime(contract?.updatedAt)}
-                </Typography>
-                <Typography variant='h6'>
-                  Document:
-                  <span
-                    className='text-blue-600 cursor-pointer'
-                    onClick={() => window.open(pinataUrl(contract?.IPFSHash), '_blank')}
-                  >
-                    {contract?.IPFSHash}
-                  </span>
                 </Typography>
               </div>
               <div className='mb-1'>
@@ -163,7 +163,7 @@ const ContractDetail = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Log ID</TableCell>
+                {/* <TableCell>Log ID</TableCell> */}
                 <TableCell>Title</TableCell>
                 <TableCell>Message</TableCell>
                 <TableCell className='max-w-[200px]'>Transaction hash</TableCell>
@@ -175,7 +175,7 @@ const ContractDetail = () => {
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell align='center'>{item.id}</TableCell>
+                  {/* <TableCell align='center'>{item.id}</TableCell> */}
                   <TableCell align='center'>{item.title}</TableCell>
                   <TableCell align='center'>{item.message}</TableCell>
                   <TableCell align='center'>{item.transactionHash}</TableCell>

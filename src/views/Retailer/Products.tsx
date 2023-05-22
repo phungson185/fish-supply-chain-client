@@ -38,6 +38,7 @@ import { RoleType } from 'types/Auth';
 import { FishProcessorDistributorOrderType } from 'types/Distributor';
 import ProductDetail from './popups/ProductDetail';
 import { DistributorRetailerOrderType } from 'types/Retailer';
+import { ProcessStatus } from 'components/ConfirmStatus';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -63,6 +64,7 @@ const Products = () => {
     disable: false,
     isHavePackets: true,
     listing: true,
+    status: ProcessStatus.Received,
   });
 
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);

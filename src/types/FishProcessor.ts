@@ -51,8 +51,8 @@ export type UpdateFishProcessingContractType = {
 };
 
 export type UpdateProcessingContractType = {
-  processedSpeciesname?: string;
-  ipfsHash?: string;
+  processedSpeciesName?: string;
+  IPFSHash?: string;
   dateOfProcessing?: number;
   dateOfExpiry?: number;
   filletsInPacket?: number;
@@ -85,6 +85,7 @@ export type FishFarmerFishProcessorOrderType = BaseType & {
   geographicOrigin: number;
   methodOfReproduction: number;
   image: string;
+  transactionHash: string;
 };
 
 export type CreateOrderType = {
@@ -98,11 +99,13 @@ export type CreateOrderType = {
   speciesName: string;
   IPFSHash: string;
   image: string;
+  transactionHash: string;
 };
 
 export type ConfirmOrderType = {
   orderId: string;
   status: number;
+  transactionHash?: string;
 };
 
 export type CreateProcesingContractType = {

@@ -65,7 +65,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
     isSuccess: getLogsSuccess,
     refetch: fetchLogs,
   } = useQuery(['logService.getLogs', { id: item.id }], () =>
-    logService.getLogs({ objectId: item.id, transactionType: TransactionType.UPDATE_ORDER_STATUS } as LogParamsType),
+    logService.getLogs({ objectId: item.id, transactionType: TransactionType.ORDER } as LogParamsType),
   );
 
   useEffect(() => {
@@ -94,6 +94,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
         resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NumberOfFishSeedsAvailable,
       ),
       status: resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NEWSTatus,
+      transactionHash: resChain.transactionHash,
     });
 
     setOrderStatus(Number(resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NEWSTatus));
@@ -113,6 +114,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
         resChain.events.FishsSeedsOrderReceived.returnValues.NumberOfFishSeedsAvailable,
       ),
       status: resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus,
+      transactionHash: resChain.transactionHash,
     });
 
     setOrderStatus(Number(resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus));

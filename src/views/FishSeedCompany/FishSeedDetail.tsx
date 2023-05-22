@@ -135,9 +135,11 @@ const FishSeedDetail = () => {
                 Updated time: <span className='font-bold'>{moment(fishSeed.updatedAt).format('HH:mm DD/MM/YYYY')}</span>
               </Typography>
             </div>
-            <Typography variant='caption' className='text-base'>
-              {fishSeed.description}
-            </Typography>
+            <Typography
+              variant='caption'
+              className='text-base'
+              dangerouslySetInnerHTML={{ __html: fishSeed.description }}
+            ></Typography>
           </Paper>
         </Grid>
         <Grid item xs={4}>

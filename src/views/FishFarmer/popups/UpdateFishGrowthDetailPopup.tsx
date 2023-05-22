@@ -68,7 +68,7 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
         farmedFishGrowthDetailsID:
           resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.FarmedFishGrowthDetailsID,
         orderId: item.id,
-        waterTemperature: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.waterTemperature,
+        waterTemperature: values.WaterTemperature,
         fishWeight: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.FishWeight,
         totalNumberOfFish: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.TotalNumberOfFish,
         IPFSHash: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.IPFShash,
