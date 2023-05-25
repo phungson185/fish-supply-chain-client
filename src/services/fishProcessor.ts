@@ -19,8 +19,7 @@ import FishProcessing from '../contracts/abis/FishProcessing.json';
 
 import { client } from './axios';
 import { ProcessingContractPaginateType, ProcessingContractParamsType } from 'types/FishProcessing';
-
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+import { web3 } from 'services';
 
 // contract methods
 const placeFarmedFishPurchaseOrder = async (body: PlaceFarmedFishPurchaseOrderType) => {

@@ -17,8 +17,7 @@ import { AbiItem } from 'web3-utils';
 import FarmedFish from '../contracts/abis/FarmedFish.json';
 import { client } from './axios';
 import { FishSeedPaginateType } from 'types/FishSeedCompany';
-
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+import { web3 } from 'services';
 
 const deployFarmedFishContract = async ({
   address,
