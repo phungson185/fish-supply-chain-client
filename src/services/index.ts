@@ -15,4 +15,4 @@ export { default as userService } from './user';
 export { default as batchService } from './batch';
 export { default as logService } from './log';
 
-export const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+export const web3 = new Web3(new Web3.providers.HttpProvider('https://data-seed-prebsc-1-s1.binance.org:8545'));

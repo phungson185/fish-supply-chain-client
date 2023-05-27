@@ -1,8 +1,7 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import { web3 } from 'contracts';
 import { store } from 'reducers';
 import { signIn, signOut } from 'reducers/profile';
-import { authService } from 'services';
+import { authService, web3 } from 'services';
 import { SyncRoleType } from 'types/Auth';
 import Web3 from 'web3';
 import Web3Modal from 'web3modal';

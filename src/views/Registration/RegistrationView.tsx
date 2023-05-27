@@ -70,13 +70,13 @@ const RegistrationView = () => {
 
   return (
     <>
-      <Registration title='Register consumer' handle={registerConsumer}></Registration>
+      {/* <Registration title='Register consumer' handle={registerConsumer}></Registration> */}
       <Registration title='Register distributor' handle={registerDistributor}></Registration>
       <Registration title='Register fish farmer' handle={registerFishFarmer}></Registration>
       <Registration title='Register fish processor' handle={registerFishProcessor}></Registration>
       <Registration title='Register fish seed company' handle={registerFishSeedCompany}></Registration>
       <Registration title='Register retailer' handle={registerRetailer}></Registration>
-      <Registration title='Register wild caught fisher' handle={registerWildCaughtFisher}></Registration>
+      {/* <Registration title='Register wild caught fisher' handle={registerWildCaughtFisher}></Registration> */}
     </>
   );
 };

@@ -41,7 +41,7 @@ import { FishProcessorDistributorOrderType } from 'types/Distributor';
 import { FishSeedCompanyFishFarmerOrderPaginateType, FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
 import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { LogParamsType, TransactionType } from 'types/Log';
-import { formatTime, shorten } from 'utils/common';
+import { formatTime, formatTimeDate, shorten } from 'utils/common';
 
 const steps = ['The request is being processed', 'The seller has accepted the request', 'The item has been received'];
 
@@ -225,7 +225,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
               <div className='mb-5 text-gray-400 text-sm'>
                 <span className='mr-2'>Expired: </span>
                 <span>
-                  {formatTime(item.dateOfProcessing)} ~{formatTime(item.dateOfExpiry)}{' '}
+                  {formatTimeDate(item.dateOfProcessing)} ~ {formatTimeDate(item.dateOfExpiry)}{' '}
                 </span>
               </div>
               <div className='flex-1'></div>
