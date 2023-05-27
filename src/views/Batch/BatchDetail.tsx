@@ -9,9 +9,11 @@ import { BatchType } from 'types/Batch';
 import { formatTime, pinataUrl } from 'utils/common';
 import { BatchComponentInfo } from './components';
 import { formatTimeDate } from 'utils/common';
+import { useWindowSize } from 'hooks';
 
 const BatchDetailPopup = () => {
   const params = useParams();
+  const { isMobile } = useWindowSize();
   const { data: item, isSuccess } = useQuery(['batchService.getBatch', { id: params.id }], () =>
     batchService.getBatchById({ id: params.id as string }),
   ) as { data: BatchType; isSuccess: boolean };
@@ -24,12 +26,12 @@ const BatchDetailPopup = () => {
     <Container className='mt-10'>
       <Paper variant='elevation' elevation={3} className='p-5'>
         <Grid container spacing={2}>
-          <Grid item xs={8} className='w-full'>
+          <Grid item xs={12} md={8} className='w-full'>
             <div className='relative h-full'>
               <div className='flex items-start w-full mb-5 gap-3'>
                 <Avatar src={item.qrCode} variant='square' className='w-20 h-20' />
-                <div className=''>
-                  <div className='mb-2 flex'>
+                <div>
+                  <div className='mb-2 flex md:flex-row flex-col items-start justify-start gap-3'>
                     <Typography variant='h1'>
                       {[
                         RoleType.fishSeedCompanyRole,
@@ -48,9 +50,41 @@ const BatchDetailPopup = () => {
                       className='ml-2'
                     />
                   </div>
+                  {!isMobile && (
+                    <>
+                      <Typography variant='h6'>
+                        Contract address:&nbsp;
+                        <span className='text-blue-600 break-all'>
+                          {[RoleType.fishSeedCompanyRole, RoleType.fishFarmerRole].includes(contract?.owner?.role)
+                            ? item.farmedFishId.farmedFishContract
+                            : item.fishProcessingId?.processingContract}
+                        </span>
+                      </Typography>
+                      <Typography variant='h6'>
+                        Document: &nbsp;
+                        <span
+                          className='text-blue-600 cursor-pointer break-all'
+                          onClick={() => window.open(pinataUrl(contract?.IPFSHash), '_blank')}
+                        >
+                          {contract?.IPFSHash}
+                        </span>
+                      </Typography>
+                    </>
+                  )}
+                </div>
+                <div className='flex-1'></div>
+                {!isMobile && (
+                  <Typography variant='caption' className='w-[30%]'>
+                    Updated time: {formatTime(contract?.updatedAt)}
+                  </Typography>
+                )}
+              </div>
+
+              {isMobile && (
+                <>
                   <Typography variant='h6'>
                     Contract address:&nbsp;
-                    <span className='text-blue-600'>
+                    <span className='text-blue-600 break-all'>
                       {[RoleType.fishSeedCompanyRole, RoleType.fishFarmerRole].includes(contract?.owner?.role)
                         ? item.farmedFishId.farmedFishContract
                         : item.fishProcessingId?.processingContract}
@@ -59,18 +93,15 @@ const BatchDetailPopup = () => {
                   <Typography variant='h6'>
                     Document: &nbsp;
                     <span
-                      className='text-blue-600 cursor-pointer'
+                      className='text-blue-600 cursor-pointer break-all'
                       onClick={() => window.open(pinataUrl(contract?.IPFSHash), '_blank')}
                     >
                       {contract?.IPFSHash}
                     </span>
                   </Typography>
-                </div>
-                <div className='flex-1'></div>
-                <Typography variant='caption' className='w-[30%]'>
-                  Updated time: {formatTime(contract?.updatedAt)}
-                </Typography>
-              </div>
+                </>
+              )}
+
               <div className='mb-2'>
                 <span className='mr-2'>Geopraphic origin: </span>
                 <Chip
@@ -138,7 +169,7 @@ const BatchDetailPopup = () => {
               </Typography>
             </div>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={12} md={4}>
             <Avatar
               src={contract?.image}
               alt='fish image'
@@ -152,13 +183,13 @@ const BatchDetailPopup = () => {
         <Typography variant='h2' className='mb-5'>
           Batch progress
         </Typography>
-        <Timeline position='alternate'>
+        <Timeline className='p-0' position={isMobile ? 'right' : 'alternate'}>
           {Object.entries(item).map(
             ([key, value], index) =>
               !['id', 'type', 'createdAt', 'updatedAt', 'lastChainPoint', 'qrCode', 'success'].includes(key) && (
                 <TimelineItem key={index}>
                   <TimelineSeparator>
-                    <CheckCircle className='text-6xl' color='primary' />
+                    <CheckCircle className={isMobile ? 'text-2xl' : 'text-6xl'} color='primary' />
                     <TimelineConnector />
                   </TimelineSeparator>
                   <TimelineContent>
@@ -170,19 +201,19 @@ const BatchDetailPopup = () => {
           <TimelineItem key={5}>
             <TimelineSeparator>
               {item.success ? (
-                <CheckCircle className='text-6xl' color='primary' />
+                <CheckCircle className={isMobile ? 'text-2xl' : 'text-6xl'} color='primary' />
               ) : (
-                <CircularProgress size={48} color='warning' />
+                <CircularProgress size={isMobile ? 24 : 48} color='warning' />
               )}
               <TimelineConnector />
             </TimelineSeparator>
             <TimelineContent>
               {item.success ? (
-                <Typography variant='h2' className='text-green-500'>
+                <Typography variant={isMobile ? 'h3' : 'h2'} className='text-green-500 ml-3'>
                   Batch completed
                 </Typography>
               ) : (
-                <Typography variant='h2' className='text-yellow-500'>
+                <Typography variant={isMobile ? 'h3' : 'h2'} className='text-yellow-500 ml-3'>
                   Batch in progress
                 </Typography>
               )}

@@ -109,10 +109,30 @@
   top: 72px !important;
 }
 
-.MuiTimelineItem-root:last-child {
-  align-items: center !important;
+@media (min-width: 600px) {
+  .MuiTimelineItem-root:last-child {
+    align-items: center !important;
 
-  &.MuiTimelineConnector-root {
+    &.MuiTimelineConnector-root {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .MuiTimelineItem-root:last-child::before,
+  .MuiTimelineItem-root:last-child .MuiTimelineConnector-root {
     display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .MuiTimelineItem-root::before,
+  .MuiTimelineItem-root .MuiTypography-root {
+    padding: 0 !important;
+  }
+
+  .MuiTimelineItem-root .MuiTypography-root .MuiContainer-root {
+    padding-bottom: 20px !important;
   }
 }
