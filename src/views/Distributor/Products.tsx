@@ -60,7 +60,7 @@ const Products = () => {
     page,
     size: 4,
     status: ProcessStatus.Received,
-    owner: param.distributor,
+    orderer: param.distributor,
     disable: false,
     isHavePackets: true,
     listing: true,

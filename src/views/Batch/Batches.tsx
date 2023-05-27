@@ -9,7 +9,7 @@ import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
-import { getRoute } from 'routes';
+import { getRoute, publicRoute } from 'routes';
 import { fishSeedCompanyService } from 'services';
 import { RoleType } from 'types/Auth';
 import { BatchType } from 'types/Batch';
@@ -174,7 +174,7 @@ const Batches = () => {
                     />
                   </TableCell>
                   <TableCell align='center' onClick={() => handleOpenBatchDetail(item)}>
-                    <Link to={privateRoute.batchDetail.url?.(item)!}>
+                    <Link to={publicRoute.batchDetail.url?.(item)!}>
                       <Visibility />
                     </Link>
                   </TableCell>

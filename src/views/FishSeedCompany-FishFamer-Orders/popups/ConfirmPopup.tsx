@@ -54,6 +54,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
       });
       refetch();
       fetchLogs();
+      onClose();
     },
     onError: (error: any) => {
       enqueueSnackbar(error, { variant: 'error' });

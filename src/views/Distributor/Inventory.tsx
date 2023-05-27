@@ -60,7 +60,7 @@ const Inventory = () => {
   const [dataSearch, onSearchChange] = useSearch({
     page,
     size: 4,
-    owner: id,
+    orderer: id,
     status: ProcessStatus.Received,
   });
 

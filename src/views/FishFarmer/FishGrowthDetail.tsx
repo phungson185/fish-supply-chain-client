@@ -218,7 +218,7 @@ const FishGrowthDetail = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Log ID</TableCell>
+                {/* <TableCell>Log ID</TableCell>  */}
                 <TableCell>Title</TableCell>
                 <TableCell>Message</TableCell>
                 <TableCell className='max-w-[200px]'>Transaction hash</TableCell>
@@ -230,7 +230,7 @@ const FishGrowthDetail = () => {
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell align='center'>{item.id}</TableCell>
+                  {/* <TableCell align='center'>{item.id}</TableCell> */}
                   <TableCell align='center'>{item.title}</TableCell>
                   <TableCell align='center'>{item.message}</TableCell>
                   <TableCell align='center'>{item.transactionHash}</TableCell>

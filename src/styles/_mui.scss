@@ -108,3 +108,11 @@
 .SnackbarContainer-top {
   top: 72px !important;
 }
+
+.MuiTimelineItem-root:last-child {
+  align-items: center !important;
+
+  &.MuiTimelineConnector-root {
+    display: none;
+  }
+}

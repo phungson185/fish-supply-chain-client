@@ -4,6 +4,11 @@ import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
 export const appTheme = createTheme({
   components: {
+    MuiContainer: {
+      defaultProps: {
+        maxWidth: 'xl',
+      },
+    },
     MuiTypography: {
       defaultProps: {
         variantMapping: {

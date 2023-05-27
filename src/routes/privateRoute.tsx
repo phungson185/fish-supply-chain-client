@@ -23,6 +23,20 @@ type PrivateRouteType = {
   [key: string]: RouteType;
 };
 
+type PublicRouteType = {
+  [key: string]: RouteType;
+};
+
+export const publicRoute: PublicRouteType = {
+  batchDetail: {
+    path: '/batch/:id',
+    name: 'Batch detail',
+    url: ({ id }: { id: string }) => `/batch/${id}`,
+    element: <BatchDetail />,
+    disabled: true,
+  },
+};
+
 const baseRoute: PrivateRouteType = {
   home: {
     path: '/',
@@ -33,13 +47,6 @@ const baseRoute: PrivateRouteType = {
     path: '/profile',
     name: 'Profile',
     element: <ProfileUpdate />,
-    disabled: true,
-  },
-  batchDetail: {
-    path: '/batch/:id',
-    name: 'Batch detail',
-    url: ({ id }: { id: string }) => `/batch/${id}`,
-    element: <BatchDetail />,
     disabled: true,
   },
 };

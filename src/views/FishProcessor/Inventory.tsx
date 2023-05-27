@@ -89,7 +89,6 @@ const Inventory = () => {
   useEffect(() => {
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
-
   if (isFetchingInventory) return <></>;
   return (
     <>
@@ -123,14 +122,15 @@ const Inventory = () => {
                       />
                       <Chip
                         label={
-                          fishSeedCompanyService.handleMapMethodOfReproduction(item?.fishProcessorId.geographicOrigin!)
-                            .label
+                          fishSeedCompanyService.handleMapMethodOfReproduction(
+                            item?.fishProcessorId.methodOfReproduction!,
+                          ).label
                         }
                         color={
                           item.disable || item.numberOfPackets === 0
                             ? 'default'
                             : (fishSeedCompanyService.handleMapMethodOfReproduction(
-                                item?.fishProcessorId.geographicOrigin!,
+                                item?.fishProcessorId.methodOfReproduction!,
                               ).color as any)
                         }
                       />

@@ -1,10 +1,11 @@
 import { AppContainer } from 'containers';
-import { PrivateLayout } from 'layouts';
+import { PrivateLayout, PublicLayout } from 'layouts';
 import { useEffect, useState } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { store } from 'reducers';
 import { signIn } from 'reducers/profile';
+import { publicRoute } from 'routes';
 import { walletService } from 'services';
 
 const App = () => {
@@ -27,11 +28,12 @@ const App = () => {
     <ReduxProvider store={store}>
       <AppContainer>
         <BrowserRouter>
-          {isReady && (
-            <Routes>
-              <Route path='/*' element={<PrivateLayout />} />
-            </Routes>
-          )}
+          <Routes>
+            {Object.values(publicRoute).map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+            {isReady && <Route path='/*' element={<PrivateLayout />} />}
+          </Routes>
         </BrowserRouter>
       </AppContainer>
     </ReduxProvider>

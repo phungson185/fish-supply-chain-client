@@ -132,7 +132,7 @@ const handleMapGeographicOrigin = (geographicOrigin: number) => {
     default:
       return {
         label: 'Not Found',
-        color: 'danger',
+        color: 'error',
       };
   }
 };
@@ -152,7 +152,7 @@ const handleMapMethodOfReproduction = (methodOfReproduction: number) => {
     default:
       return {
         label: 'Not Found',
-        color: 'danger',
+        color: 'error',
       };
   }
 };

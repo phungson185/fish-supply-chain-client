@@ -1,25 +1,3 @@
-import { useSearch } from 'hooks';
-import { parse } from 'qs';
-import { useQuery } from 'react-query';
-import { useLocation, useParams } from 'react-router-dom';
-import { distributorService, fishProcessorService, fishSeedCompanyService, retailerService } from 'services';
-import { ProfileInventoryType } from 'types/FishProcessor';
-import { useCallback, useEffect, useState } from 'react';
-import {
-  Avatar,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  Chip,
-  Container,
-  Dialog,
-  Grid,
-  Pagination,
-  Typography,
-  debounce,
-} from '@mui/material';
 import {
   AccountBalanceWalletOutlined,
   ApartmentOutlined,
@@ -28,17 +6,32 @@ import {
   Inventory2Outlined,
   LocalPhoneOutlined,
 } from '@mui/icons-material';
-import { formatTime, pinataUrl, shorten } from 'utils/common';
-import moment from 'moment';
-import { FishOfDistributorOrderPopup, ProcessedFishOrderPopup } from 'views/Batch/components';
-import { FishProcessingType } from 'types/FishProcessing';
-import { useSelector } from 'react-redux';
-import { profileSelector } from 'reducers/profile';
-import { RoleType } from 'types/Auth';
-import { FishProcessorDistributorOrderType } from 'types/Distributor';
-import ProductDetail from './popups/ProductDetail';
-import { DistributorRetailerOrderType } from 'types/Retailer';
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Container,
+  Dialog,
+  Grid,
+  Pagination,
+  Typography,
+  debounce,
+} from '@mui/material';
 import { ProcessStatus } from 'components/ConfirmStatus';
+import { useSearch } from 'hooks';
+import moment from 'moment';
+import { parse } from 'qs';
+import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import { useSelector } from 'react-redux';
+import { useLocation, useParams } from 'react-router-dom';
+import { profileSelector } from 'reducers/profile';
+import { retailerService } from 'services';
+import { DistributorRetailerOrderType, ProfileInventoryType } from 'types/Retailer';
+import { pinataUrl, shorten } from 'utils/common';
+import ProductDetail from './popups/ProductDetail';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -60,7 +53,7 @@ const Products = () => {
   const [dataSearch, onSearchChange] = useSearch({
     page,
     size: 4,
-    owner: param.distributor,
+    buyer: param.retailer,
     disable: false,
     isHavePackets: true,
     listing: true,
@@ -76,7 +69,7 @@ const Products = () => {
   const [selectedFish, setSelectedFish] = useState<DistributorRetailerOrderType>({} as DistributorRetailerOrderType);
 
   const { data: profile, isSuccess: isSuccessProfile } = useQuery('retailerService.getProfileInventory', () =>
-    retailerService.getProfileInventory({ id: param.distributor ?? id }),
+    retailerService.getProfileInventory({ id: param.retailer ?? id }),
   ) as {
     data: ProfileInventoryType;
     isSuccess: boolean;
@@ -161,7 +154,7 @@ const Products = () => {
                 <div className='flex items-center gap-2 mb-5'>
                   <Inventory2Outlined className='' />
                   <div className=''>Contracts: </div>
-                  <div className='text-primary-main'>{profile.fishProcessing}</div>
+                  <div className='text-primary-main'>{profile.retailer}</div>
                 </div>
               </div>
             </div>
@@ -216,7 +209,7 @@ const Products = () => {
                       Contract
                     </Button>
                     <div className='flex-1'></div>
-                    {role === RoleType.retailerRole && (
+                    {/* {role === RoleType.retailerRole && (
                       <Button
                         size='small'
                         variant='contained'
@@ -227,7 +220,7 @@ const Products = () => {
                       >
                         Order
                       </Button>
-                    )}
+                    )} */}
                   </CardActions>
                 </Card>
               </Grid>

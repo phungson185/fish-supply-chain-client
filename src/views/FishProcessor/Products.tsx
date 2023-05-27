@@ -200,12 +200,14 @@ const Products = () => {
                       />
                       <Chip
                         label={
-                          fishSeedCompanyService.handleMapMethodOfReproduction(item?.fishProcessorId.geographicOrigin!)
-                            .label
+                          fishSeedCompanyService.handleMapMethodOfReproduction(
+                            item?.fishProcessorId.methodOfReproduction!,
+                          ).label
                         }
                         color={
-                          fishSeedCompanyService.handleMapMethodOfReproduction(item?.fishProcessorId.geographicOrigin!)
-                            .color as any
+                          fishSeedCompanyService.handleMapMethodOfReproduction(
+                            item?.fishProcessorId.methodOfReproduction!,
+                          ).color as any
                         }
                       />
                     </div>
