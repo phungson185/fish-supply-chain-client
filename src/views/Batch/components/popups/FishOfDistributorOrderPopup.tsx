@@ -44,7 +44,6 @@ const FishOfDistributorOrderPopup = ({ item, refetch, onClose }: PopupProps) => 
 
   const handleOrder = () => {
     handleSubmit(async (values) => {
-      console.log(item.owner.address);
       const resChain = await retailerService.placeRetailerPurchaseOrder({
         buyer: address,
         seller: item.owner.address,

@@ -43,7 +43,6 @@ type PopupProps = PopupController & {
 };
 
 const ProductDetail = ({ item, onClose }: PopupProps) => {
-  console.log(item);
   return (
     <>
       <DialogTitle>{item.speciesName}</DialogTitle>
