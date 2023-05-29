@@ -3,7 +3,6 @@ import { parse } from 'qs';
 import { useQuery } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
 import { distributorService, fishProcessorService, fishSeedCompanyService } from 'services';
-import { ProfileInventoryType } from 'types/FishProcessor';
 import { useCallback, useEffect, useState } from 'react';
 import {
   Avatar,
@@ -35,7 +34,7 @@ import { FishProcessingType } from 'types/FishProcessing';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
 import { RoleType } from 'types/Auth';
-import { FishProcessorDistributorOrderType } from 'types/Distributor';
+import { FishProcessorDistributorOrderType, ProfileInventoryType } from 'types/Distributor';
 import ProductDetail from './popups/ProductDetail';
 import { ProcessStatus } from 'components/ConfirmStatus';
 
@@ -162,7 +161,7 @@ const Products = () => {
                 <div className='flex items-center gap-2 mb-5'>
                   <Inventory2Outlined className='' />
                   <div className=''>Contracts: </div>
-                  <div className='text-primary-main'>{profile.fishProcessing}</div>
+                  <div className='text-primary-main'>{profile.distributor}</div>
                 </div>
               </div>
             </div>

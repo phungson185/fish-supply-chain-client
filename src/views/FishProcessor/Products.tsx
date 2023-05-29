@@ -172,8 +172,8 @@ const Products = () => {
       {items && items.length > 0 && (
         <Container className='bg-white p-5 rounded'>
           <Grid container spacing={2} justifyContent={items.length % 4 === 0 ? 'center' : 'left'} className='mb-10'>
-            {items.map((item) => (
-              <Grid item>
+            {items.map((item, index) => (
+              <Grid item key={index}>
                 <Card sx={{ width: 272, height: '100%' }}>
                   <CardMedia
                     sx={{ height: 200 }}
