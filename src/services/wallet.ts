@@ -11,7 +11,7 @@ const connectProvider = async () => {
     walletconnect: {
       package: WalletConnectProvider,
       options: {
-        rpc: [],
+        rpc: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
       },
     },
   };
