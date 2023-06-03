@@ -1,3 +1,4 @@
+import { AccountManagement } from 'views/AccountManagement';
 import { BatchDetail, Batches } from 'views/Batch';
 import { DistributorInventory, DistributorProducts } from 'views/Distributor';
 import { DistributorRetailerOrders } from 'views/Distributor-Retailer-Orders';
@@ -57,6 +58,11 @@ const fdaRoute: PrivateRouteType = {
     path: '/registration',
     name: 'Registration',
     element: <RegistrationView />,
+  },
+  accountManagement: {
+    path: '/account-management',
+    name: 'Account management',
+    element: <AccountManagement />,
   },
 };
 

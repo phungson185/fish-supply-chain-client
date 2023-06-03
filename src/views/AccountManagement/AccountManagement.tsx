@@ -1,5 +1,4 @@
-import { Assignment, CategoryOutlined, Visibility } from '@mui/icons-material';
-
+import { Assignment, CategoryOutlined } from '@mui/icons-material';
 import {
   Avatar,
   Button,
@@ -9,6 +8,7 @@ import {
   MenuItem,
   Pagination,
   Paper,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -20,24 +20,21 @@ import {
 } from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
 import { useAnchor, useSearch } from 'hooks';
+import { useSnackbar } from 'notistack';
 import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
-import { getRoute } from 'routes';
-import { fishSeedCompanyService } from 'services';
-import { formatTime, pinataUrl } from 'utils/common';
-import AddFishSeedPopup from './popups/AddFishSeedPopup';
+import { fishSeedCompanyService, userService } from 'services';
+import { formatTime } from 'utils/common';
 
 const FILTERS = [
-  { label: 'Species name', orderBy: 'speciesName' },
-  { label: 'Geographic origin', orderBy: 'geographicOrigin' },
-  { label: 'Method of reproduction', orderBy: 'methodOfReproduction' },
-  { label: 'Water temperature', orderBy: 'waterTemperature' },
-  { label: 'Quantity', orderBy: 'quantity' },
-  { label: 'Update time', orderBy: 'updatedAt' },
+  { label: 'Company name', orderBy: 'name' },
+  { label: 'Company address', orderBy: 'userAddress' },
+  { label: 'Role', orderBy: 'role' },
+  { label: 'Updated time', orderBy: 'updatedAt' },
 ];
 
 const SORT_TYPES = [
@@ -45,33 +42,31 @@ const SORT_TYPES = [
   { label: 'High to Low', desc: 'true' },
 ];
 
-const FishSeeds = () => {
+const AccountManagement = () => {
+  const { id, role, address } = useSelector(profileSelector);
+
   const location = useLocation();
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
-  const [dataSearch, onSearchChange] = useSearch({ page });
-  const { role } = useSelector(profileSelector);
-  const navigate = useNavigate();
-  const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
-  const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
-  const privateRoute = getRoute(role);
-
+  const [dataSearch, onSearchChange] = useSearch({
+    page,
+  });
   const { data, isFetching, refetch } = useQuery(
-    ['fishSeedCompanyService.getFishSeeds', dataSearch],
-    () => fishSeedCompanyService.getFishSeeds(dataSearch),
+    ['userService.getAllUsers', dataSearch],
+    () => userService.getAllUsers(dataSearch),
     {
-      keepPreviousData: true,
+      keepPreviousData: false,
       staleTime: 0,
     },
   );
+  const { enqueueSnackbar } = useSnackbar();
 
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
   const [desc, setDesc] = useState(query.desc || SORT_TYPES[0].desc);
   const [search, setSearch] = useState(query.search || '');
   const [params, setParams] = useState({ search, page });
-  const [openCreatePopup, setOpenCreatePopup] = useState(false);
-  const [openAddFishSeedPopup, setOpenAddFishSeedPopup] = useState(false);
-
+  const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
+  const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceChangeParams = useCallback(
     debounce((values) => {
@@ -82,6 +77,23 @@ const FishSeeds = () => {
   useEffect(() => {
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
+
+  const { mutate: updateUser } = useMutation(userService.updateUser, {
+    onSuccess: () => {
+      enqueueSnackbar('Update user successfully', { variant: 'success' });
+      refetch();
+    },
+  });
+
+  const handleUpdateUser = async (id: string, userAddress: string, active: boolean) => {
+    try {
+      await userService.updateUserStatus(address, userAddress, !active);
+      updateUser({ userId: id, active: !active });
+    } catch (error) {
+      console.error(error);
+      enqueueSnackbar('Update user failed', { variant: 'error' });
+    }
+  };
 
   return (
     <>
@@ -161,75 +173,54 @@ const FishSeeds = () => {
             debounceChangeParams({ search: value });
           }}
         />
-
-        <Button
-          variant='contained'
-          onClick={() => {
-            setOpenAddFishSeedPopup(true);
-          }}
-        >
-          Add fish seed
-        </Button>
       </div>
       <TableContainer component={Paper}>
         <Spinner loading={isFetching}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Species name</TableCell>
-                <TableCell>Image</TableCell>
-                <TableCell>Geographic origin</TableCell>
-                <TableCell>Method of reproduction</TableCell>
-                <TableCell>Water temperature</TableCell>
-                <TableCell>Quantity</TableCell>
-                <TableCell>IPFS hash</TableCell>
-                <TableCell>Update time</TableCell>
-                <TableCell>Action</TableCell>
+                <TableCell>User ID</TableCell>
+                <TableCell>Avatar</TableCell>
+                <TableCell>Wallet address</TableCell>
+                <TableCell>Company name</TableCell>
+                <TableCell>Company phone</TableCell>
+                <TableCell>Company address</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Updated time</TableCell>
+                <TableCell>Active</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell align='center'>{item.speciesName}</TableCell>
+                  <TableCell align='center'>{item.id}</TableCell>
                   <TableCell align='center'>
-                    <Avatar src={item.image} variant='square'>
-                      <Assignment />
-                    </Avatar>
+                    <Avatar src={item.avatar} variant='square' />
                   </TableCell>
+                  <TableCell align='center'>{item.address}</TableCell>
+                  <TableCell align='center'>{item.name}</TableCell>
+                  <TableCell align='center'>{item.phone}</TableCell>
+                  <TableCell align='center'>{item.userAddress}</TableCell>
+
                   <TableCell align='center'>
-                    <Chip
-                      label={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).label}
-                      color={fishSeedCompanyService.handleMapGeographicOrigin(item?.geographicOrigin!).color as any}
-                    />
-                  </TableCell>
-                  <TableCell align='center'>
-                    <Chip
-                      label={fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).label}
-                      color={
-                        fishSeedCompanyService.handleMapMethodOfReproduction(item?.methodOfReproduction!).color as any
-                      }
-                    />
-                  </TableCell>
-                  <TableCell align='center'>{item.waterTemperature}°C</TableCell>
-                  <TableCell align='center'>{item.quantity}kg</TableCell>
-                  <TableCell
-                    align='center'
-                    className='cursor-pointer hover:text-blue-500'
-                    onClick={() => window.open(pinataUrl(item.IPFSHash), '_blank')}
-                  >
-                    {item.IPFSHash}
+                    <Chip color={userService.mapColorRole(item.role)} label={item.role} style={{ minWidth: '170px' }} />
                   </TableCell>
                   <TableCell align='center'>{formatTime(item.updatedAt)}</TableCell>
-                  <TableCell align='center'>
-                    <Link to={privateRoute.fishSeedDetail.url?.(item)!}>
-                      <Visibility />
-                    </Link>
+
+                  <TableCell className='text-center'>
+                    <Switch
+                      color={item.active ? 'primary' : 'error'}
+                      checked={item.active}
+                      onClick={() => {
+                        handleUpdateUser(item.id, item.address, item.active);
+                      }}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
               <TableRowEmpty visible={!isFetching && items.length === 0} />
             </TableBody>
-            <caption className='font-bold border-t'>{total ?? 0} Contracts</caption>
+            <caption className='font-bold border-t'>{total ?? 0} Users</caption>
           </Table>
         </Spinner>
       </TableContainer>
@@ -241,12 +232,8 @@ const FishSeeds = () => {
           onChange={(event, value) => onSearchChange({ page: value })}
         />
       </div>
-
-      <Dialog open={openAddFishSeedPopup} fullWidth maxWidth='md'>
-        <AddFishSeedPopup refetch={refetch} onClose={() => setOpenAddFishSeedPopup(false)} />
-      </Dialog>
     </>
   );
 };
 
-export default FishSeeds;
+export default AccountManagement;

@@ -13,11 +13,6 @@ const FishSeedCompanyFishFarmerOrders = () => {
 
   const [activeTab, onTabChange] = useTabs(tabs);
 
-  // useEffect(() => {
-  //   onTabChange({} as SyntheticEvent<Element, Event>, 'account');
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
   return (
     <>
       <Container>

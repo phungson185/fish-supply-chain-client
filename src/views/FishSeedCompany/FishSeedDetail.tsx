@@ -37,6 +37,7 @@ import { LoadingButton } from '@mui/lab';
 import { Controller, useForm } from 'react-hook-form';
 import { formatTime } from 'utils/common';
 import { LogParamsType } from 'types/Log';
+import { Spinner } from 'components';
 
 const FishSeedDetail = () => {
   const params = useParams();
@@ -51,6 +52,7 @@ const FishSeedDetail = () => {
   const { address } = useSelector(profileSelector);
   const systemConfig = useSelector(systemSelector);
   const { enqueueSnackbar } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     data: fishSeed,
@@ -69,7 +71,7 @@ const FishSeedDetail = () => {
   );
   const { items = [], total, currentPage, pages: totalPage } = logs ?? {};
 
-  const { mutate: createBatch, isLoading } = useMutation(fishSeedCompanyService.createBatch, {
+  const { mutate: createBatch } = useMutation(fishSeedCompanyService.createBatch, {
     onSuccess: () => {
       enqueueSnackbar('Deploy contract successfully', {
         variant: 'success',
@@ -82,40 +84,46 @@ const FishSeedDetail = () => {
 
   const handleDeployContract = async () => {
     handleSubmit(async (values) => {
-      const resChain = await fishSeedCompanyService.deployFarmedFishContract({
-        address,
-        contract: {
-          registration: systemConfig.registrationContract,
-          Geographicorigin: fishSeed?.geographicOrigin.toString(),
-          Images: fishSeed?.image,
-          IPFShash: fishSeed?.IPFSHash,
-          MethodOfReproduction: fishSeed?.methodOfReproduction.toString(),
-          NumberOfFishSeedsavailable: values.numberOfFishSeedToDeploy,
-          Speciesname: fishSeed?.speciesName,
-          WaterTemperature: fishSeed?.waterTemperature,
-        } as FarmedFishContractType,
-      });
+      try {
+        setIsLoading(true);
+        const resChain = await fishSeedCompanyService.deployFarmedFishContract({
+          address,
+          contract: {
+            registration: systemConfig.registrationContract,
+            Geographicorigin: fishSeed?.geographicOrigin.toString(),
+            Images: fishSeed?.image,
+            IPFShash: fishSeed?.IPFSHash,
+            MethodOfReproduction: fishSeed?.methodOfReproduction.toString(),
+            NumberOfFishSeedsavailable: values.numberOfFishSeedToDeploy,
+            Speciesname: fishSeed?.speciesName,
+            WaterTemperature: fishSeed?.waterTemperature,
+          } as FarmedFishContractType,
+        });
 
-      const restApi = await fishSeedCompanyService.createFarmedFishContract({
-        farmedFishContract: resChain.options.address,
-        fishSeedId: fishSeed?.id!,
-        speciesName: fishSeed?.speciesName!,
-        geographicOrigin: fishSeed?.geographicOrigin!,
-        numberOfFishSeedsAvailable: values.numberOfFishSeedToDeploy,
-        methodOfReproduction: fishSeed?.methodOfReproduction!,
-        image: fishSeed?.image!,
-        waterTemperature: fishSeed?.waterTemperature!,
-        IPFSHash: fishSeed?.IPFSHash!,
-      });
+        const restApi = await fishSeedCompanyService.createFarmedFishContract({
+          farmedFishContract: resChain.options.address,
+          fishSeedId: fishSeed?.id!,
+          speciesName: fishSeed?.speciesName!,
+          geographicOrigin: fishSeed?.geographicOrigin!,
+          numberOfFishSeedsAvailable: values.numberOfFishSeedToDeploy,
+          methodOfReproduction: fishSeed?.methodOfReproduction!,
+          image: fishSeed?.image!,
+          waterTemperature: fishSeed?.waterTemperature!,
+          IPFSHash: fishSeed?.IPFSHash!,
+        });
 
-      await createBatch({
-        farmedFishId: restApi.id,
-        type: 1,
-      });
+        await createBatch({
+          farmedFishId: restApi.id,
+          type: 1,
+        });
 
-      setOpenEnterQuantityPopup(false);
-      fetchFishSeed();
-      fetchLogs();
+        setOpenEnterQuantityPopup(false);
+        fetchFishSeed();
+        fetchLogs();
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+      }
     })();
   };
 

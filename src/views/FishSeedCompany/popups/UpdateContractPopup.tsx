@@ -36,22 +36,20 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
   const [imageLoading, setImageLoading] = useState(false);
   const [image, setImage] = useState('');
   const [documentLoading, setDocumentLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { mutate: updateContract, isLoading: updateContractLoading } = useMutation(
-    fishSeedCompanyService.updateFarmedFishContract,
-    {
-      onSuccess: () => {
-        enqueueSnackbar('Update contract successfully', {
-          variant: 'success',
-        });
-        onClose();
-        fetchContract();
-      },
-      onError: (error: any) => {
-        enqueueSnackbar(error, { variant: 'error' });
-      },
+  const { mutate: updateContract } = useMutation(fishSeedCompanyService.updateFarmedFishContract, {
+    onSuccess: () => {
+      enqueueSnackbar('Update contract successfully', {
+        variant: 'success',
+      });
+      onClose();
+      fetchContract();
     },
-  );
+    onError: (error: any) => {
+      enqueueSnackbar(error, { variant: 'error' });
+    },
+  });
 
   useEffect(() => {
     if (data) {
@@ -64,31 +62,38 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
 
   const handleUpdateContract = async () => {
     handleSubmit(async (values) => {
-      const resChain = await fishSeedCompanyService.updateFarmedfishContract({
-        FarmedFishContract: data.farmedFishContract,
-        FishSeedUploader: address,
-        Geographicorigin: values.geographicOrigin,
-        Images: values.image,
-        MethodOfReproduction: values.methodOfReproduction,
-        NumberOfFishSeedsavailable: values.numberOfFishSeedsAvailable,
-        Speciesname: values.speciesName,
-        WaterTemperature: values.waterTemperature,
-        IPFShash: values.IPFSHash,
-      });
+      try {
+        setIsLoading(true);
+        const resChain = await fishSeedCompanyService.updateFarmedfishContract({
+          FarmedFishContract: data.farmedFishContract,
+          FishSeedUploader: address,
+          Geographicorigin: values.geographicOrigin,
+          Images: values.image,
+          MethodOfReproduction: values.methodOfReproduction,
+          NumberOfFishSeedsavailable: values.numberOfFishSeedsAvailable,
+          Speciesname: values.speciesName,
+          WaterTemperature: values.waterTemperature,
+          IPFShash: values.IPFSHash,
+        });
 
-      await updateContract({
-        id: data.id,
-        body: {
-          transactionHash: resChain.transactionHash,
-          numberOfFishSeedsAvailable: values.numberOfFishSeedsAvailable,
-          IPFSHash: values.IPFSHash,
-          geographicOrigin: values.geographicOrigin,
-          methodOfReproduction: values.methodOfReproduction,
-          speciesName: values.speciesName,
-          waterTemperature: values.waterTemperature,
-          image: values.image,
-        },
-      });
+        await updateContract({
+          id: data.id,
+          body: {
+            transactionHash: resChain.transactionHash,
+            numberOfFishSeedsAvailable: values.numberOfFishSeedsAvailable,
+            IPFSHash: values.IPFSHash,
+            geographicOrigin: values.geographicOrigin,
+            methodOfReproduction: values.methodOfReproduction,
+            speciesName: values.speciesName,
+            waterTemperature: values.waterTemperature,
+            image: values.image,
+          },
+        });
+
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+      }
     })();
   };
 
@@ -266,7 +271,7 @@ const UpdateContractPopup = ({ onClose, fetchContract, data }: PopupProps) => {
         <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
           Cancel
         </LoadingButton>
-        <LoadingButton variant='contained' onClick={handleUpdateContract} loading={updateContractLoading}>
+        <LoadingButton variant='contained' onClick={handleUpdateContract} loading={isLoading}>
           Update
         </LoadingButton>
       </DialogActions>

@@ -1,308 +1,326 @@
 {
-	"compiler": {
-		"version": "0.6.0+commit.26b70077"
-	},
-	"language": "Solidity",
-	"output": {
-		"abi": [
-			{
-				"inputs": [],
-				"stateMutability": "nonpayable",
-				"type": "constructor"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "c",
-						"type": "address"
-					}
-				],
-				"name": "ConsumerExists",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "d",
-						"type": "address"
-					}
-				],
-				"name": "DistributorExists",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "f",
-						"type": "address"
-					}
-				],
-				"name": "FishFarmerExists",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "p",
-						"type": "address"
-					}
-				],
-				"name": "FishProcessorExists",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "s",
-						"type": "address"
-					}
-				],
-				"name": "FishSeedCompanyExists",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "r",
-						"type": "address"
-					}
-				],
-				"name": "GetRole",
-				"outputs": [
-					{
-						"internalType": "string",
-						"name": "",
-						"type": "string"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "c",
-						"type": "address"
-					}
-				],
-				"name": "RegisterConsumer",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "d",
-						"type": "address"
-					}
-				],
-				"name": "RegisterDistributor",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "f",
-						"type": "address"
-					}
-				],
-				"name": "RegisterFishFarmer",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "p",
-						"type": "address"
-					}
-				],
-				"name": "RegisterFishProcessor",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "s",
-						"type": "address"
-					}
-				],
-				"name": "RegisterFishSeedCompany",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "r",
-						"type": "address"
-					}
-				],
-				"name": "RegisterRetailer",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "w",
-						"type": "address"
-					}
-				],
-				"name": "RegisterWildCaughtFisher",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "r",
-						"type": "address"
-					}
-				],
-				"name": "RetailerExists",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "w",
-						"type": "address"
-					}
-				],
-				"name": "WildCaughtFisherExists",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "f",
-						"type": "address"
-					}
-				],
-				"name": "isFDA",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			}
-		],
-		"devdoc": {
-			"methods": {}
-		},
-		"userdoc": {
-			"methods": {}
-		}
-	},
-	"settings": {
-		"compilationTarget": {
-			"contracts/fish-supply-chain.sol": "Registration"
-		},
-		"evmVersion": "istanbul",
-		"libraries": {},
-		"metadata": {
-			"bytecodeHash": "ipfs"
-		},
-		"optimizer": {
-			"enabled": false,
-			"runs": 200
-		},
-		"remappings": []
-	},
-	"sources": {
-		"contracts/fish-supply-chain.sol": {
-			"keccak256": "0x1db8cedc5a1453349f1bd0a8406d32cc5dcae98f4a96b24a372eb4a228b041a9",
-			"urls": [
-				"bzz-raw://738383328b2f9ffa4f043532740e2074b49e35256bb5459a00c1426779d374a0",
-				"dweb:/ipfs/QmcGQzJqUTDtAZjBpjNP3XSxdXjqR4gjHNpJCUnRnDHGR5"
-			]
-		}
-	},
-	"version": 1
+  "compiler": {
+    "version": "0.6.0+commit.26b70077"
+  },
+  "language": "Solidity",
+  "output": {
+    "abi": [
+      {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "c",
+            "type": "address"
+          }
+        ],
+        "name": "ConsumerExists",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "d",
+            "type": "address"
+          }
+        ],
+        "name": "DistributorExists",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "f",
+            "type": "address"
+          }
+        ],
+        "name": "FishFarmerExists",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "p",
+            "type": "address"
+          }
+        ],
+        "name": "FishProcessorExists",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "s",
+            "type": "address"
+          }
+        ],
+        "name": "FishSeedCompanyExists",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "r",
+            "type": "address"
+          }
+        ],
+        "name": "GetRole",
+        "outputs": [
+          {
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "c",
+            "type": "address"
+          }
+        ],
+        "name": "RegisterConsumer",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "d",
+            "type": "address"
+          }
+        ],
+        "name": "RegisterDistributor",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "f",
+            "type": "address"
+          }
+        ],
+        "name": "RegisterFishFarmer",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "p",
+            "type": "address"
+          }
+        ],
+        "name": "RegisterFishProcessor",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "s",
+            "type": "address"
+          }
+        ],
+        "name": "RegisterFishSeedCompany",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "r",
+            "type": "address"
+          }
+        ],
+        "name": "RegisterRetailer",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "w",
+            "type": "address"
+          }
+        ],
+        "name": "RegisterWildCaughtFisher",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "r",
+            "type": "address"
+          }
+        ],
+        "name": "RetailerExists",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "u",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "active",
+            "type": "bool"
+          }
+        ],
+        "name": "UpdateUserStatus",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "w",
+            "type": "address"
+          }
+        ],
+        "name": "WildCaughtFisherExists",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "f",
+            "type": "address"
+          }
+        ],
+        "name": "isFDA",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ],
+    "devdoc": {
+      "methods": {}
+    },
+    "userdoc": {
+      "methods": {}
+    }
+  },
+  "settings": {
+    "compilationTarget": {
+      "contracts/fish-supply-chain.sol": "Registration"
+    },
+    "evmVersion": "istanbul",
+    "libraries": {},
+    "metadata": {
+      "bytecodeHash": "ipfs"
+    },
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "remappings": []
+  },
+  "sources": {
+    "contracts/fish-supply-chain.sol": {
+      "keccak256": "0x23b2b495b5e21a88da2156454ce3b09a0846d0f3ad295c4df81cf5d19d1f4535",
+      "urls": [
+        "bzz-raw://6a96d4705f0edd1d6ddaaa939fa5dd8743741d4af5051c96a3afffecda667bb9",
+        "dweb:/ipfs/QmYni2nkSQnbGDypvrstQ3gpk5uLaqSXu2sGpSDe257cZo"
+      ]
+    }
+  },
+  "version": 1
 }

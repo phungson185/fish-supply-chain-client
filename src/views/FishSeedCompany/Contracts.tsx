@@ -26,7 +26,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { getRoute } from 'routes';
 import { fishSeedCompanyService } from 'services';
-import { pinataUrl } from 'utils/common';
+import { formatTime, pinataUrl } from 'utils/common';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -82,6 +82,18 @@ const Contracts = () => {
   return (
     <>
       <div className='flex items-center justify-between'>
+        <TextField
+          label='Search'
+          InputProps={{ className: 'bg-white text-black' }}
+          value={search}
+          sx={{ width: '30%' }}
+          onChange={(event) => {
+            const { value } = event.target;
+            setSearch(value);
+            debounceChangeParams({ search: value });
+          }}
+        />
+
         <div className='flex justify-between gap-2'>
           <Button
             variant='text'
@@ -145,36 +157,6 @@ const Contracts = () => {
             ))}
           </Menu>
         </div>
-
-        <TextField
-          placeholder='Search...'
-          InputProps={{ className: 'bg-white text-black' }}
-          value={search}
-          sx={{ width: '30%' }}
-          onChange={(event) => {
-            const { value } = event.target;
-            setSearch(value);
-            debounceChangeParams({ search: value });
-          }}
-        />
-
-        {/* <Button
-            variant='contained'
-            onClick={() => {
-              setOpenCreatePopup(true);
-            }}
-          >
-            Create Farmed Fish Contract
-          </Button> */}
-
-        {/* <Button
-          variant='contained'
-          onClick={() => {
-            setOpenAddFishSeedPopup(true);
-          }}
-        >
-          Add fish seed
-        </Button> */}
       </div>
       <TableContainer component={Paper}>
         <Spinner loading={isFetching}>
@@ -182,7 +164,6 @@ const Contracts = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Contract address</TableCell>
-                <TableCell>Company</TableCell>
                 <TableCell>Species name</TableCell>
                 <TableCell>Image</TableCell>
                 <TableCell>Geographic origin</TableCell>
@@ -190,6 +171,7 @@ const Contracts = () => {
                 <TableCell>Water temperature</TableCell>
                 <TableCell>Number of fish seeds available</TableCell>
                 <TableCell>IPFS hash</TableCell>
+                <TableCell>Updated time</TableCell>
                 <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
@@ -197,7 +179,6 @@ const Contracts = () => {
               {items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell align='center'>{item.farmedFishContract}</TableCell>
-                  <TableCell align='center'>{item.owner?.name}</TableCell>
                   <TableCell align='center'>{item.speciesName}</TableCell>
                   <TableCell align='center'>
                     <Avatar src={item.image} variant='square'>
@@ -227,6 +208,7 @@ const Contracts = () => {
                   >
                     {item.IPFSHash}
                   </TableCell>
+                  <TableCell>{formatTime(item.updatedAt)}</TableCell>
                   <TableCell align='center'>
                     <Link to={privateRoute.contractDetail.url?.(item)!}>
                       <Visibility />

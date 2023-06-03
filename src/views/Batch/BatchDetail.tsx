@@ -45,7 +45,7 @@ const BatchDetailPopup = () => {
 
                     <Chip
                       color={`${item.success ? 'success' : 'warning'}`}
-                      label={`${item.success ? 'Success' : 'Pending'}`}
+                      label={`${item.success ? 'Completed' : 'In progress'}`}
                       icon={item.success ? <CheckCircle /> : <CircularProgress size={24} />}
                       className='ml-2'
                     />

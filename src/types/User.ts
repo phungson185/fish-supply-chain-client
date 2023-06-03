@@ -14,9 +14,11 @@ export type UserType = {
   name: string;
   createdAt: string;
   updatedAt: string;
+  active: boolean;
 };
 
 export type UserUpdateType = {
+  userId?: string;
   userAddress?: string;
   email?: string;
   bio?: string;
@@ -24,7 +26,10 @@ export type UserUpdateType = {
   avatar?: string;
   cover?: string;
   name?: string;
+  active?: boolean;
 };
+
+export type GetAllUserType = PaginateParamsType & {};
 
 export type UserParamsType = PaginateParamsType & {
   address?: string;
@@ -35,4 +40,3 @@ export type UserPaginateType = PaginateType & {
 };
 
 export type AccountParamsType = PaginateParamsType;
-

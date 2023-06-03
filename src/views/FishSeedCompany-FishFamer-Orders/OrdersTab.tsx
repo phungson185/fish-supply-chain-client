@@ -1,4 +1,4 @@
-import { BalanceOutlined, CategoryOutlined, DeviceThermostat } from '@mui/icons-material';
+import { BalanceOutlined, CategoryOutlined, DeviceThermostat, ViewListOutlined } from '@mui/icons-material';
 import {
   Avatar,
   Button,
@@ -32,6 +32,10 @@ import { ConfirmPopup } from './popups';
 import { RoleType } from 'types/Auth';
 
 const FILTERS = [
+  { label: 'Species name', orderBy: 'speciesName' },
+  { label: 'Geographic origin', orderBy: 'geographicOrigin' },
+  { label: 'Method of reproduction', orderBy: 'methodOfReproduction' },
+  { label: 'Water temperature', orderBy: 'waterTemperature' },
   { label: 'Number of fish seeds ordered', orderBy: 'numberOfFishSeedsOrdered' },
   {
     label: 'Updated time',
@@ -240,6 +244,13 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
               count={totalPage}
               onChange={(event, value) => onSearchChange({ page: value })}
             />
+          </div>
+        )}
+
+        {items.length === 0 && (
+          <div className='flex flex-col gap-5 items-center justify-center'>
+            <ViewListOutlined color='disabled' style={{ fontSize: '400px' }} />
+            <div className='text-3xl font-medium'>No order not found</div>
           </div>
         )}
       </Spinner>
