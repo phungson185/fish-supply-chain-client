@@ -109,13 +109,13 @@ contract Registration {
     function UpdateUserStatus(address u, bool active) public onlyFDA {
         require(isFDA(msg.sender), "Sender not authorized");
 
-        if (FishSeedCompanyExists(u)) FishSeedCompany[u] = active;
-        if (FishFarmerExists(u)) FishFarmer[u] = active;
-        if (FishProcessorExists(u)) FishProcessor[u] = active;
-        if (DistributorExists(u)) Distributor[u] = active;
-        if (RetailerExists(u)) Retailer[u] = active;
-        if (ConsumerExists(u)) Consumer[u] = active;
-        if (WildCaughtFisherExists(u)) WildCaughtFisher[u] = active;
+        FishSeedCompany[u] = active;
+        FishFarmer[u] = active;
+        FishProcessor[u] = active;
+        Distributor[u] = active;
+        Retailer[u] = active;
+        Consumer[u] = active;
+        WildCaughtFisher[u] = active;
     }
 }
 

@@ -3,7 +3,7 @@ import { client } from './axios';
 import { RoleType } from 'types/Auth';
 import { registrationContract } from 'contracts';
 
-const updateUserStatus = (sender: string, address: string, active: boolean) =>
+const updateUserStatus = async (sender: string, address: string, active: boolean) =>
   registrationContract().methods.UpdateUserStatus(address, active).send({ from: sender, gas: 3500000 });
 
 const getProfile = async (): Promise<UserType> => client.get(`/user`);

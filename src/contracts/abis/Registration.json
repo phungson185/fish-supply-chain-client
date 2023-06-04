@@ -315,10 +315,10 @@
   },
   "sources": {
     "contracts/fish-supply-chain.sol": {
-      "keccak256": "0x23b2b495b5e21a88da2156454ce3b09a0846d0f3ad295c4df81cf5d19d1f4535",
+      "keccak256": "0xb9f76997939e2aa893eeba951d0870c9d152f34f3881378685074d517118e633",
       "urls": [
-        "bzz-raw://6a96d4705f0edd1d6ddaaa939fa5dd8743741d4af5051c96a3afffecda667bb9",
-        "dweb:/ipfs/QmYni2nkSQnbGDypvrstQ3gpk5uLaqSXu2sGpSDe257cZo"
+        "bzz-raw://102767c310275a145195cffd95180d583b87c532ebb9c6b81b2e1ed2cd32e971",
+        "dweb:/ipfs/QmQ2jxYe97i6L3foCCqZgzJra85zSCfwF3nshTfb4Nne3y"
       ]
     }
   },
