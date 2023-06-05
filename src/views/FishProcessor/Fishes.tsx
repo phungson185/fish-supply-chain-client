@@ -1,12 +1,21 @@
-import { ArticleOutlined, Assignment, KeyboardArrowDownOutlined, KeyboardArrowUpOutlined } from '@mui/icons-material';
+import {
+  ArticleOutlined,
+  Assignment,
+  CategoryOutlined,
+  KeyboardArrowDownOutlined,
+  KeyboardArrowUpOutlined,
+} from '@mui/icons-material';
 
 import {
   Avatar,
   Box,
+  Button,
   Chip,
   Collapse,
   Dialog,
   IconButton,
+  Menu,
+  MenuItem,
   Pagination,
   Paper,
   Table,
@@ -15,6 +24,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
   debounce,
 } from '@mui/material';
@@ -36,8 +46,12 @@ import CreateContractPopup from './popups/CreateContractPopup';
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
   { label: 'Geographic origin', orderBy: 'geographicOrigin' },
-  { label: 'Number of fish seeds available', orderBy: 'numberOfFishSeedsAvailable' },
-  { label: 'Aquaculture water type', orderBy: 'aquacultureWaterType' },
+  { label: 'Method of reproduction', orderBy: 'methodOfReproduction' },
+  { label: 'Number of fish ordered', orderBy: 'numberOfFishOrdered' },
+  {
+    label: 'Updated time',
+    orderBy: 'updatedAt',
+  },
 ];
 
 const SORT_TYPES = [
@@ -171,6 +185,7 @@ const Fishes = () => {
                 <Table size='small' aria-label='purchases'>
                   <TableHead>
                     <TableRow>
+                      <TableCell align='center'>QR code</TableCell>
                       <TableCell align='center'>Contract address</TableCell>
                       <TableCell align='center'>Species name</TableCell>
                       <TableCell align='center'>Image</TableCell>
@@ -185,6 +200,11 @@ const Fishes = () => {
                       getProcessingContracts.items.length > 0 &&
                       getProcessingContracts.items.map((contract) => (
                         <TableRow key={contract.id}>
+                          <TableCell align='center'>
+                            <Avatar src={contract.qrCode} variant='square'>
+                              <Assignment />
+                            </Avatar>
+                          </TableCell>
                           <TableCell align='center'>{contract.processingContract}</TableCell>
                           <TableCell align='center'>{contract.processedSpeciesName}</TableCell>
                           <TableCell align='center'>
@@ -214,7 +234,19 @@ const Fishes = () => {
   return (
     <>
       <div className='flex items-center justify-between'>
-        {/* <div className='flex justify-between gap-2'>
+        <TextField
+          label='Search'
+          InputProps={{ className: 'bg-white text-black' }}
+          value={search}
+          sx={{ width: '30%' }}
+          onChange={(event) => {
+            const { value } = event.target;
+            setSearch(value);
+            debounceChangeParams({ search: value });
+          }}
+        />
+
+        <div className='flex justify-between gap-2'>
           <Button
             variant='text'
             color='inherit'
@@ -277,27 +309,6 @@ const Fishes = () => {
             ))}
           </Menu>
         </div>
-
-        <TextField
-          placeholder='Search...'
-          InputProps={{ className: 'bg-white text-black' }}
-          value={search}
-          sx={{ width: '30%' }}
-          onChange={(event) => {
-            const { value } = event.target;
-            setSearch(value);
-            debounceChangeParams({ search: value });
-          }}
-        /> */}
-
-        {/* <Button
-          variant='contained'
-          onClick={() => {
-            setOpenCreatePopup(true);
-          }}
-        >
-          Create Farmed Fish Contract
-        </Button> */}
       </div>
       <TableContainer component={Paper}>
         <Spinner loading={isFetching}>

@@ -1,15 +1,12 @@
-import { BalanceOutlined, CategoryOutlined, DeviceThermostat } from '@mui/icons-material';
+import { BalanceOutlined, CategoryOutlined, ViewListOutlined } from '@mui/icons-material';
 import {
   Avatar,
   Button,
   Chip,
-  Container,
   Dialog,
   Menu,
   MenuItem,
   Pagination,
-  Tab,
-  Tabs,
   TextField,
   Typography,
   debounce,
@@ -17,23 +14,23 @@ import {
 import { Spinner } from 'components';
 import { ProcessStatus, statusStep } from 'components/ConfirmStatus';
 import { useAnchor, useSearch } from 'hooks';
-import useTabs, { TabType } from 'hooks/useTabs';
-import { useSnackbar } from 'notistack';
 import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
-import { fishFarmerService, fishProcessorService, fishSeedCompanyService } from 'services';
-import { FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
-import { formatTime } from 'utils/common';
-import { ConfirmPopup } from './popups';
+import { fishProcessorService, fishSeedCompanyService } from 'services';
 import { RoleType } from 'types/Auth';
 import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
+import { formatTime } from 'utils/common';
+import { ConfirmPopup } from './popups';
 
 const FILTERS = [
-  { label: 'Number of fish seeds ordered', orderBy: 'numberOfFishSeedsOrdered' },
+  { label: 'Species name', orderBy: 'speciesName' },
+  { label: 'Geographic origin', orderBy: 'geographicOrigin' },
+  { label: 'Method of reproduction', orderBy: 'methodOfReproduction' },
+  { label: 'Number of fish ordered', orderBy: 'numberOfFishOrdered' },
   {
     label: 'Updated time',
     orderBy: 'updatedAt',
@@ -87,16 +84,11 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
 
-  // useEffect(() => {
-  //   onTabChange({} as SyntheticEvent<Element, Event>, 'account');
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
   return (
     <>
       <div className='flex items-center justify-between mb-5'>
         <TextField
-          placeholder='Search...'
+          label='Search'
           InputProps={{ className: 'bg-white text-black' }}
           value={search}
           sx={{ width: '60%' }}
@@ -182,8 +174,18 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
             }}
           >
             <div className='flex flex-row items-center gap-2 border-b-2 border-solid border-gray-200 pb-3 mb-3'>
-              <Avatar src={item.farmedFishSeller.avatar ?? ''} />
-              <div className='font-bold'>{item.farmedFishSeller.name}</div>
+              <Avatar
+                src={
+                  role === RoleType.fishProcessorRole
+                    ? item.farmedFishSeller.avatar ?? ''
+                    : item.farmedFishPurchaser.avatar ?? ''
+                }
+              />
+              <div className='font-bold'>
+                {role === RoleType.fishProcessorRole
+                  ? item.farmedFishSeller.name ?? ''
+                  : item.farmedFishPurchaser.name ?? ''}
+              </div>
               <div className='flex-1'></div>
               {statusStep.find((step) => step.code === item.status)?.component}
               {statusStep.find((step) => step.code === item.status)?.description}
@@ -236,6 +238,13 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
               count={totalPage}
               onChange={(event, value) => onSearchChange({ page: value })}
             />
+          </div>
+        )}
+
+        {items.length === 0 && (
+          <div className='flex flex-col gap-5 items-center justify-center'>
+            <ViewListOutlined color='disabled' style={{ fontSize: '400px' }} />
+            <div className='text-3xl font-medium'>No order not found</div>
           </div>
         )}
       </Spinner>

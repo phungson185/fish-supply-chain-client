@@ -185,7 +185,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
           <Grid item xs={4}>
             <div className='flex flex-row gap-3 items-center mb-5'>
               <Typography variant='h3'>Order ID: </Typography>
-              <div className='text-xl text-blue-500'>{shorten(item.retailerPurchaseOrderID)}</div>
+              <div className='text-xl text-blue-500'>{item.id}</div>
             </div>
             <Avatar variant='square' src={item.image} sx={{ width: '100%', height: 'auto' }} />
           </Grid>

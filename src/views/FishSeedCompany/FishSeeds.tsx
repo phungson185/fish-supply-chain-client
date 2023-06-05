@@ -151,7 +151,7 @@ const FishSeeds = () => {
         </div>
 
         <TextField
-          placeholder='Search...'
+          label='Search'
           InputProps={{ className: 'bg-white text-black' }}
           value={search}
           sx={{ width: '30%' }}

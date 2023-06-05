@@ -3,13 +3,10 @@ import {
   Avatar,
   Button,
   Chip,
-  Container,
   Dialog,
   Menu,
   MenuItem,
   Pagination,
-  Tab,
-  Tabs,
   TextField,
   Typography,
   debounce,
@@ -17,8 +14,6 @@ import {
 import { Spinner } from 'components';
 import { ProcessStatus, statusStep } from 'components/ConfirmStatus';
 import { useAnchor, useSearch } from 'hooks';
-import useTabs, { TabType } from 'hooks/useTabs';
-import { useSnackbar } from 'notistack';
 import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -26,10 +21,10 @@ import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { fishFarmerService, fishSeedCompanyService } from 'services';
+import { RoleType } from 'types/Auth';
 import { FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
 import { formatTime } from 'utils/common';
 import { ConfirmPopup } from './popups';
-import { RoleType } from 'types/Auth';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -90,16 +85,11 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
     onSearchChange({ orderBy, desc, ...params });
   }, [onSearchChange, orderBy, desc, params]);
 
-  // useEffect(() => {
-  //   onTabChange({} as SyntheticEvent<Element, Event>, 'account');
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
   return (
     <>
       <div className='flex items-center justify-between mb-5'>
         <TextField
-          placeholder='Search...'
+          label='Search'
           InputProps={{ className: 'bg-white text-black' }}
           value={search}
           sx={{ width: '60%' }}

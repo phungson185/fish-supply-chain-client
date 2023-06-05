@@ -57,8 +57,9 @@ const UpdateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
   const location = useLocation();
   const { tab, page = 1, size = 5, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page, size });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { mutate: updateProcessingContract, isLoading } = useMutation(fishProcessorService.updateProcessingContract, {
+  const { mutate: updateProcessingContract } = useMutation(fishProcessorService.updateProcessingContract, {
     onSuccess: () => {
       enqueueSnackbar('Update contract successfully', {
         variant: 'success',
@@ -103,45 +104,52 @@ const UpdateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
 
   const handleUpdateContract = () => {
     handleSubmit(async (values) => {
-      if (DateTime.fromISO(values.dateOfProcessing.ts) < DateTime.now()) {
-        enqueueSnackbar('Date of processing must be from current date', { variant: 'error' });
-        return;
+      try {
+        setIsLoading(true);
+        if (DateTime.fromISO(values.dateOfProcessing.ts) < DateTime.now()) {
+          enqueueSnackbar('Date of processing must be from current date', { variant: 'error' });
+          return;
+        }
+
+        if (values.dateOfExpiry.ts < values.dateOfProcessing.ts) {
+          enqueueSnackbar('Date of expiry must be after date of processing', { variant: 'error' });
+          return;
+        }
+
+        const resChain = await fishProcessorService.updateFishProcessingContract({
+          sender: address,
+          dateOfProcessing: new Date(values.dateOfProcessing).getTime(),
+          dateOfExpiry: new Date(values.dateOfExpiry).getTime(),
+          ipfsHash: values.ipfsHash,
+          processedSpeciesname: values.processedSpeciesname,
+          filletsInPacket: values.filletsInPacket,
+          numberOfPackets: values.numberOfPackets,
+          image: values.image,
+          fishProcessingContractAddress: item.processingContract,
+        });
+
+        let dataChain = resChain.events.ProcessedFishPackageIDCreated.returnValues;
+
+        updateProcessingContract({
+          id: item.id,
+          body: {
+            image: dataChain.Image,
+            dateOfProcessing: Number(dataChain.DateOfProcessing),
+            dateOfExpiry: Number(dataChain.DateOfExpiry),
+            IPFSHash: dataChain.IPFS_Hash,
+            filletsInPacket: Number(dataChain.FilletsInPacket),
+            numberOfPackets: Number(dataChain.NumberOfPackets),
+            description: values.description,
+            processedSpeciesName: dataChain.ProcessedSpeciesName,
+            listing: values.listing,
+            transactionHash: resChain.transactionHash,
+          },
+        });
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
       }
-
-      if (values.dateOfExpiry.ts < values.dateOfProcessing.ts) {
-        enqueueSnackbar('Date of expiry must be after date of processing', { variant: 'error' });
-        return;
-      }
-
-      const resChain = await fishProcessorService.updateFishProcessingContract({
-        sender: address,
-        dateOfProcessing: new Date(values.dateOfProcessing).getTime(),
-        dateOfExpiry: new Date(values.dateOfExpiry).getTime(),
-        ipfsHash: values.ipfsHash,
-        processedSpeciesname: values.processedSpeciesname,
-        filletsInPacket: values.filletsInPacket,
-        numberOfPackets: values.numberOfPackets,
-        image: values.image,
-        fishProcessingContractAddress: item.processingContract,
-      });
-
-      let dataChain = resChain.events.ProcessedFishPackageIDCreated.returnValues;
-
-      updateProcessingContract({
-        id: item.id,
-        body: {
-          image: dataChain.Image,
-          dateOfProcessing: Number(dataChain.DateOfProcessing),
-          dateOfExpiry: Number(dataChain.DateOfExpiry),
-          IPFSHash: dataChain.IPFS_Hash,
-          filletsInPacket: Number(dataChain.FilletsInPacket),
-          numberOfPackets: Number(dataChain.NumberOfPackets),
-          description: values.description,
-          processedSpeciesName: dataChain.ProcessedSpeciesName,
-          listing: values.listing,
-          transactionHash: resChain.transactionHash,
-        },
-      });
     })();
   };
 
@@ -243,16 +251,9 @@ const UpdateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
                 name='processedSpeciesname'
                 defaultValue=''
                 control={control}
-                rules={{ required: 'Species name is required' }}
+                rules={{ required: 'Product name is required' }}
                 render={({ field, fieldState: { invalid, error } }) => (
-                  <TextField
-                    {...field}
-                    required
-                    disabled
-                    label='Species name'
-                    error={invalid}
-                    helperText={error?.message}
-                  />
+                  <TextField {...field} required label='Product name' error={invalid} helperText={error?.message} />
                 )}
               />
 
@@ -419,7 +420,12 @@ const UpdateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
       </DialogContent>
 
       <DialogActions>
-        <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
+        <LoadingButton
+          variant='outlined'
+          color='inherit'
+          onClick={onClose}
+          disabled={isLoading || imageLoading || documentLoading}
+        >
           Cancel
         </LoadingButton>
         <LoadingButton

@@ -1,7 +1,8 @@
 import { LoadingButton } from '@mui/lab';
 import { DialogActions, DialogContent, DialogTitle, InputAdornment, TextField, Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { Controller, useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { Controller, set, useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -20,10 +21,11 @@ const FishSeedsOrderPopup = ({ item, onClose }: PopupProps) => {
   const { address } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const { mutate: updateContract } = useMutation(fishSeedCompanyService.updateFarmedFishContract);
 
-  const { mutate: createOder, isLoading } = useMutation(fishFarmerService.createOder, {
+  const { mutate: createOder } = useMutation(fishFarmerService.createOder, {
     onSuccess: () => {
       enqueueSnackbar('Create order successfully', {
         variant: 'success',
@@ -38,32 +40,39 @@ const FishSeedsOrderPopup = ({ item, onClose }: PopupProps) => {
 
   const handleOrder = () => {
     handleSubmit(async (values) => {
-      const resChain = await fishFarmerService.placeFishSeedsPurchaseOrder({
-        farmedFishContractAddress: item.farmedFishContract,
-        FishSeedsPurchaser: address,
-        FishSeedsSeller: item.owner.address,
-        NumberOfFishSeedsOrdered: values.NumberOfFishSeedsOrdered,
-      });
+      try {
+        setIsLoading(true);
+        const resChain = await fishFarmerService.placeFishSeedsPurchaseOrder({
+          farmedFishContractAddress: item.farmedFishContract,
+          FishSeedsPurchaser: address,
+          FishSeedsSeller: item.owner.address,
+          NumberOfFishSeedsOrdered: values.NumberOfFishSeedsOrdered,
+        });
 
-      updateContract({
-        id: item.id,
-        body: {
+        updateContract({
+          id: item.id,
+          body: {
+            transactionHash: resChain.transactionHash,
+            numberOfFishSeedsAvailable:
+              resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.NumberOfFishSeedsAvailable,
+          },
+        });
+
+        createOder({
+          farmedFishId: item.id,
+          fishSeedPurchaseOrderId: resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.FishSeedsPurchaseOrderID,
+          fishSeedsPurchaser: address,
+          fishSeedsSeller: item.owner.address,
+          numberOfFishSeedsOrdered: resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.NumberOfFishSeedsOrdered,
+          fishSeedsPurchaseOrderDetailsStatus:
+            resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.FishSeedsPurchaseOrderDetailsStatus,
           transactionHash: resChain.transactionHash,
-          numberOfFishSeedsAvailable:
-            resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.NumberOfFishSeedsAvailable,
-        },
-      });
-
-      createOder({
-        farmedFishId: item.id,
-        fishSeedPurchaseOrderId: resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.FishSeedsPurchaseOrderID,
-        fishSeedsPurchaser: address,
-        fishSeedsSeller: item.owner.address,
-        numberOfFishSeedsOrdered: resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.NumberOfFishSeedsOrdered,
-        fishSeedsPurchaseOrderDetailsStatus:
-          resChain.events.FishSeedsPurchaseOrderPlaced.returnValues.FishSeedsPurchaseOrderDetailsStatus,
-        transactionHash: resChain.transactionHash,
-      });
+        });
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
+      }
     })();
   };
   return (
@@ -105,7 +114,7 @@ const FishSeedsOrderPopup = ({ item, onClose }: PopupProps) => {
       </DialogContent>
 
       <DialogActions>
-        <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
+        <LoadingButton variant='outlined' color='inherit' onClick={onClose} disabled={isLoading}>
           Cancel
         </LoadingButton>
         <LoadingButton variant='contained' onClick={handleOrder} loading={isLoading}>

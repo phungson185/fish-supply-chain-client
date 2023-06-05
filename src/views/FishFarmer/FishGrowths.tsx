@@ -3,8 +3,6 @@ import {
   Avatar,
   Button,
   Chip,
-  debounce,
-  Dialog,
   Menu,
   MenuItem,
   Pagination,
@@ -15,26 +13,31 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
+  debounce,
 } from '@mui/material';
 import { Spinner, TableRowEmpty } from 'components';
+import { ProcessStatus } from 'components/ConfirmStatus';
 import { useAnchor, useSearch } from 'hooks';
 import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Link, useLocation } from 'react-router-dom';
+import { profileSelector } from 'reducers/profile';
+import { getRoute } from 'routes';
 import { fishFarmerService, fishSeedCompanyService } from 'services';
 import { FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
-import { UpdateFishGrowthDetailPopup } from './popups';
-import { useSelector } from 'react-redux';
-import { profileSelector } from 'reducers/profile';
-import { ProcessStatus } from 'components/ConfirmStatus';
 import { pinataUrl } from 'utils/common';
-import { Link } from 'react-router-dom';
-import { getRoute } from 'routes';
 
 const FILTERS = [
+  { label: 'Species name', orderBy: 'speciesName' },
   { label: 'Total number of fish', orderBy: 'totalNumberOfFish' },
+  { label: 'Water temperature', orderBy: 'waterTemperature' },
+  { label: 'Geographic origin', orderBy: 'geographicOrigin' },
+  { label: 'Method of reproduction', orderBy: 'methodOfReproduction' },
   { label: 'Fish weight', orderBy: 'fishWeight' },
+  { label: 'Updated time', orderBy: 'updatedAt' },
 ];
 
 const SORT_TYPES = [
@@ -88,6 +91,18 @@ const FishGrowths = () => {
   return (
     <>
       <div className='flex items-center justify-between'>
+        <TextField
+          label='Search'
+          InputProps={{ className: 'bg-white text-black' }}
+          value={search}
+          sx={{ width: '30%' }}
+          onChange={(event) => {
+            const { value } = event.target;
+            setSearch(value);
+            debounceChangeParams({ search: value });
+          }}
+        />
+
         <div className='flex justify-between gap-2'>
           <Button
             variant='text'
@@ -151,18 +166,6 @@ const FishGrowths = () => {
             ))}
           </Menu>
         </div>
-
-        {/* <TextField
-          placeholder='Search...'
-          InputProps={{ className: 'bg-white text-black' }}
-          value={search}
-          sx={{ width: '30%' }}
-          onChange={(event) => {
-            const { value } = event.target;
-            setSearch(value);
-            debounceChangeParams({ search: value });
-          }}
-        /> */}
       </div>
       <TableContainer component={Paper}>
         <Spinner loading={isFetching}>

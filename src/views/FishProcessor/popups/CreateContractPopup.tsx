@@ -33,7 +33,8 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
   const [imageLoading, setImageLoading] = useState(false);
   const [documentLoading, setDocumentLoading] = useState(false);
   const [image, setImage] = useState('');
-  const { mutate: createProcessingContract, isLoading } = useMutation(fishProcessorService.createProcessingContract, {
+  const [isLoading, setIsLoading] = useState(false);
+  const { mutate: createProcessingContract } = useMutation(fishProcessorService.createProcessingContract, {
     onSuccess: () => {
       enqueueSnackbar('Deploy contract successfully', {
         variant: 'success',
@@ -48,7 +49,6 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
 
   useEffect(() => {
     if (item) {
-      setValue('processedSpeciesname', item.speciesName);
       setValue('ipfsHash', item.IPFSHash);
       setValue('registration', systemConfig?.registrationContract);
     }
@@ -56,44 +56,51 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
 
   const handleDeployContract = () => {
     handleSubmit(async (values) => {
-      if (DateTime.fromISO(values.dateOfProcessing.ts) < DateTime.now()) {
-        enqueueSnackbar('Date of processing must be from current date', { variant: 'error' });
-        return;
+      try {
+        setIsLoading(true);
+        if (DateTime.fromISO(values.dateOfProcessing.ts) < DateTime.now()) {
+          enqueueSnackbar('Date of processing must be from current date', { variant: 'error' });
+          return;
+        }
+
+        if (values.dateOfExpiry.ts < values.dateOfProcessing.ts) {
+          enqueueSnackbar('Date of expiry must be after date of processing', { variant: 'error' });
+          return;
+        }
+
+        const resChain = await fishProcessorService.deployFishProcessingContract({
+          sender: address,
+          dateOfProcessing: values.dateOfProcessing.ts,
+          dateOfExpiry: values.dateOfExpiry.ts,
+          ipfsHash: values.ipfsHash,
+          processedSpeciesname: values.processedSpeciesname,
+          registration: systemConfig?.registrationContract,
+          filletsInPacket: values.filletsInPacket,
+          numberOfPackets: values.numberOfPackets,
+          farmedFishPurchaseOrderID: item.farmedFishPurchaseOrderID,
+          image: values.image,
+        });
+
+        createProcessingContract({
+          farmedFishPurchaseOrderID: item.farmedFishPurchaseOrderID,
+          image: values.image,
+          dateOfProcessing: values.dateOfProcessing.ts,
+          dateOfExpiry: values.dateOfExpiry.ts,
+          fishProcessorId: item.id,
+          fishProcessor: id as string,
+          IPFSHash: values.ipfsHash,
+          registrationContract: systemConfig?.registrationContract,
+          filletsInPacket: values.filletsInPacket,
+          processingContract: resChain.options.address,
+          numberOfPackets: values.numberOfPackets,
+          processedSpeciesName: values.processedSpeciesname,
+          description: values.description,
+        });
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
       }
-
-      if (values.dateOfExpiry.ts < values.dateOfProcessing.ts) {
-        enqueueSnackbar('Date of expiry must be after date of processing', { variant: 'error' });
-        return;
-      }
-
-      const resChain = await fishProcessorService.deployFishProcessingContract({
-        sender: address,
-        dateOfProcessing: values.dateOfProcessing.ts,
-        dateOfExpiry: values.dateOfExpiry.ts,
-        ipfsHash: values.ipfsHash,
-        processedSpeciesname: values.processedSpeciesname,
-        registration: systemConfig?.registrationContract,
-        filletsInPacket: values.filletsInPacket,
-        numberOfPackets: values.numberOfPackets,
-        farmedFishPurchaseOrderID: item.farmedFishPurchaseOrderID,
-        image: values.image,
-      });
-
-      createProcessingContract({
-        farmedFishPurchaseOrderID: item.farmedFishPurchaseOrderID,
-        image: values.image,
-        dateOfProcessing: values.dateOfProcessing.ts,
-        dateOfExpiry: values.dateOfExpiry.ts,
-        fishProcessorId: item.id,
-        fishProcessor: id as string,
-        IPFSHash: values.ipfsHash,
-        registrationContract: systemConfig?.registrationContract,
-        filletsInPacket: values.filletsInPacket,
-        processingContract: resChain.options.address,
-        numberOfPackets: values.numberOfPackets,
-        processedSpeciesName: values.processedSpeciesname,
-        description: values.description,
-      });
     })();
   };
 
@@ -185,16 +192,9 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
                 name='processedSpeciesname'
                 defaultValue=''
                 control={control}
-                rules={{ required: 'Species name is required' }}
+                rules={{ required: 'Product name is required' }}
                 render={({ field, fieldState: { invalid, error } }) => (
-                  <TextField
-                    {...field}
-                    required
-                    disabled
-                    label='Species name'
-                    error={invalid}
-                    helperText={error?.message}
-                  />
+                  <TextField {...field} required label='Product name' error={invalid} helperText={error?.message} />
                 )}
               />
 
@@ -320,10 +320,20 @@ const CreateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
       </DialogContent>
 
       <DialogActions>
-        <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
+        <LoadingButton
+          variant='outlined'
+          color='inherit'
+          onClick={onClose}
+          disabled={isLoading || imageLoading || documentLoading}
+        >
           Cancel
         </LoadingButton>
-        <LoadingButton variant='contained' onClick={handleDeployContract} loading={isLoading}>
+        <LoadingButton
+          variant='contained'
+          onClick={handleDeployContract}
+          loading={isLoading}
+          disabled={imageLoading || documentLoading}
+        >
           Deploy
         </LoadingButton>
       </DialogActions>

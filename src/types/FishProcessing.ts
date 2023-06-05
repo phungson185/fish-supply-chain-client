@@ -19,6 +19,7 @@ export type FishProcessingType = BaseType & {
   description: string;
   listing: boolean;
   disable: boolean;
+  qrCode: string;
 };
 
 export type ProcessingContractParamsType = PaginateParamsType & {

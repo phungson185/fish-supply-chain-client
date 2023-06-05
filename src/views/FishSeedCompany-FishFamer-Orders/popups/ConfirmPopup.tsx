@@ -46,8 +46,18 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
   const { address, role } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
   const [activeStep, setActiveStep] = useState<number>(0);
-
-  const { mutate: confirmOrder, isLoading } = useMutation(fishFarmerService.confirmOrder, {
+  const [isLoading, setIsLoading] = useState({
+    accept: {
+      loading: false,
+      disabled: false,
+    },
+    reject: {
+      loading: false,
+      disabled: false,
+    },
+  });
+  const [isRecieveLoading, setIsRecieveLoading] = useState(false);
+  const { mutate: confirmOrder } = useMutation(fishFarmerService.confirmOrder, {
     onSuccess: () => {
       enqueueSnackbar('Confirm order successfully', {
         variant: 'success',
@@ -82,44 +92,85 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
   }, [getLogsSuccess, logs]);
 
   const handleConfirm = async (accepted: boolean) => {
-    const resChain = await fishFarmerService.confirmFishSeedsPurchaseOrder({
-      accepted,
-      farmedFishContractAddress: item.farmedFishId.farmedFishContract,
-      sender: address,
-      FishSeedsPurchaseOrderID: item.fishSeedPurchaseOrderId,
-    });
+    try {
+      setIsLoading({
+        accept: {
+          loading: accepted,
+          disabled: !accepted,
+        },
+        reject: {
+          loading: !accepted,
+          disabled: accepted,
+        },
+      });
+      const resChain = await fishFarmerService.confirmFishSeedsPurchaseOrder({
+        accepted,
+        farmedFishContractAddress: item.farmedFishId.farmedFishContract,
+        sender: address,
+        FishSeedsPurchaseOrderID: item.fishSeedPurchaseOrderId,
+      });
 
-    await confirmOrder({
-      orderId: item.id,
-      numberOfFishSeedsAvailable: Number(
-        resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NumberOfFishSeedsAvailable,
-      ),
-      status: resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NEWSTatus,
-      transactionHash: resChain.transactionHash,
-    });
+      await confirmOrder({
+        orderId: item.id,
+        numberOfFishSeedsAvailable: Number(
+          resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NumberOfFishSeedsAvailable,
+        ),
+        status: resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NEWSTatus,
+        transactionHash: resChain.transactionHash,
+      });
 
-    setOrderStatus(Number(resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NEWSTatus));
-    setActiveStep(activeStep + 1);
+      setOrderStatus(Number(resChain.events.FishSeedsPurchaseOrderConfirmed.returnValues.NEWSTatus));
+      setActiveStep(activeStep + 1);
+      setIsLoading({
+        accept: {
+          loading: false,
+          disabled: false,
+        },
+        reject: {
+          loading: false,
+          disabled: false,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      setIsLoading({
+        accept: {
+          loading: false,
+          disabled: false,
+        },
+        reject: {
+          loading: false,
+          disabled: false,
+        },
+      });
+    }
   };
 
   const handleRecieve = async () => {
-    const resChain = await fishFarmerService.receiveFishSeedsOrder({
-      farmedFishContractAddress: item.farmedFishId.farmedFishContract,
-      sender: address,
-      FishSeedsPurchaseOrderID: item.fishSeedPurchaseOrderId,
-    });
+    try {
+      setIsRecieveLoading(true);
+      const resChain = await fishFarmerService.receiveFishSeedsOrder({
+        farmedFishContractAddress: item.farmedFishId.farmedFishContract,
+        sender: address,
+        FishSeedsPurchaseOrderID: item.fishSeedPurchaseOrderId,
+      });
 
-    await confirmOrder({
-      orderId: item.id,
-      numberOfFishSeedsAvailable: Number(
-        resChain.events.FishsSeedsOrderReceived.returnValues.NumberOfFishSeedsAvailable,
-      ),
-      status: resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus,
-      transactionHash: resChain.transactionHash,
-    });
+      await confirmOrder({
+        orderId: item.id,
+        numberOfFishSeedsAvailable: Number(
+          resChain.events.FishsSeedsOrderReceived.returnValues.NumberOfFishSeedsAvailable,
+        ),
+        status: resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus,
+        transactionHash: resChain.transactionHash,
+      });
 
-    setOrderStatus(Number(resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus));
-    setActiveStep(activeStep + 1);
+      setOrderStatus(Number(resChain.events.FishsSeedsOrderReceived.returnValues.NEWSTatus));
+      setActiveStep(activeStep + 1);
+      setIsRecieveLoading(false);
+    } catch (error) {
+      console.error(error);
+      setIsRecieveLoading(false);
+    }
   };
   return (
     <>
@@ -175,7 +226,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
           <Grid item xs={4}>
             <div className='flex flex-row gap-3 items-center mb-5'>
               <Typography variant='h3'>Order ID: </Typography>
-              <div className='text-xl text-blue-500'>{shorten(item.fishSeedPurchaseOrderId)}</div>
+              <div className='text-xl text-blue-500'>{item.id}</div>
             </div>
             <Avatar variant='square' src={item.image} sx={{ width: '100%', height: 'auto' }} />
           </Grid>
@@ -248,20 +299,26 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
             <LoadingButton
               variant='contained'
               color='success'
-              disabled={['Accepted', 'Rejected', 'Received'].includes(
-                statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
-              )}
+              disabled={
+                ['Accepted', 'Rejected', 'Received'].includes(
+                  statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
+                ) || isLoading.accept.disabled
+              }
               onClick={() => handleConfirm(true)}
+              loading={isLoading.accept.loading}
             >
               Accept
             </LoadingButton>
             <LoadingButton
               variant='contained'
               color='error'
-              disabled={['Accepted', 'Rejected', 'Received'].includes(
-                statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
-              )}
+              disabled={
+                ['Accepted', 'Rejected', 'Received'].includes(
+                  statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
+                ) || isLoading.reject.disabled
+              }
               onClick={() => handleConfirm(false)}
+              loading={isLoading.reject.loading}
             >
               Reject
             </LoadingButton>
@@ -276,12 +333,18 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
               statusStep[item.fishSeedsPurchaseOrderDetailsStatus].label,
             )}
             onClick={handleRecieve}
+            loading={isRecieveLoading}
           >
             Received
           </LoadingButton>
         )}
 
-        <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
+        <LoadingButton
+          variant='outlined'
+          color='inherit'
+          onClick={onClose}
+          disabled={isLoading.accept.loading || isLoading.reject.loading || isRecieveLoading}
+        >
           Cancel
         </LoadingButton>
       </DialogActions>
