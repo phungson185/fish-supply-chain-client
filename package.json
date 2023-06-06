@@ -24,6 +24,7 @@
     "@walletconnect/web3-provider": "^1.7.4",
     "axios": "^0.24.0",
     "date-fns": "^2.29.3",
+    "html-to-image": "^1.11.11",
     "humps": "^2.0.1",
     "jwt-decode": "^3.1.2",
     "luxon": "^2.3.0",

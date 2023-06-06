@@ -4,6 +4,7 @@ import {
   CategoryOutlined,
   KeyboardArrowDownOutlined,
   KeyboardArrowUpOutlined,
+  Visibility,
 } from '@mui/icons-material';
 
 import {
@@ -40,8 +41,10 @@ import { profileSelector } from 'reducers/profile';
 import { getRoute } from 'routes';
 import { fishProcessorService, fishSeedCompanyService } from 'services';
 import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
+import { FishProcessingType } from 'types/FishProcessing';
 import { formatTimeDate, pinataUrl } from 'utils/common';
 import CreateContractPopup from './popups/CreateContractPopup';
+import ProductDetail from './popups/ProductDetail';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },
@@ -70,9 +73,11 @@ const Fishes = () => {
     status: ProcessStatus.Received,
   });
   const [openCreateContractPopup, setOpenCreateContractPopup] = useState(false);
+  const [openProductDetailPopup, setOpenProductDetailPopup] = useState(false);
   const [selectedFish, setSelectedFish] = useState<FishFarmerFishProcessorOrderType>(
     {} as FishFarmerFishProcessorOrderType,
   );
+  const [selectedContract, setSelectedContract] = useState<FishProcessingType>({} as FishProcessingType);
   const navigate = useNavigate();
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
@@ -193,6 +198,7 @@ const Fishes = () => {
                       <TableCell align='center'>Date of expiry</TableCell>
                       <TableCell align='right'>Fillets in packet</TableCell>
                       <TableCell align='right'>Number of packets</TableCell>
+                      <TableCell align='center'>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -216,6 +222,16 @@ const Fishes = () => {
                           <TableCell align='center'>{formatTimeDate(contract.dateOfExpiry)}</TableCell>
                           <TableCell align='right'>{contract.filletsInPacket} fillets</TableCell>
                           <TableCell align='right'>{contract.numberOfPackets} packets</TableCell>
+                          <TableCell align='center'>
+                            <div
+                              onClick={() => {
+                                setSelectedContract(contract);
+                                setOpenProductDetailPopup(true);
+                              }}
+                            >
+                              <Visibility className='cursor-pointer' />
+                            </div>
+                          </TableCell>
                         </TableRow>
                       ))}
                     <TableRowEmpty
@@ -347,6 +363,10 @@ const Fishes = () => {
 
       <Dialog open={openCreateContractPopup} fullWidth maxWidth='lg'>
         <CreateContractPopup item={selectedFish} refetch={refetch} onClose={() => setOpenCreateContractPopup(false)} />
+      </Dialog>
+
+      <Dialog open={openProductDetailPopup} fullWidth maxWidth='lg'>
+        <ProductDetail item={selectedContract} onClose={() => setOpenProductDetailPopup(false)} />
       </Dialog>
     </>
   );

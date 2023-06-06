@@ -1,41 +1,3 @@
-import { LoadingButton } from '@mui/lab';
-import {
-  Button,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  Pagination,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from '@mui/material';
-import { DesktopDatePicker, DesktopDateTimePicker } from '@mui/x-date-pickers';
-import { DateTime } from 'luxon';
-import { useSnackbar } from 'notistack';
-import { Controller, useForm } from 'react-hook-form';
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from 'react-query';
-import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { profileSelector } from 'reducers/profile';
-import { systemSelector } from 'reducers/system';
-import { fileService, fishProcessorService, logService } from 'services';
-import { PopupController } from 'types/Common';
-import { FishFarmerFishProcessorOrderPaginateType, FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
-import { useEffect, useState } from 'react';
-import { UploadLabel } from 'views/Registration/components';
-import { formatTime, formatTimeDate, getBase64, pinataUrl, shorten } from 'utils/common';
-import TextEditor from 'components/TextEditor';
-import { FishProcessingType } from 'types/FishProcessing';
-import { FishProcessorDistributorOrderType } from 'types/Distributor';
 import {
   AccountBalanceWalletOutlined,
   ApartmentOutlined,
@@ -44,20 +6,51 @@ import {
   LocalPhoneOutlined,
   SetMealOutlined,
 } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
+import {
+  Avatar,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Pagination,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
 import { TableRowEmpty } from 'components';
-import { parse } from 'qs';
 import { useSearch } from 'hooks';
+import { parse } from 'qs';
+import { useQuery } from 'react-query';
+import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import { profileSelector } from 'reducers/profile';
+import { logService } from 'services';
+import { RoleType } from 'types/Auth';
+import { PopupController } from 'types/Common';
+import { FishProcessingType } from 'types/FishProcessing';
 import { LogParamsType, TransactionType } from 'types/Log';
+import { formatTime, formatTimeDate, pinataUrl, shorten } from 'utils/common';
+import { UploadLabel } from 'views/Registration/components';
+import SelectStampPopup from './SelectStampPopup';
+import { useState } from 'react';
 
 type PopupProps = PopupController & {
   item: FishProcessingType;
 };
 
 const ProductDetail = ({ item, onClose }: PopupProps) => {
+  const { role } = useSelector(profileSelector);
   const location = useLocation();
   const { tab, page = 1, size = 5, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page, size });
-
+  const [openSelectStampPopup, setOpenSelectStampPopup] = useState(false);
   const {
     data: logs,
     isSuccess: getLogsSuccess,
@@ -77,8 +70,12 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
       <DialogContent>
         <div className='flex flex-row gap-3 items-center justify-between mb-2'>
           <Typography variant='h4'>Product information</Typography>
-          <Switch checked={item.listing} />
-          <div>Listing</div>
+          {role === RoleType.fishProcessorRole && (
+            <>
+              <Switch checked={item.listing} />
+              <div>Listing</div>
+            </>
+          )}
           <div className='flex-1'></div>
           <div className=''></div>
           <Button
@@ -100,11 +97,12 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
           </Button>
         </div>
         <div className='flex flex-row gap-3 w-full mb-2'>
-          <div className='w-full max-w-[50%]'>
+          <div className='w-full max-w-[50%] flex items-start flex-col gap-10'>
             <UploadLabel
               {...{ htmlFor: 'cover', variant: 'rounded', image: item.image }}
-              {...{ width: '100%', height: '100%', loading: false, error: false }}
+              {...{ width: '70%', height: '70%', loading: false, error: false }}
             />
+            <div>Lot Code: {item.id}</div>
           </div>
           <div className='w-full max-w-[50%]'>
             <div className='pb-5 border-b-2 border-solid border-gray-200 w-fit mb-5'>
@@ -133,24 +131,34 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
               </div>
             </div>
 
-            <div>
-              <div className='mb-1 text-xl font-bold'>{item.processedSpeciesName}</div>
-              <div className='mb-5 text-gray-400 text-sm'>
-                <span className='mr-2'>Expired: </span>
-                <span>
-                  {formatTimeDate(item.dateOfProcessing)} ~ {formatTimeDate(item.dateOfExpiry)}{' '}
-                </span>
-              </div>
-              <div className='flex-1'></div>
-              <div className=''>
-                <div className='inline-block mr-1'>Fillets in packet: </div>
-                <div className='inline-block mr-1'>{item.filletsInPacket} fillets</div>
-                <SetMealOutlined className='inline-block mb-1' color='primary' />
-              </div>
-              <div className=''>
-                <div className='inline-block mr-1'>Number of packets: </div>
-                <div className='inline-block mr-1'>{item.numberOfPackets} packets</div>
-                <Inventory2Outlined className='inline-block mb-1' color='primary' />
+            <div className='flex flex-row gap-3'>
+              {role === RoleType.fishProcessorRole && (
+                <div>
+                  <Avatar variant='square' src={item.qrCode} className='w-32 h-32 mb-4' />
+                  <Button className='w-full' variant='outlined' onClick={() => setOpenSelectStampPopup(true)}>
+                    Download
+                  </Button>
+                </div>
+              )}
+              <div>
+                <div className='mb-1 text-xl font-bold'>{item.processedSpeciesName}</div>
+                <div className='mb-5 text-gray-400 text-sm'>
+                  <span className='mr-2'>Expired: </span>
+                  <span>
+                    {formatTimeDate(item.dateOfProcessing)} ~ {formatTimeDate(item.dateOfExpiry)}{' '}
+                  </span>
+                </div>
+                <div className='flex-1'></div>
+                <div className=''>
+                  <div className='inline-block mr-1'>Fillets in packet: </div>
+                  <div className='inline-block mr-1'>{item.filletsInPacket} fillets</div>
+                  <SetMealOutlined className='inline-block mb-1' color='primary' />
+                </div>
+                <div className=''>
+                  <div className='inline-block mr-1'>Number of packets: </div>
+                  <div className='inline-block mr-1'>{item.numberOfPackets} packets</div>
+                  <Inventory2Outlined className='inline-block mb-1' color='primary' />
+                </div>
               </div>
             </div>
           </div>
@@ -207,6 +215,10 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
           Cancel
         </LoadingButton>
       </DialogActions>
+
+      <Dialog open={openSelectStampPopup} fullWidth maxWidth='lg'>
+        <SelectStampPopup item={item} onClose={() => setOpenSelectStampPopup(false)} />
+      </Dialog>
     </>
   );
 };
