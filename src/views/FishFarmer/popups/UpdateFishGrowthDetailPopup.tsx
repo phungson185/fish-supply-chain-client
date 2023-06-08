@@ -24,6 +24,7 @@ import {
 import { useState } from 'react';
 import { UploadLabel } from 'views/Registration/components';
 import { getBase64 } from 'utils/common';
+import { set } from 'date-fns';
 
 type PopupProps = PopupController & {
   item: FishSeedCompanyFishFarmerOrderType;
@@ -36,9 +37,10 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
   const { enqueueSnackbar } = useSnackbar();
   const [documentLoading, setDocumentLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [image, setImage] = useState('');
 
-  const { mutate: updateGrowthDetail, isLoading } = useMutation(fishFarmerService.updateGrowthDetail, {
+  const { mutate: updateGrowthDetail } = useMutation(fishFarmerService.updateGrowthDetail, {
     onSuccess: () => {
       enqueueSnackbar('Update growth detail successfully', {
         variant: 'success',
@@ -53,27 +55,34 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
 
   const handleUpdateGrowthDetail = () => {
     handleSubmit(async (values) => {
-      const resChain = await fishFarmerService.updateFarmedFishGrowthDetails({
-        FarmedFishGrowthDetailsUploader: address,
-        FishWeight: values.FishWeight,
-        TotalNumberOfFish: values.TotalNumberOfFish,
-        IPFShash: values.IPFShash,
-        WaterTemperature: values.WaterTemperature,
-        Image: values.Image,
-        farmedFishContractAddress: item.farmedFishId.farmedFishContract,
-      });
+      try {
+        setIsLoading(true);
+        const resChain = await fishFarmerService.updateFarmedFishGrowthDetails({
+          FarmedFishGrowthDetailsUploader: address,
+          FishWeight: values.FishWeight,
+          TotalNumberOfFish: values.TotalNumberOfFish,
+          IPFShash: values.IPFShash,
+          WaterTemperature: values.WaterTemperature,
+          Image: values.Image,
+          farmedFishContractAddress: item.farmedFishId.farmedFishContract,
+        });
 
-      await updateGrowthDetail({
-        transactionHash: resChain.transactionHash,
-        farmedFishGrowthDetailsID:
-          resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.FarmedFishGrowthDetailsID,
-        orderId: item.id,
-        waterTemperature: values.WaterTemperature,
-        fishWeight: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.FishWeight,
-        totalNumberOfFish: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.TotalNumberOfFish,
-        IPFSHash: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.IPFShash,
-        image: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.Image,
-      } as UpdateGrowthDetailType);
+        await updateGrowthDetail({
+          transactionHash: resChain.transactionHash,
+          farmedFishGrowthDetailsID:
+            resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.FarmedFishGrowthDetailsID,
+          orderId: item.id,
+          waterTemperature: values.WaterTemperature,
+          fishWeight: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.FishWeight,
+          totalNumberOfFish: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.TotalNumberOfFish,
+          IPFSHash: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.IPFShash,
+          image: resChain.events?.FarmedFishGrowthDetailsUpdated.returnValues.Image,
+        } as UpdateGrowthDetailType);
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
+      }
     })();
   };
 
@@ -234,7 +243,7 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
       </DialogContent>
 
       <DialogActions>
-        <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
+        <LoadingButton variant='outlined' color='inherit' onClick={onClose} disabled={isLoading}>
           Cancel
         </LoadingButton>
         <LoadingButton

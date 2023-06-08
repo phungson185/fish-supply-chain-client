@@ -7,6 +7,7 @@ import {
   FishSeedCompanyFishFarmerOrderType,
   PlaceFishSeedsPurchaseOrderType,
   ReceiveFishSeedsOrderType,
+  SummaryParamsType,
   UpdateFarmedFishGrowthDetailsType,
   UpdateGrowthDetailType,
 } from 'types/FishFarmer';
@@ -93,6 +94,9 @@ const confirmOrder = async ({ orderId, ...body }: ConfirmOrderType) =>
 
 const updateGrowthDetail = async ({ orderId, ...body }: UpdateGrowthDetailType) =>
   client.put(`/fishfarmer/updateGrowthDetails/${orderId}`, body);
+const summaryCommon = async (): Promise<any> => client.get(`/fishfarmer/summaryCommon`);
+const summaryMostOrder = async (params: SummaryParamsType): Promise<any> =>
+  client.get(`/fishfarmer/summaryMostOrder/${params.geographicOrigin}/${params.methodOfReproduction}`);
 
 export default {
   placeFishSeedsPurchaseOrder,
@@ -105,4 +109,6 @@ export default {
   getOrder,
   getOrders,
   updateGrowthDetail,
+  summaryCommon,
+  summaryMostOrder,
 };

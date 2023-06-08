@@ -87,6 +87,11 @@ export type UpdateGrowthDetailType = {
   farmedFishGrowthDetailsID?: string;
 };
 
+export type SummaryParamsType = {
+  geographicOrigin: number;
+  methodOfReproduction: number;
+};
+
 export type FishSeedCompanyFishFarmerOrderParamsType = PaginateParamsType & {
   fishSeedsPurchaseOrderDetailsStatus?: number;
   fishSeedsPurchaser?: string;

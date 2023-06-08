@@ -2,13 +2,12 @@ import { AccountManagement } from 'views/AccountManagement';
 import { BatchDetail, Batches } from 'views/Batch';
 import { DistributorInventory, DistributorProducts } from 'views/Distributor';
 import { DistributorRetailerOrders } from 'views/Distributor-Retailer-Orders';
-import { FishGrowthDetail, FishGrowths } from 'views/FishFarmer';
+import { FishFarmerSummary, FishGrowthDetail, FishGrowths } from 'views/FishFarmer';
 import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
 import { Fishes, ProcessorInventory, ProcessorProducts } from 'views/FishProcessor';
 import { FishProcessorDistributorOrders } from 'views/FishProcessor - Distributor - Orders';
-import { ContractDetail, Contracts, FishSeedDetail, FishSeeds } from 'views/FishSeedCompany';
+import { ContractDetail, Contracts, FishSeedCompanySummary, FishSeedDetail, FishSeeds } from 'views/FishSeedCompany';
 import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
-import Summary from 'views/FishSeedCompany/Summary';
 import { ProfileUpdate } from 'views/Profile';
 import { RegistrationView } from 'views/Registration';
 import { RetailerInventory, RetailerProducts } from 'views/Retailer';
@@ -106,7 +105,7 @@ const fishSeedCompanyRoute: PrivateRouteType = {
   summary: {
     path: '/summary',
     name: 'Summary',
-    element: <Summary />,
+    element: <FishSeedCompanySummary />,
   },
 };
 
@@ -145,6 +144,11 @@ const fishFarmerRoute: PrivateRouteType = {
     path: '/fishFarmerFishProcessorOrders',
     name: 'FishFarmer - FishProcessor - Orders',
     element: <FishFarmerFishProcessorOrders />,
+  },
+  summary: {
+    path: '/summary',
+    name: 'Summary',
+    element: <FishFarmerSummary />,
   },
 };
 

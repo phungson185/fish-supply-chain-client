@@ -3,7 +3,7 @@ import { Spinner } from 'components';
 import { is } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { fishSeedCompanyService } from 'services';
+import { fishFarmerService, fishSeedCompanyService } from 'services';
 import { SummaryParamsType } from 'types/FishSeedCompany';
 
 import ApexCharts from 'apexcharts';
@@ -19,8 +19,8 @@ const Summary = () => {
   const [methodOfReproductionFilter, setMethodOfReproductionFilter] = useState(5);
 
   const { data: summaryCommon, isFetching: isFetchingCommon } = useQuery(
-    ['fishSeedCompanyService.summaryCommon'],
-    () => fishSeedCompanyService.summaryCommon(),
+    ['fishFarmerService.summaryCommon'],
+    () => fishFarmerService.summaryCommon(),
     {
       keepPreviousData: false,
       staleTime: 0,
@@ -28,24 +28,24 @@ const Summary = () => {
   );
 
   const { data: summaryMostOrder, isFetching: isFetchingMostOrder } = useQuery(
-    ['fishSeedCompanyService.summaryMostOrder', dataFilter],
-    () => fishSeedCompanyService.summaryMostOrder(dataFilter),
+    ['fishFarmerService.summaryMostOrder', dataFilter],
+    () => fishFarmerService.summaryMostOrder(dataFilter),
     {
       keepPreviousData: false,
       staleTime: 0,
     },
   );
 
-  const [farmedFishChartData, setFarmedFishChartData] = useState<any>();
+  const [quantityOfOrderData, setQuantityOfOrderData] = useState<any>();
   const [topOrderChartData, setTopOrderChartData] = useState<any>();
 
   useEffect(() => {
     if (summaryCommon) {
-      const farmedFishChart = {
+      const quantityOfOrder = {
         series: [
           {
             name: 'Order count',
-            data: summaryCommon.topFarmedFish.map((fish: any) => ({
+            data: summaryCommon.quantityOfOrdersForFishGrowth.map((fish: any) => ({
               x: fish.speciesName,
               y: fish.orderCount,
             })),
@@ -56,7 +56,7 @@ const Summary = () => {
             title: {
               text: 'Species name',
             },
-            categories: summaryCommon.topFarmedFish.map((fish: any) => fish.speciesName),
+            categories: summaryCommon.quantityOfOrdersForFishGrowth.map((fish: any) => fish.speciesName),
           },
           yaxis: {
             title: {
@@ -65,7 +65,7 @@ const Summary = () => {
           },
         },
       };
-      setFarmedFishChartData(farmedFishChart);
+      setQuantityOfOrderData(quantityOfOrder);
     }
   }, [summaryCommon]);
 
@@ -77,14 +77,14 @@ const Summary = () => {
             name: 'Total of farming fish',
             data: summaryMostOrder.map((fish: any) => ({
               x: fish.speciesName,
-              y: fish.quantity,
+              y: fish.numberOfFishSeedsOrdered,
             })),
           },
           {
-            name: 'Total of deployed fish',
+            name: 'Total of ordered fish',
             data: summaryMostOrder.map((fish: any) => ({
               x: fish.speciesName,
-              y: fish.numberOfFishSeedsOrdered,
+              y: fish.numberOfFishOrdered,
             })),
           },
         ],
@@ -111,30 +111,30 @@ const Summary = () => {
       {summaryCommon && (
         <div className='flex flex-row gap-10 justify-center mb-10'>
           <Paper className='bg-white flex flex-col items-center p-5 rounded-2xl' style={{ width: '30%' }}>
-            <div className='text-2xl mb-5'>Total of fish seeds</div>
-            <div className='text-5xl font-bold'>{summaryCommon.totalFishSeed}</div>
+            <div className='text-2xl mb-5'>Total order to fish seed company</div>
+            <div className='text-5xl font-bold'>{summaryCommon.totalOrderToFishSeedCompany}</div>
           </Paper>
           <Paper className='bg-white flex flex-col items-center p-5 rounded-2xl' style={{ width: '30%' }}>
-            <div className='text-2xl mb-5'>Total of contracts</div>
-            <div className='text-5xl font-bold'>{summaryCommon.totalFarmedFish}</div>
+            <div className='text-2xl mb-5'>Total order from fish processor</div>
+            <div className='text-5xl font-bold'>{summaryCommon.totalOrderFromFishProcessor}</div>
           </Paper>
           <Paper className='bg-white flex flex-col items-center p-5 rounded-2xl' style={{ width: '30%' }}>
-            <div className='text-2xl mb-5'>Total of order</div>
-            <div className='text-5xl font-bold'>{summaryCommon.totalOrder}</div>
+            <div className='text-2xl mb-5'>Average fish weight</div>
+            <div className='text-5xl font-bold'>{summaryCommon.averageFishWeight}</div>
           </Paper>
         </div>
       )}
       <div className='flex flex-row gap-10 justify-center'>
-        {farmedFishChartData && (
+        {quantityOfOrderData && (
           <Paper className='p-5' sx={{ width: 'fit-content' }}>
             <Chart
-              options={farmedFishChartData.options}
-              series={farmedFishChartData.series}
+              options={quantityOfOrderData.options}
+              series={quantityOfOrderData.series}
               type='bar'
               width={700}
               height={400}
             />
-            <div className='text-xl font-bold text-center'>The quantity of orders for each contract</div>
+            <div className='text-xl font-bold text-center'>The quantity of orders for each fish</div>
           </Paper>
         )}
 
@@ -177,7 +177,9 @@ const Summary = () => {
               width={700}
               height={400}
             />
-            <div className='text-xl font-bold text-center'>The contracts ordered the most</div>
+            <div className='text-xl font-bold text-center'>
+              The ratio between the quantity currently being farmed and the quantity sold for each fish species
+            </div>
           </Paper>
         )}
       </div>
