@@ -9,6 +9,7 @@ import {
   FarmedFishType,
   FishSeedParamsType,
   FishSeedType,
+  SummaryParamsType,
   UpdateFarmedFishContractType,
   UpdateFarmedFishType,
 } from 'types/FishSeedCompany';
@@ -111,6 +112,9 @@ const updateFarmedFishContract = async ({
 }): Promise<FarmedFishType> => client.put(`/fishSeedCompany/contract/${id}`, body);
 const createBatch = async (body: CreateBatchType): Promise<any> => client.post('/fishseedcompany/createBatch', body);
 const getBatchs = async (params?: BatchParamsType): Promise<BatchPaginateType> => client.get('/batchs', { params });
+const summaryCommon = async (): Promise<any> => client.get(`/fishSeedCompany/summaryCommon`);
+const summaryMostOrder = async (params: SummaryParamsType): Promise<any> =>
+  client.get(`/fishSeedCompany/summaryMostOrder/${params.geographicOrigin}/${params.methodOfReproduction}`);
 
 const handleMapGeographicOrigin = (geographicOrigin: number) => {
   switch (geographicOrigin) {
@@ -172,4 +176,6 @@ export default {
   updateFishSeed,
   handleMapGeographicOrigin,
   handleMapMethodOfReproduction,
+  summaryCommon,
+  summaryMostOrder,
 };

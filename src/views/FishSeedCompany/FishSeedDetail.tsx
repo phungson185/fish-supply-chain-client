@@ -265,7 +265,7 @@ const FishSeedDetail = () => {
         </DialogContent>
 
         <DialogActions>
-          <LoadingButton variant='outlined' color='inherit' onClick={() => setOpenEnterQuantityPopup(false)}>
+          <LoadingButton variant='outlined' color='inherit' onClick={() => setOpenEnterQuantityPopup(false)} disabled>
             Cancel
           </LoadingButton>
           <LoadingButton variant='contained' onClick={handleDeployContract} loading={isLoading}>

@@ -105,6 +105,11 @@ export type UpdateFarmedFishType = {
   waterTemperature?: number;
 };
 
+export type SummaryParamsType = {
+  geographicOrigin: number;
+  methodOfReproduction: number;
+};
+
 export type CreateBatchType = {
   farmedFishId: string;
   type: number;
