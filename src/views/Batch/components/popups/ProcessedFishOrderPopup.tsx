@@ -2,6 +2,7 @@ import { LoadingButton } from '@mui/lab';
 import { DialogActions, DialogContent, DialogTitle, InputAdornment, TextField, Typography } from '@mui/material';
 import moment from 'moment';
 import { useSnackbar } from 'notistack';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
@@ -20,9 +21,10 @@ const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
   const { control, handleSubmit } = useForm({ mode: 'onChange' });
   const { address, id } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { mutate: createOder, isLoading } = useMutation(distributorService.createOder, {
+  const { mutate: createOder } = useMutation(distributorService.createOder, {
     onSuccess: () => {
       enqueueSnackbar('Create order successfully', {
         variant: 'success',
@@ -39,38 +41,45 @@ const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
 
   const handleOrder = () => {
     handleSubmit(async (values) => {
-      const resChain = await distributorService.placeProcessedFishPurchaseOrder({
-        fishProcessingContractAddress: item.processingContract,
-        orderer: address,
-        Receiver: item.fishProcessor.address,
-        quantityoffishpackageordered: values.quantityoffishpackageordered,
-      });
+      try {
+        setIsLoading(true);
+        const resChain = await distributorService.placeProcessedFishPurchaseOrder({
+          fishProcessingContractAddress: item.processingContract,
+          orderer: address,
+          Receiver: item.fishProcessor.address,
+          quantityoffishpackageordered: values.quantityoffishpackageordered,
+        });
 
-      updateContract({
-        id: item.id,
-        body: {
+        updateContract({
+          id: item.id,
+          body: {
+            transactionHash: resChain.transactionHash,
+            numberOfPackets: resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.NumberOfPackets,
+          },
+        });
+
+        await createOder({
+          orderer: id as string,
+          receiver: item.fishProcessor.id,
+          speciesName: item.processedSpeciesName,
+          processedFishPurchaseOrderId:
+            resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.ProcessedFishPurchaseOrderID,
+          quantityOfFishPackageOrdered:
+            resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.quantityoffishpackageordered,
+          fishProcessingId: item.id,
+          dateOfExpiry: item.dateOfExpiry,
+          dateOfProcessing: item.dateOfProcessing,
+          filletsInPacket: item.filletsInPacket,
+          image: item.image,
+          IPFSHash: item.IPFSHash,
+          description: item.description,
           transactionHash: resChain.transactionHash,
-          numberOfPackets: resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.NumberOfPackets,
-        },
-      });
-
-      await createOder({
-        orderer: id as string,
-        receiver: item.fishProcessor.id,
-        speciesName: item.processedSpeciesName,
-        processedFishPurchaseOrderId:
-          resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.ProcessedFishPurchaseOrderID,
-        quantityOfFishPackageOrdered:
-          resChain.events.ProcessedFishPuchaseOrderPlaced.returnValues.quantityoffishpackageordered,
-        fishProcessingId: item.id,
-        dateOfExpiry: item.dateOfExpiry,
-        dateOfProcessing: item.dateOfProcessing,
-        filletsInPacket: item.filletsInPacket,
-        image: item.image,
-        IPFSHash: item.IPFSHash,
-        description: item.description,
-        transactionHash: resChain.transactionHash,
-      });
+        });
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
+      }
     })();
   };
   return (
@@ -111,7 +120,7 @@ const ProcessedFishOrderPopup = ({ item, onClose }: PopupProps) => {
       </DialogContent>
 
       <DialogActions>
-        <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
+        <LoadingButton variant='outlined' color='inherit' onClick={onClose} disabled={isLoading}>
           Cancel
         </LoadingButton>
         <LoadingButton variant='contained' onClick={handleOrder} loading={isLoading}>

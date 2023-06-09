@@ -4,7 +4,7 @@ import { DistributorInventory, DistributorProducts } from 'views/Distributor';
 import { DistributorRetailerOrders } from 'views/Distributor-Retailer-Orders';
 import { FishFarmerSummary, FishGrowthDetail, FishGrowths } from 'views/FishFarmer';
 import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
-import { Fishes, ProcessorInventory, ProcessorProducts } from 'views/FishProcessor';
+import { Fishes, ProcessorInventory, ProcessorProducts, ProcessorSummary } from 'views/FishProcessor';
 import { FishProcessorDistributorOrders } from 'views/FishProcessor - Distributor - Orders';
 import { ContractDetail, Contracts, FishSeedCompanySummary, FishSeedDetail, FishSeeds } from 'views/FishSeedCompany';
 import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
@@ -190,6 +190,11 @@ const fishProcessorRoute: PrivateRouteType = {
     path: '/distributorFishProcessorOrders',
     name: 'Distributor - FishProcessor - Orders',
     element: <FishProcessorDistributorOrders />,
+  },
+  summary: {
+    path: '/summary',
+    name: 'Summary',
+    element: <ProcessorSummary />,
   },
 };
 

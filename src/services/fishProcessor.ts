@@ -156,6 +156,7 @@ const updateProcessingContract = async ({
 
 const getProfileInventory = async ({ id }: { id?: string }): Promise<ProfileInventoryType> =>
   client.get(`/fishprocessor/get-profile-inventory/${id}`);
+const summaryCommon = async (): Promise<any> => client.get(`/fishprocessor/summaryCommon`);
 
 export default {
   placeFarmedFishPurchaseOrder,
@@ -171,4 +172,5 @@ export default {
   createProcessingContract,
   getProcessingContracts,
   getProfileInventory,
+  summaryCommon,
 };

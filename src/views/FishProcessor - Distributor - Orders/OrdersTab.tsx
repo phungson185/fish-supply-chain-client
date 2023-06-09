@@ -38,13 +38,25 @@ import { ConfirmPopup } from './popups';
 import { RoleType } from 'types/Auth';
 import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { FishProcessorDistributorOrderType } from 'types/Distributor';
+import { DesktopDatePicker } from '@mui/x-date-pickers';
 
 const FILTERS = [
-  { label: 'Number of fish seeds ordered', orderBy: 'numberOfFishSeedsOrdered' },
+  { label: 'Species name', orderBy: 'speciesName' },
+  { label: 'Quantity of fish package ordered', orderBy: 'quantityOfFishPackageOrdered' },
+  { label: 'Date of processing', orderBy: 'dateOfProcessing' },
+  { label: 'Date of expiry', orderBy: 'dateOfExpiry' },
+  { label: 'Number of packets', orderBy: 'numberOfPackets' },
+  { label: 'Fillets in packet', orderBy: 'filletsInPacket' },
   {
     label: 'Updated time',
     orderBy: 'updatedAt',
   },
+];
+
+const DATE_FILTERS = [
+  { label: 'All', value: null },
+  { label: 'Date of processing', value: 'dateOfProcessing' },
+  { label: 'Date of expiry', value: 'dateOfExpiry' },
 ];
 
 const SORT_TYPES = [
@@ -74,6 +86,10 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
     },
   );
   const { items = [], total, currentPage, pages: totalPage } = data ?? {};
+  const [fromDate, setFromDate] = useState(query.fromDate || null);
+  const [toDate, setToDate] = useState(query.toDate || null);
+  const [valueFromDate, setValueFromDate] = useState(null);
+  const [valueToDate, setValueToDate] = useState(null);
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
   const [desc, setDesc] = useState(query.desc || SORT_TYPES[0].desc);
   const [search, setSearch] = useState(query.search || '');
@@ -82,6 +98,8 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
   const [selectedOrder, setSelectedOrder] = useState<FishProcessorDistributorOrderType>(
     {} as FishProcessorDistributorOrderType,
   );
+  const [anchorDateFilter, openDateFilter, onOpenDateFilter, onCloseDateFilter] = useAnchor();
+  const [dateFilter, setDateFilter] = useState(query.dateFilter || null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceChangeParams = useCallback(
@@ -91,22 +109,27 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
     [],
   );
   useEffect(() => {
-    onSearchChange({ orderBy, desc, ...params });
-  }, [onSearchChange, orderBy, desc, params]);
+    onSearchChange({ orderBy, desc, dateFilter, fromDate, toDate, ...params });
+  }, [onSearchChange, orderBy, desc, dateFilter, fromDate, toDate, params]);
 
-  // useEffect(() => {
-  //   onTabChange({} as SyntheticEvent<Element, Event>, 'account');
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  const handleChangeFromDate = (value: any) => {
+    setValueFromDate(value);
+    setFromDate(value.ts);
+  };
+
+  const handleChangeToDate = (value: any) => {
+    setValueToDate(value);
+    setToDate(value.ts);
+  };
 
   return (
     <>
       <div className='flex items-center justify-between mb-5'>
         <TextField
-          placeholder='Search...'
+          label='Search'
           InputProps={{ className: 'bg-white text-black' }}
           value={search}
-          sx={{ width: '60%' }}
+          sx={{ width: '30%' }}
           onChange={(event) => {
             const { value } = event.target;
             setSearch(value);
@@ -116,8 +139,57 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
 
         <div className='flex justify-between gap-2'>
           <Button
-            variant='text'
-            color='inherit'
+            variant='outlined'
+            color='primary'
+            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
+            startIcon={<CategoryOutlined />}
+            onClick={onOpenDateFilter}
+          >
+            {DATE_FILTERS.find((item) => item.value === dateFilter)?.label ?? DATE_FILTERS[0].label}
+          </Button>
+          <Menu
+            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            anchorEl={anchorDateFilter}
+            open={openDateFilter}
+            onClose={onCloseDateFilter}
+            onClick={onCloseDateFilter}
+          >
+            {DATE_FILTERS.map((item, index) => (
+              <MenuItem
+                key={index}
+                classes={{ selected: 'bg-info-light' }}
+                selected={item.value === dateFilter}
+                onClick={() => {
+                  setDateFilter(item.value);
+                }}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
+          </Menu>
+
+          <DesktopDatePicker
+            label='From date'
+            value={valueFromDate}
+            onChange={handleChangeFromDate}
+            renderInput={(params) => <TextField {...params} />}
+            inputFormat='dd/MM/yyyy'
+          />
+
+          <DesktopDatePicker
+            label='To date'
+            value={valueToDate}
+            onChange={handleChangeToDate}
+            renderInput={(params) => <TextField {...params} />}
+            inputFormat='dd/MM/yyyy'
+          />
+        </div>
+
+        <div className='flex justify-between gap-2'>
+          <Button
+            variant='outlined'
+            color='primary'
             classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
             startIcon={<CategoryOutlined />}
             onClick={onOpenFilter}
@@ -147,8 +219,8 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
           </Menu>
 
           <Button
-            variant='text'
-            color='inherit'
+            variant='outlined'
+            color='primary'
             classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
             startIcon={<CategoryOutlined />}
             onClick={onOpenSort}
