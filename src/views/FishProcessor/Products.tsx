@@ -32,7 +32,7 @@ import {
   Inventory2Outlined,
   LocalPhoneOutlined,
 } from '@mui/icons-material';
-import { formatTime, pinataUrl, shorten } from 'utils/common';
+import { contractUrl, formatTime, pinataUrl, shorten } from 'utils/common';
 import moment from 'moment';
 import { ProcessedFishOrderPopup } from 'views/Batch/components';
 import { FishProcessingType } from 'types/FishProcessing';
@@ -76,17 +76,18 @@ const Products = () => {
   });
 
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
-  const [dateFilter, setDateFilter] = useState(query.dateFilter || null);
-  const [fromDate, setFromDate] = useState(query.fromDate || null);
-  const [toDate, setToDate] = useState(query.toDate || null);
-  const [valueFromDate, setValueFromDate] = useState(null);
-  const [valueToDate, setValueToDate] = useState(null);
   const [desc, setDesc] = useState(query.desc || SORT_TYPES[0].desc);
   const [search, setSearch] = useState(query.search || '');
   const [params, setParams] = useState({ search, page });
   const [openOrderPopup, setOpenOrderPopup] = useState(false);
   const [selectedFish, setSelectedFish] = useState<FishProcessingType>({} as FishProcessingType);
   const [openProductDetailPop, setOpenProductDetailPop] = useState(false);
+
+  const [fromDate, setFromDate] = useState(query.fromDate || null);
+  const [toDate, setToDate] = useState(query.toDate || null);
+  const [valueFromDate, setValueFromDate] = useState(null);
+  const [valueToDate, setValueToDate] = useState(null);
+  const [dateFilter, setDateFilter] = useState(query.dateFilter || null);
   const [anchorDateFilter, openDateFilter, onOpenDateFilter, onCloseDateFilter] = useAnchor();
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
@@ -390,7 +391,12 @@ const Products = () => {
                     >
                       Document
                     </Button>
-                    <Button size='small' variant='contained' color='secondary'>
+                    <Button
+                      size='small'
+                      variant='contained'
+                      color='secondary'
+                      onClick={() => window.open(contractUrl(item.processingContract), '_blank')}
+                    >
                       Contract
                     </Button>
                     <div className='flex-1'></div>
@@ -420,6 +426,10 @@ const Products = () => {
             />
           </div>
         </Container>
+      )}
+
+      {items && items.length === 0 && (
+        <Avatar className='h-96 w-96 mx-auto my-auto' src={require('assets/images/no-product-found.png').default} />
       )}
 
       <Dialog open={openOrderPopup} fullWidth maxWidth='xs'>

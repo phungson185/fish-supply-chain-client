@@ -32,7 +32,7 @@ import {
   Inventory2Outlined,
   LocalPhoneOutlined,
 } from '@mui/icons-material';
-import { formatTime, pinataUrl, shorten } from 'utils/common';
+import { contractUrl, formatTime, pinataUrl, shorten } from 'utils/common';
 import moment from 'moment';
 import { ProcessedFishOrderPopup } from 'views/Batch/components';
 import { FishProcessingType } from 'types/FishProcessing';
@@ -321,7 +321,7 @@ const Inventory = () => {
                       variant='contained'
                       color='secondary'
                       disabled={item.disable || item.numberOfPackets === 0}
-                      onClick={() => window.open(pinataUrl(item.processingContract), '_blank')}
+                      onClick={() => window.open(contractUrl(item.processingContract), '_blank')}
                     >
                       Contract
                     </Button>
@@ -353,6 +353,10 @@ const Inventory = () => {
             />
           </div>
         </Container>
+      )}
+
+      {items && items.length === 0 && (
+        <Avatar className='h-96 w-96 mx-auto my-auto' src={require('assets/images/no-product-found.png').default} />
       )}
 
       <Dialog open={openOrderPopup} fullWidth maxWidth='xs'>

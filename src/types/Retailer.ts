@@ -93,6 +93,13 @@ export type DistributorRetailerOrderParamsType = PaginateParamsType & {
   isHavePackets?: boolean;
 };
 
+export type UpdateNumberOfProductType = {
+  sender: string;
+  fishProcessingContractAddress: string;
+  RetailerPurchaseOrderID: string;
+  NumberOfFishPackage: number;
+};
+
 export type DistributorRetailerOrderPaginateType = PaginateType & {
   items: DistributorRetailerOrderType[];
 };

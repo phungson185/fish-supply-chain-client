@@ -65,6 +65,7 @@ const updateOrder = async ({ orderId, ...body }: UpdateOrderType) =>
 
 const getProfileInventory = async ({ id }: { id?: string }): Promise<ProfileInventoryType> =>
   client.get(`/distributor/get-profile-inventory/${id}`);
+const summaryCommon = async (): Promise<any> => client.get(`/distributor/summaryCommon`);
 
 export default {
   placeProcessedFishPurchaseOrder,
@@ -76,4 +77,5 @@ export default {
   getOrders,
   confirmOrder,
   updateOrder,
+  summaryCommon,
 };

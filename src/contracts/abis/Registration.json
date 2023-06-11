@@ -242,6 +242,11 @@
             "type": "address"
           },
           {
+            "internalType": "string",
+            "name": "role",
+            "type": "string"
+          },
+          {
             "internalType": "bool",
             "name": "active",
             "type": "bool"
@@ -315,10 +320,10 @@
   },
   "sources": {
     "contracts/fish-supply-chain.sol": {
-      "keccak256": "0xb9f76997939e2aa893eeba951d0870c9d152f34f3881378685074d517118e633",
+      "keccak256": "0xf5e7c5b8d966c15b7c250f6741a3c2f1692782dfba41c75b6781dd8052d6d8e1",
       "urls": [
-        "bzz-raw://102767c310275a145195cffd95180d583b87c532ebb9c6b81b2e1ed2cd32e971",
-        "dweb:/ipfs/QmQ2jxYe97i6L3foCCqZgzJra85zSCfwF3nshTfb4Nne3y"
+        "bzz-raw://cd4c14fb43252493e419363649e7b72b348f5cb485e3f4d439f178d1441ef205",
+        "dweb:/ipfs/QmbjZhSLxncqRbzrjEgNsdzuSzEmrbmVZMCmkAboUUyuBp"
       ]
     }
   },

@@ -1,8 +1,6 @@
 import {
   AccountBalanceWalletOutlined,
   ApartmentOutlined,
-  BalanceOutlined,
-  DeviceThermostat,
   HomeOutlined,
   Inventory2Outlined,
   LocalPhoneOutlined,
@@ -11,7 +9,6 @@ import {
 import { LoadingButton } from '@mui/lab';
 import {
   Avatar,
-  Chip,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -24,24 +21,13 @@ import {
 import { ProcessStatus, statusStep } from 'components/ConfirmStatus';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
-import {
-  distributorService,
-  fishFarmerService,
-  fishProcessorService,
-  fishSeedCompanyService,
-  logService,
-  retailerService,
-} from 'services';
-import fishProcessor from 'services/fishProcessor';
+import { distributorService, logService, retailerService } from 'services';
 import retailer from 'services/retailer';
 import { RoleType } from 'types/Auth';
 import { PopupController } from 'types/Common';
-import { FishProcessorDistributorOrderType } from 'types/Distributor';
-import { FishSeedCompanyFishFarmerOrderPaginateType, FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
-import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { LogParamsType, TransactionType } from 'types/Log';
 import { DistributorRetailerOrderType } from 'types/Retailer';
 import { formatTime, formatTimeDate, shorten } from 'utils/common';
@@ -58,14 +44,26 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
   const { address, role } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
   const [activeStep, setActiveStep] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState({
+    accept: {
+      loading: false,
+      disabled: false,
+    },
+    reject: {
+      loading: false,
+      disabled: false,
+    },
+  });
+  const [isRecieveLoading, setIsRecieveLoading] = useState(false);
 
-  const { mutate: confirmOrder, isLoading } = useMutation(retailer.confirmOrder, {
+  const { mutate: confirmOrder } = useMutation(retailer.confirmOrder, {
     onSuccess: () => {
       enqueueSnackbar('Confirm order successfully', {
         variant: 'success',
       });
       refetch();
       fetchLogs();
+      onClose();
     },
     onError: (error: any) => {
       enqueueSnackbar(error, { variant: 'error' });
@@ -95,46 +93,87 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
   }, [getLogsSuccess, logs]);
 
   const handleConfirm = async (accepted: boolean) => {
-    const resChain = await retailerService.confirmRetailerPurchaseOrder({
-      fishProcessingContractAddress: item.distributorId.fishProcessingId.processingContract,
-      accepted,
-      sender: address,
-      RetailerPurchaseOrderID: item.retailerPurchaseOrderID,
-      ProcessedFishPurchaseOrderID: item.processedFishPurchaseOrderID,
-    });
+    try {
+      setIsLoading({
+        accept: {
+          loading: accepted,
+          disabled: !accepted,
+        },
+        reject: {
+          loading: !accepted,
+          disabled: accepted,
+        },
+      });
+      const resChain = await retailerService.confirmRetailerPurchaseOrder({
+        fishProcessingContractAddress: item.distributorId.fishProcessingId.processingContract,
+        accepted,
+        sender: address,
+        RetailerPurchaseOrderID: item.retailerPurchaseOrderID,
+        ProcessedFishPurchaseOrderID: item.processedFishPurchaseOrderID,
+      });
 
-    if (!accepted) {
-      updateDistributorProducts({
-        orderId: item.distributorId.id,
-        numberOfPackets: resChain.events.RetailerPurchaseOrderConfirmed.returnValues.NumberOfFishPackages,
+      if (!accepted) {
+        updateDistributorProducts({
+          orderId: item.distributorId.id,
+          numberOfPackets: resChain.events.RetailerPurchaseOrderConfirmed.returnValues.NumberOfFishPackages,
+        });
+      }
+
+      confirmOrder({
+        orderId: item.id,
+        status: Number(resChain.events.RetailerPurchaseOrderConfirmed.returnValues.newstatuS),
+        transactionHash: resChain.transactionHash,
+      });
+
+      setOrderStatus(Number(resChain.events.RetailerPurchaseOrderConfirmed.returnValues.newstatuS));
+      setActiveStep(activeStep + 1);
+      setIsLoading({
+        accept: {
+          loading: false,
+          disabled: false,
+        },
+        reject: {
+          loading: false,
+          disabled: false,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      setIsLoading({
+        accept: {
+          loading: false,
+          disabled: false,
+        },
+        reject: {
+          loading: false,
+          disabled: false,
+        },
       });
     }
-
-    confirmOrder({
-      orderId: item.id,
-      status: Number(resChain.events.RetailerPurchaseOrderConfirmed.returnValues.newstatuS),
-      transactionHash: resChain.transactionHash,
-    });
-
-    setOrderStatus(Number(resChain.events.RetailerPurchaseOrderConfirmed.returnValues.newstatuS));
-    setActiveStep(activeStep + 1);
   };
 
   const handleRecieve = async () => {
-    const resChain = await retailerService.receiveRetailerOrder({
-      sender: address,
-      fishProcessingContractAddress: item.distributorId.fishProcessingId.processingContract,
-      RetailerPurchaseOrderID: item.retailerPurchaseOrderID,
-    });
+    try {
+      setIsRecieveLoading(true);
+      const resChain = await retailerService.receiveRetailerOrder({
+        sender: address,
+        fishProcessingContractAddress: item.distributorId.fishProcessingId.processingContract,
+        RetailerPurchaseOrderID: item.retailerPurchaseOrderID,
+      });
 
-    confirmOrder({
-      orderId: item.id,
-      status: ProcessStatus.Received,
-      transactionHash: resChain.transactionHash,
-    });
+      confirmOrder({
+        orderId: item.id,
+        status: ProcessStatus.Received,
+        transactionHash: resChain.transactionHash,
+      });
 
-    setOrderStatus(ProcessStatus.Received);
-    setActiveStep(activeStep + 1);
+      setOrderStatus(ProcessStatus.Received);
+      setActiveStep(activeStep + 1);
+      setIsRecieveLoading(false);
+    } catch (error) {
+      console.error(error);
+      setIsRecieveLoading(false);
+    }
   };
   return (
     <>
@@ -245,16 +284,24 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
             <LoadingButton
               variant='contained'
               color='success'
-              disabled={['Accepted', 'Rejected', 'Received'].includes(statusStep[item.status].label)}
+              disabled={
+                ['Accepted', 'Rejected', 'Received'].includes(statusStep[item.status].label) ||
+                isLoading.accept.disabled
+              }
               onClick={() => handleConfirm(true)}
+              loading={isLoading.accept.loading}
             >
               Accept
             </LoadingButton>
             <LoadingButton
               variant='contained'
               color='error'
-              disabled={['Accepted', 'Rejected', 'Received'].includes(statusStep[item.status].label)}
+              disabled={
+                ['Accepted', 'Rejected', 'Received'].includes(statusStep[item.status].label) ||
+                isLoading.reject.disabled
+              }
               onClick={() => handleConfirm(false)}
+              loading={isLoading.reject.loading}
             >
               Reject
             </LoadingButton>
@@ -267,12 +314,18 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
             color='warning'
             disabled={['Pending', 'Rejected', 'Received'].includes(statusStep[item.status].label)}
             onClick={handleRecieve}
+            loading={isRecieveLoading}
           >
             Received
           </LoadingButton>
         )}
 
-        <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
+        <LoadingButton
+          variant='outlined'
+          color='inherit'
+          onClick={onClose}
+          disabled={isLoading.accept.loading || isLoading.reject.loading || isRecieveLoading}
+        >
           Cancel
         </LoadingButton>
       </DialogActions>

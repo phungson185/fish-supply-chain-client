@@ -1,6 +1,7 @@
 import { LoadingButton } from '@mui/lab';
 import {
   Button,
+  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -20,12 +21,12 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { systemSelector } from 'reducers/system';
-import { fileService, fishProcessorService } from 'services';
+import { fileService, fishProcessorService, retailerService } from 'services';
 import { PopupController } from 'types/Common';
 import { FishFarmerFishProcessorOrderPaginateType, FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { useEffect, useState } from 'react';
 import { UploadLabel } from 'views/Registration/components';
-import { formatTime, formatTimeDate, getBase64, pinataUrl, shorten } from 'utils/common';
+import { contractUrl, formatTime, formatTimeDate, getBase64, pinataUrl, shorten } from 'utils/common';
 import TextEditor from 'components/TextEditor';
 import { FishProcessingType } from 'types/FishProcessing';
 import { FishProcessorDistributorOrderType } from 'types/Distributor';
@@ -44,6 +45,38 @@ type PopupProps = PopupController & {
 };
 
 const ProductDetail = ({ item, onClose }: PopupProps) => {
+  const { address } = useSelector(profileSelector);
+  const [openUpdateQuantityPopup, setOpenUpdateQuantityPopup] = useState(false);
+  const [quantity, setQuantity] = useState(0);
+  const { enqueueSnackbar } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { mutate: updateQuantityProduct } = useMutation(retailerService.updateQuantityProduct, {
+    onSuccess: () => {
+      enqueueSnackbar('Update successfully', { variant: 'success' });
+      setOpenUpdateQuantityPopup(false);
+    },
+  });
+
+  const handleUpdateQuantity = async () => {
+    try {
+      setIsLoading(true);
+
+      await retailerService.updateNumberOfProduct({
+        sender: address,
+        fishProcessingContractAddress: item.distributorId.fishProcessingId.processingContract,
+        NumberOfFishPackage: quantity,
+        RetailerPurchaseOrderID: item.retailerPurchaseOrderID,
+      });
+
+      updateQuantityProduct({ orderId: item.id, quantity });
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <DialogTitle>{item.speciesName}</DialogTitle>
@@ -68,16 +101,18 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
             variant='contained'
             color='secondary'
             disabled={item.disable || item.numberOfPackets === 0}
+            onClick={() => window.open(contractUrl(item.distributorId.fishProcessingId.processingContract), '_blank')}
           >
             Contract
           </Button>
         </div>
         <div className='flex flex-row gap-3 w-full mb-2'>
-          <div className='w-full max-w-[50%]'>
+          <div className='w-full max-w-[50%] flex items-start flex-col gap-10'>
             <UploadLabel
               {...{ htmlFor: 'cover', variant: 'rounded', image: item.image }}
               {...{ width: '100%', height: '100%', loading: false, error: false }}
             />
+            <div>Lot Code: {item.id}</div>
           </div>
           <div className='w-full max-w-[50%]'>
             <div className='pb-5 border-b-2 border-solid border-gray-200 w-fit mb-5'>
@@ -138,7 +173,46 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
         <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
           Cancel
         </LoadingButton>
+
+        <LoadingButton variant='contained' color='primary' onClick={() => setOpenUpdateQuantityPopup(true)}>
+          Update quantity
+        </LoadingButton>
       </DialogActions>
+
+      <Dialog open={openUpdateQuantityPopup} onClose={() => setOpenUpdateQuantityPopup(false)}>
+        <DialogTitle>Update quantity</DialogTitle>
+        <DialogContent>
+          <div className='w-full'>
+            <Typography variant='subtitle1'>Number of packets</Typography>
+            <TextField
+              fullWidth
+              type='number'
+              variant='outlined'
+              value={item.numberOfPackets}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (Number(value) >= 0) {
+                  setQuantity(Number(value));
+                }
+              }}
+            />
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <LoadingButton
+            variant='outlined'
+            color='inherit'
+            onClick={() => setOpenUpdateQuantityPopup(false)}
+            disabled={isLoading}
+          >
+            Cancel
+          </LoadingButton>
+
+          <LoadingButton variant='contained' color='primary' loading={isLoading} onClick={handleUpdateQuantity}>
+            Update
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

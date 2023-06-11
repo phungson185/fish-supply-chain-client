@@ -6,4 +6,4 @@ import { web3 } from 'services';
 // bsc testnet
 
 export const registrationContract = () =>
-  new web3.eth.Contract(Registration.output.abi as AbiItem[], '0x51BB0F3Ec73057D793E7FD6ffc585D0Ac08A5777');
+  new web3.eth.Contract(Registration.output.abi as AbiItem[], '0xA31D300fC786B9af33b38C27679d32b7cEDB061A');

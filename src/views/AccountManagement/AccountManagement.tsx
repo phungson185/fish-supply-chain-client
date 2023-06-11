@@ -85,9 +85,9 @@ const AccountManagement = () => {
     },
   });
 
-  const handleUpdateUser = async (id: string, userAddress: string, active: boolean) => {
+  const handleUpdateUser = async (id: string, userAddress: string, role: string, active: boolean) => {
     try {
-      await userService.updateUserStatus(address, userAddress, !active);
+      await userService.updateUserStatus(address, userAddress, role, !active);
       updateUser({ userId: id, active: !active });
     } catch (error) {
       console.error(error);
@@ -212,7 +212,7 @@ const AccountManagement = () => {
                       color={item.active ? 'primary' : 'error'}
                       checked={item.active}
                       onClick={() => {
-                        handleUpdateUser(item.id, item.address, item.active);
+                        handleUpdateUser(item.id, item.address, item.role, item.active);
                       }}
                     />
                   </TableCell>

@@ -1,6 +1,6 @@
 import { AccountManagement } from 'views/AccountManagement';
 import { BatchDetail, Batches } from 'views/Batch';
-import { DistributorInventory, DistributorProducts } from 'views/Distributor';
+import { DistributorInventory, DistributorProducts, DistributorSummary } from 'views/Distributor';
 import { DistributorRetailerOrders } from 'views/Distributor-Retailer-Orders';
 import { FishFarmerSummary, FishGrowthDetail, FishGrowths } from 'views/FishFarmer';
 import { FishFarmerFishProcessorOrders } from 'views/FishFarmer-FishProcessor-Orders';
@@ -10,7 +10,7 @@ import { ContractDetail, Contracts, FishSeedCompanySummary, FishSeedDetail, Fish
 import { FishSeedCompanyFishFarmerOrders } from 'views/FishSeedCompany-FishFamer-Orders';
 import { ProfileUpdate } from 'views/Profile';
 import { RegistrationView } from 'views/Registration';
-import { RetailerInventory, RetailerProducts } from 'views/Retailer';
+import { RetailerInventory, RetailerProducts, RetailerSummary } from 'views/Retailer';
 
 type RouteType = {
   path: string;
@@ -232,6 +232,11 @@ const distributorRoute: PrivateRouteType = {
     name: 'Retailer - Distribution - Orders',
     element: <DistributorRetailerOrders />,
   },
+  summary: {
+    path: '/summary',
+    name: 'Summary',
+    element: <DistributorSummary />,
+  },
 };
 
 const retailerRoute: PrivateRouteType = {
@@ -244,7 +249,7 @@ const retailerRoute: PrivateRouteType = {
   distributorProducts: {
     path: '/products/:id',
     name: 'Inventory',
-    url: ({ id }: { id: string }) => `/products/${id}`,
+    url: ({ owner }: { owner: any }) => `/products/${owner.id}`,
     element: <DistributorProducts />,
     disabled: true,
   },
@@ -262,6 +267,11 @@ const retailerRoute: PrivateRouteType = {
     path: '/retailerDistributionOrders',
     name: 'Retailer - Distribution - Orders',
     element: <DistributorRetailerOrders />,
+  },
+  summary: {
+    path: '/summary',
+    name: 'Summary',
+    element: <RetailerSummary />,
   },
 };
 

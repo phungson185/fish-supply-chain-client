@@ -2,6 +2,7 @@ import { LoadingButton } from '@mui/lab';
 import { DialogActions, DialogContent, DialogTitle, InputAdornment, TextField, Typography } from '@mui/material';
 import moment from 'moment';
 import { useSnackbar } from 'notistack';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
@@ -25,8 +26,9 @@ const FishOfDistributorOrderPopup = ({ item, refetch, onClose }: PopupProps) => 
   const { address, id } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { mutate: createOder, isLoading } = useMutation(retailerService.createOder, {
+  const { mutate: createOder } = useMutation(retailerService.createOder, {
     onSuccess: () => {
       enqueueSnackbar('Create order successfully', {
         variant: 'success',
@@ -44,38 +46,45 @@ const FishOfDistributorOrderPopup = ({ item, refetch, onClose }: PopupProps) => 
 
   const handleOrder = () => {
     handleSubmit(async (values) => {
-      const resChain = await retailerService.placeRetailerPurchaseOrder({
-        buyer: address,
-        seller: item.owner.address,
-        fishProcessingContractAddress: item.fishProcessingId.processingContract,
-        NumberOfFishPackagesOrdered: values.quantityoffishpackageordered,
-        ProcessedFishPurchaseOrderID: item.processedFishPurchaseOrderId,
-      });
+      try {
+        setIsLoading(true);
+        const resChain = await retailerService.placeRetailerPurchaseOrder({
+          buyer: address,
+          seller: item.owner.address,
+          fishProcessingContractAddress: item.fishProcessingId.processingContract,
+          NumberOfFishPackagesOrdered: values.quantityoffishpackageordered,
+          ProcessedFishPurchaseOrderID: item.processedFishPurchaseOrderId,
+        });
 
-      let dataResChain = resChain.events.RetailerPuchaseOrderPlaced.returnValues;
+        let dataResChain = resChain.events.RetailerPuchaseOrderPlaced.returnValues;
 
-      updateDistributorProducts({
-        orderId: item.id,
-        numberOfPackets: dataResChain.NumberOfFishPackages,
-      });
+        updateDistributorProducts({
+          orderId: item.id,
+          numberOfPackets: dataResChain.NumberOfFishPackages,
+        });
 
-      await createOder({
-        buyer: id as string,
-        seller: item.owner.id,
-        retailerPurchaseOrderID: dataResChain.RetailerPurchaseOrderID,
-        processedFishPurchaseOrderID: dataResChain.ProcessedFishPurchaseOrderID,
-        numberOfFishPackagesOrdered: dataResChain.NumberOfFishPackagesOrdered,
-        dateOfExpiry: item.dateOfExpiry,
-        dateOfProcessing: item.dateOfProcessing,
-        description: item.description,
-        distributorId: item.id,
-        filletsInPacket: item.filletsInPacket,
-        image: item.image,
-        numberOfPackets: item.numberOfPackets,
-        IPFSHash: item.IPFSHash,
-        speciesName: item.speciesName,
-        transactionHash: resChain.transactionHash,
-      });
+        await createOder({
+          buyer: id as string,
+          seller: item.owner.id,
+          retailerPurchaseOrderID: dataResChain.RetailerPurchaseOrderID,
+          processedFishPurchaseOrderID: dataResChain.ProcessedFishPurchaseOrderID,
+          numberOfFishPackagesOrdered: dataResChain.NumberOfFishPackagesOrdered,
+          dateOfExpiry: item.dateOfExpiry,
+          dateOfProcessing: item.dateOfProcessing,
+          description: item.description,
+          distributorId: item.id,
+          filletsInPacket: item.filletsInPacket,
+          image: item.image,
+          numberOfPackets: item.numberOfPackets,
+          IPFSHash: item.IPFSHash,
+          speciesName: item.speciesName,
+          transactionHash: resChain.transactionHash,
+        });
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
+      }
     })();
   };
   return (
@@ -116,7 +125,7 @@ const FishOfDistributorOrderPopup = ({ item, refetch, onClose }: PopupProps) => 
       </DialogContent>
 
       <DialogActions>
-        <LoadingButton variant='outlined' color='inherit' onClick={onClose}>
+        <LoadingButton variant='outlined' color='inherit' onClick={onClose} disabled={isLoading}>
           Cancel
         </LoadingButton>
         <LoadingButton variant='contained' onClick={handleOrder} loading={isLoading}>

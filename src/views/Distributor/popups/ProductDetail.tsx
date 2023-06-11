@@ -25,7 +25,7 @@ import { PopupController } from 'types/Common';
 import { FishFarmerFishProcessorOrderPaginateType, FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { useEffect, useState } from 'react';
 import { UploadLabel } from 'views/Registration/components';
-import { formatTime, formatTimeDate, getBase64, pinataUrl, shorten } from 'utils/common';
+import { contractUrl, formatTime, formatTimeDate, getBase64, pinataUrl, shorten } from 'utils/common';
 import TextEditor from 'components/TextEditor';
 import { FishProcessingType } from 'types/FishProcessing';
 import { FishProcessorDistributorOrderType } from 'types/Distributor';
@@ -67,16 +67,18 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
             variant='contained'
             color='secondary'
             disabled={item.disable || item.numberOfPackets === 0}
+            onClick={() => window.open(contractUrl(item.fishProcessingId.processingContract), '_blank')}
           >
             Contract
           </Button>
         </div>
         <div className='flex flex-row gap-3 w-full mb-2'>
-          <div className='w-full max-w-[50%]'>
+          <div className='w-full max-w-[50%] flex items-start flex-col gap-10'>
             <UploadLabel
               {...{ htmlFor: 'cover', variant: 'rounded', image: item.image }}
               {...{ width: '100%', height: '100%', loading: false, error: false }}
             />
+            <div>Lot Code: {item.id}</div>
           </div>
           <div className='w-full max-w-[50%]'>
             <div className='pb-5 border-b-2 border-solid border-gray-200 w-fit mb-5'>

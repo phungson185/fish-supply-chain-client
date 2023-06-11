@@ -1,8 +1,6 @@
 import {
   AccountBalanceWalletOutlined,
   ApartmentOutlined,
-  BalanceOutlined,
-  DeviceThermostat,
   HomeOutlined,
   Inventory2Outlined,
   LocalPhoneOutlined,
@@ -11,7 +9,6 @@ import {
 import { LoadingButton } from '@mui/lab';
 import {
   Avatar,
-  Chip,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -24,22 +21,14 @@ import {
 import { ProcessStatus, statusStep } from 'components/ConfirmStatus';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
-import {
-  distributorService,
-  fishFarmerService,
-  fishProcessorService,
-  fishSeedCompanyService,
-  logService,
-} from 'services';
+import { distributorService, logService } from 'services';
 import fishProcessor from 'services/fishProcessor';
 import { RoleType } from 'types/Auth';
 import { PopupController } from 'types/Common';
 import { FishProcessorDistributorOrderType } from 'types/Distributor';
-import { FishSeedCompanyFishFarmerOrderPaginateType, FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
-import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { LogParamsType, TransactionType } from 'types/Log';
 import { formatTime, formatTimeDate, shorten } from 'utils/common';
 
@@ -74,6 +63,7 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
       });
       refetch();
       fetchLogs();
+      onClose();
     },
     onError: (error: any) => {
       enqueueSnackbar(error, { variant: 'error' });

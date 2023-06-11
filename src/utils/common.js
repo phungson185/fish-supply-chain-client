@@ -52,4 +52,8 @@ export const pinataUrl = (hash) => {
   return `https://gateway.pinata.cloud/ipfs/${hash}`;
 };
 
+export const contractUrl = (address) => {
+  return `https://testnet.bscscan.com/address/${address}`;
+};
+
 export { default as merge } from './merge';

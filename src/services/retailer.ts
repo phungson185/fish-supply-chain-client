@@ -7,6 +7,7 @@ import {
   PlaceRetailerPurchaseOrderType,
   ProfileInventoryType,
   ReceiveRetailerOrderType,
+  UpdateNumberOfProductType,
   UpdateOrderType,
 } from 'types/Retailer';
 import Web3 from 'web3';
@@ -52,6 +53,18 @@ const receiveRetailerOrder = async (body: ReceiveRetailerOrderType) => {
   return result;
 };
 
+const updateNumberOfProduct = async (body: UpdateNumberOfProductType) => {
+  const { sender, RetailerPurchaseOrderID, NumberOfFishPackage, fishProcessingContractAddress } = body;
+  const processingContract = new web3.eth.Contract(FishProcessing.abi as AbiItem[], fishProcessingContractAddress);
+  const result = await processingContract.methods
+    .UpdateQuantityOfProduct(RetailerPurchaseOrderID, NumberOfFishPackage)
+    .send({
+      from: sender,
+      gas: 3500000,
+    });
+  return result;
+};
+
 // api methods
 const createOder = async (body: CreateOrderType) => client.post('/retailer/order', body);
 
@@ -66,15 +79,22 @@ const updateOrder = async ({ orderId, ...body }: UpdateOrderType) =>
 
 const getProfileInventory = async ({ id }: { id?: string }): Promise<ProfileInventoryType> =>
   client.get(`/retailer/get-profile-inventory/${id}`);
+const summaryCommon = async (): Promise<any> => client.get(`/retailer/summaryCommon`);
+
+const updateQuantityProduct = async (body: { orderId: string; quantity: number }) =>
+  client.put(`/retailer/update-number-of-product`, body);
 
 export default {
   placeRetailerPurchaseOrder,
   confirmRetailerPurchaseOrder,
   receiveRetailerOrder,
+  updateNumberOfProduct,
 
   createOder,
   getOrders,
   confirmOrder,
   updateOrder,
   getProfileInventory,
+  summaryCommon,
+  updateQuantityProduct,
 };

@@ -1,4 +1,4 @@
-import { useSearch } from 'hooks';
+import { useAnchor, useSearch } from 'hooks';
 import { parse } from 'qs';
 import { useQuery } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
@@ -15,19 +15,24 @@ import {
   Container,
   Dialog,
   Grid,
+  Menu,
+  MenuItem,
   Pagination,
+  TextField,
   Typography,
   debounce,
 } from '@mui/material';
 import {
   AccountBalanceWalletOutlined,
   ApartmentOutlined,
+  CategoryOutlined,
   EmailOutlined,
   HomeOutlined,
+  Image,
   Inventory2Outlined,
   LocalPhoneOutlined,
 } from '@mui/icons-material';
-import { formatTime, pinataUrl, shorten } from 'utils/common';
+import { contractUrl, formatTime, pinataUrl, shorten } from 'utils/common';
 import moment from 'moment';
 import { FishOfDistributorOrderPopup, ProcessedFishOrderPopup } from 'views/Batch/components';
 import { FishProcessingType } from 'types/FishProcessing';
@@ -37,12 +42,21 @@ import { RoleType } from 'types/Auth';
 import { FishProcessorDistributorOrderType, ProfileInventoryType } from 'types/Distributor';
 import ProductDetail from './popups/ProductDetail';
 import { ProcessStatus } from 'components/ConfirmStatus';
+import noOrderFound from 'assets/images/no-order-found.png';
+import { DesktopDatePicker } from '@mui/x-date-pickers';
 
 const FILTERS = [
-  { label: 'Species name', orderBy: 'speciesName' },
-  { label: 'Geographic origin', orderBy: 'geographicOrigin' },
-  { label: 'Number of fish seeds available', orderBy: 'numberOfFishSeedsAvailable' },
-  { label: 'Aquaculture water type', orderBy: 'aquacultureWaterType' },
+  { label: 'Product name', orderBy: 'processedSpeciesName' },
+  { label: 'Date of processing', orderBy: 'dateOfProcessing' },
+  { label: 'Date of expiry', orderBy: 'dateOfExpiry' },
+  { label: 'Fillets in packet', orderBy: 'filletsInPacket' },
+  { label: 'Number of packets', orderBy: 'numberOfPackets' },
+];
+
+const DATE_FILTERS = [
+  { label: 'All', value: null },
+  { label: 'Date of processing', value: 'dateOfProcessing' },
+  { label: 'Date of expiry', value: 'dateOfExpiry' },
 ];
 
 const SORT_TYPES = [
@@ -75,8 +89,17 @@ const Products = () => {
     {} as FishProcessorDistributorOrderType,
   );
 
+  const [fromDate, setFromDate] = useState(query.fromDate || null);
+  const [toDate, setToDate] = useState(query.toDate || null);
+  const [valueFromDate, setValueFromDate] = useState(null);
+  const [valueToDate, setValueToDate] = useState(null);
+  const [dateFilter, setDateFilter] = useState(query.dateFilter || null);
+  const [anchorDateFilter, openDateFilter, onOpenDateFilter, onCloseDateFilter] = useAnchor();
+  const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
+  const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
+
   const { data: profile, isSuccess: isSuccessProfile } = useQuery('distributorService.getProfileInventory', () =>
-    distributorService.getProfileInventory({ id: param.distributor ?? id }),
+    distributorService.getProfileInventory({ id: param.id ?? id }),
   ) as {
     data: ProfileInventoryType;
     isSuccess: boolean;
@@ -101,13 +124,23 @@ const Products = () => {
     [],
   );
   useEffect(() => {
-    onSearchChange({ orderBy, desc, ...params });
-  }, [onSearchChange, orderBy, desc, params]);
+    onSearchChange({ orderBy, desc, dateFilter, fromDate, toDate, ...params });
+  }, [onSearchChange, orderBy, desc, dateFilter, fromDate, toDate, params]);
 
-  if (!isSuccessProfile || isFetchingInventory) return <></>;
+  const handleChangeFromDate = (value: any) => {
+    setValueFromDate(value);
+    setFromDate(value.ts);
+  };
+
+  const handleChangeToDate = (value: any) => {
+    setValueToDate(value);
+    setToDate(value.ts);
+  };
+
+  if (!isSuccessProfile) return <></>;
   return (
     <>
-      <Container className='bg-white p-5 rounded mb-10'>
+      <Container className='bg-white p-5 rounded-3xl mb-10'>
         <Grid container spacing={2} alignItems={'center'}>
           <Grid item xs={4} className='relative'>
             <>
@@ -160,7 +193,7 @@ const Products = () => {
                 </div>
                 <div className='flex items-center gap-2 mb-5'>
                   <Inventory2Outlined className='' />
-                  <div className=''>Contracts: </div>
+                  <div className=''>Products: </div>
                   <div className='text-primary-main'>{profile.distributor}</div>
                 </div>
               </div>
@@ -169,8 +202,136 @@ const Products = () => {
         </Grid>
       </Container>
 
+      <Container className='flex items-center justify-between bg-white p-5 rounded-t-3xl'>
+        <TextField
+          label='Search'
+          InputProps={{ className: 'bg-white text-black ' }}
+          value={search}
+          sx={{ width: '30%' }}
+          style={{ maxHeight: '48px' }}
+          onChange={(event) => {
+            const { value } = event.target;
+            setSearch(value);
+            debounceChangeParams({ search: value });
+          }}
+        />
+
+        <div className='flex justify-between gap-2'>
+          <Button
+            variant='outlined'
+            color='primary'
+            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
+            startIcon={<CategoryOutlined />}
+            onClick={onOpenDateFilter}
+          >
+            {DATE_FILTERS.find((item) => item.value === dateFilter)?.label ?? DATE_FILTERS[0].label}
+          </Button>
+          <Menu
+            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            anchorEl={anchorDateFilter}
+            open={openDateFilter}
+            onClose={onCloseDateFilter}
+            onClick={onCloseDateFilter}
+          >
+            {DATE_FILTERS.map((item, index) => (
+              <MenuItem
+                key={index}
+                classes={{ selected: 'bg-info-light' }}
+                selected={item.value === dateFilter}
+                onClick={() => {
+                  setDateFilter(item.value);
+                }}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
+          </Menu>
+
+          <DesktopDatePicker
+            label='From date'
+            value={valueFromDate}
+            onChange={handleChangeFromDate}
+            renderInput={(params) => <TextField {...params} />}
+            inputFormat='dd/MM/yyyy'
+          />
+
+          <DesktopDatePicker
+            label='To date'
+            value={valueToDate}
+            onChange={handleChangeToDate}
+            renderInput={(params) => <TextField {...params} />}
+            inputFormat='dd/MM/yyyy'
+          />
+        </div>
+
+        <div className='flex justify-between gap-2'>
+          <Button
+            variant='outlined'
+            color='primary'
+            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
+            startIcon={<CategoryOutlined />}
+            onClick={onOpenFilter}
+          >
+            {FILTERS.find((item) => item.orderBy === orderBy)?.label ?? FILTERS[0].label}
+          </Button>
+          <Menu
+            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            anchorEl={anchorFilter}
+            open={openFilter}
+            onClose={onCloseFilter}
+            onClick={onCloseFilter}
+          >
+            {FILTERS.map((item, index) => (
+              <MenuItem
+                key={index}
+                classes={{ selected: 'bg-info-light' }}
+                selected={item.orderBy === orderBy}
+                onClick={() => {
+                  setOrderBy(item.orderBy);
+                }}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
+          </Menu>
+
+          <Button
+            variant='outlined'
+            color='primary'
+            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
+            startIcon={<CategoryOutlined />}
+            onClick={onOpenSort}
+          >
+            {SORT_TYPES.find((item) => item.desc === desc)?.label ?? SORT_TYPES[0].label}
+          </Button>
+          <Menu
+            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            anchorEl={anchorSort}
+            open={openSort}
+            onClose={onCloseSort}
+            onClick={onCloseSort}
+          >
+            {SORT_TYPES.map((item, index) => (
+              <MenuItem
+                key={index}
+                classes={{ selected: 'bg-info-light' }}
+                selected={item.desc === desc}
+                onClick={() => {
+                  setDesc(item.desc);
+                }}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
+          </Menu>
+        </div>
+      </Container>
+
       {items && items.length > 0 && (
-        <Container className='bg-white p-5 rounded'>
+        <Container className='bg-white p-5 rounded-b-3xl'>
           <Grid container spacing={2} justifyContent={items.length % 4 === 0 ? 'center' : 'left'} className='mb-10'>
             {items.map((item) => (
               <Grid item key={item.id}>
@@ -212,7 +373,12 @@ const Products = () => {
                     >
                       Document
                     </Button>
-                    <Button size='small' variant='contained' color='secondary'>
+                    <Button
+                      size='small'
+                      variant='contained'
+                      color='secondary'
+                      onClick={() => window.open(contractUrl(item.fishProcessingId.processingContract), '_blank')}
+                    >
                       Contract
                     </Button>
                     <div className='flex-1'></div>
@@ -242,6 +408,10 @@ const Products = () => {
             />
           </div>
         </Container>
+      )}
+
+      {items && items.length === 0 && (
+        <Avatar className='h-96 w-96 mx-auto my-auto' src={require('assets/images/no-product-found.png').default} />
       )}
 
       <Dialog open={openProductDetailPop} fullWidth maxWidth='md'>

@@ -106,16 +106,55 @@ contract Registration {
         return "Unknown";
     }
 
-    function UpdateUserStatus(address u, bool active) public onlyFDA {
+    function UpdateUserStatus(
+        address u,
+        string memory role,
+        bool active
+    ) public onlyFDA {
         require(isFDA(msg.sender), "Sender not authorized");
 
-        FishSeedCompany[u] = active;
-        FishFarmer[u] = active;
-        FishProcessor[u] = active;
-        Distributor[u] = active;
-        Retailer[u] = active;
-        Consumer[u] = active;
-        WildCaughtFisher[u] = active;
+        if (
+            keccak256(abi.encodePacked(role)) ==
+            keccak256(abi.encodePacked("Fish Seed Company"))
+        ) {
+            FishSeedCompany[u] = active;
+        }
+        if (
+            keccak256(abi.encodePacked(role)) ==
+            keccak256(abi.encodePacked("Fish Farmer"))
+        ) {
+            FishFarmer[u] = active;
+        }
+        if (
+            keccak256(abi.encodePacked(role)) ==
+            keccak256(abi.encodePacked("Fish Processor"))
+        ) {
+            FishProcessor[u] = active;
+        }
+        if (
+            keccak256(abi.encodePacked(role)) ==
+            keccak256(abi.encodePacked("Distributor"))
+        ) {
+            Distributor[u] = active;
+        }
+        if (
+            keccak256(abi.encodePacked(role)) ==
+            keccak256(abi.encodePacked("Retailer"))
+        ) {
+            Retailer[u] = active;
+        }
+        if (
+            keccak256(abi.encodePacked(role)) ==
+            keccak256(abi.encodePacked("Consumer"))
+        ) {
+            Consumer[u] = active;
+        }
+        if (
+            keccak256(abi.encodePacked(role)) ==
+            keccak256(abi.encodePacked("Wild Caught Fisher"))
+        ) {
+            WildCaughtFisher[u] = active;
+        }
     }
 }
 
@@ -1027,138 +1066,26 @@ contract FishProcessing {
         emit RetailerOrderReceived(RetailerPurchaseOrderID);
     }
 
-    struct ConsumerOrderDetails {
-        bytes32 RetailerPurchaseOrderID;
-        address vendor;
-        address vendee;
-        status ConsumerOrderDetailsStatus;
-    }
-
-    mapping(bytes32 => ConsumerOrderDetails) public GetConsumerOrderID;
-
-    modifier onlyVendor() {
-        require(
-            RegistrationContract.RetailerExists(msg.sender),
-            "Sender not authorized."
-        );
-        _;
-    }
-
-    modifier onlyVendee() {
-        require(
-            RegistrationContract.ConsumerExists(msg.sender),
-            "Sender not autorized."
-        );
-        _;
-    }
-
-    event ConsumerOrderPlaced(
-        bytes32 ConsumerOrderID,
+    function UpdateQuantityOfProduct(
         bytes32 RetailerPurchaseOrderID,
-        address vendor,
-        address vendee
-    );
-    event ConsumerOrderConfirmed(bytes32 ConsumerOrderID, status newstatus);
-    event ConsumerOrderReceived(bytes32 ConsumerOrderID);
-
-    function PlaceConsumerOrder(
-        bytes32 RetailerPurchaseOrderID,
-        address vendor,
-        address vendee
-    ) public onlyVendee {
+        uint256 NumberOfFishPackage
+    ) public onlyBuyer {
         require(
-            RegistrationContract.ConsumerExists(vendee),
-            "Consumer is not authorized."
-        );
-        bytes32 poiu = keccak256(
-            abi.encodePacked(
+            GetRetailerPurchaseOrderID[RetailerPurchaseOrderID].buyer ==
                 msg.sender,
-                now,
-                address(this),
-                RetailerPurchaseOrderID
-            )
-        );
-
-        GetConsumerOrderID[poiu] = ConsumerOrderDetails(
-            RetailerPurchaseOrderID,
-            vendor,
-            msg.sender,
-            status.Pending
-        );
-
-        emit ConsumerOrderPlaced(
-            poiu,
-            RetailerPurchaseOrderID,
-            vendor,
-            msg.sender
-        );
-    }
-
-    function ConfirmConsumerPurchaseOrder(
-        bytes32 ConsumerOrderID,
-        bool accepted
-    ) public onlyVendor {
-        require(
-            GetConsumerOrderID[ConsumerOrderID].vendor == msg.sender,
-            "FishSeedsCompany is not authorized."
-        );
-
-        require(
-            GetConsumerOrderID[ConsumerOrderID].ConsumerOrderDetailsStatus ==
-                status.Pending
-        );
-        if (accepted) {
-            GetConsumerOrderID[ConsumerOrderID]
-                .ConsumerOrderDetailsStatus = status.Accepted;
-        } else {
-            GetConsumerOrderID[ConsumerOrderID]
-                .ConsumerOrderDetailsStatus = status.Rejected;
-        }
-        emit ConsumerOrderConfirmed(
-            ConsumerOrderID,
-            GetConsumerOrderID[ConsumerOrderID].ConsumerOrderDetailsStatus
-        );
-    }
-
-    function ReceiveConsumerOrder(bytes32 ConsumerOrderID) public onlyVendee {
-        require(
-            GetConsumerOrderID[ConsumerOrderID].vendee == msg.sender,
-            "Sender not authorized."
+            "Buyer not authorized."
         );
         require(
             keccak256(
                 abi.encodePacked(
-                    GetConsumerOrderID[ConsumerOrderID]
-                        .ConsumerOrderDetailsStatus
+                    GetRetailerPurchaseOrderID[RetailerPurchaseOrderID]
+                        .RetailerPurchaseOrderStatus
                 )
-            ) == keccak256(abi.encodePacked(status.Accepted)),
+            ) == keccak256(abi.encodePacked(status.Pending)),
             "The shipment has not arrived yet"
         );
 
-        GetConsumerOrderID[ConsumerOrderID].ConsumerOrderDetailsStatus = status
-            .Received;
-
-        emit ConsumerOrderReceived(ConsumerOrderID);
+        GetRetailerPurchaseOrderID[RetailerPurchaseOrderID]
+            .NumberOfFishPackagesOrdered = NumberOfFishPackage;
     }
-
-    // event FineStatusCreated(address FishProcessor, bool fineStatus);
-
-    // function CreateFineResult(
-    //     uint256 NumberOfViolations,
-    //     uint256 AcceptabeleNumberofViolations,
-    //     address FishProcessor
-    // ) public {
-    //     require(
-    //         RegistrationContract.isFDA(msg.sender) == true,
-    //         "only FDA can perform this."
-    //     );
-
-    //     Fine = false;
-
-    //     if ((NumberOfViolations) >= AcceptabeleNumberofViolations) {
-    //         Fine = true;
-    //     }
-
-    //     emit FineStatusCreated(FishProcessor, Fine);
-    // }
 }

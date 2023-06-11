@@ -36,7 +36,7 @@ import { RoleType } from 'types/Auth';
 import { PopupController } from 'types/Common';
 import { FishProcessingType } from 'types/FishProcessing';
 import { LogParamsType, TransactionType } from 'types/Log';
-import { formatTime, formatTimeDate, pinataUrl, shorten } from 'utils/common';
+import { contractUrl, formatTime, formatTimeDate, pinataUrl, shorten } from 'utils/common';
 import { UploadLabel } from 'views/Registration/components';
 import SelectStampPopup from './SelectStampPopup';
 import { useState } from 'react';
@@ -92,6 +92,7 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
             variant='contained'
             color='secondary'
             disabled={item.disable || item.numberOfPackets === 0}
+            onClick={() => window.open(contractUrl(item.processingContract), '_blank')}
           >
             Contract
           </Button>
