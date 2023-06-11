@@ -20,27 +20,23 @@ const ProfileUpdate = () => {
   const dispatch = useDispatch();
   const profile = useSelector(profileSelector);
 
-  // const [cover, setCover] = useState(profile.cover);
   const [coverLoading, setCoverLoading] = useState(false);
 
   const { enqueueSnackbar } = useSnackbar();
   const { control, handleSubmit, clearErrors, setValue } = useForm();
 
-  // useEffect(() => {
-  //   setValue('name', profile.name);
-  //   setValue('bio', profile.bio);
-  // }, [profile, setValue]);
   const [imageLoading, setImageLoading] = useState(false);
+  const [image, setImage] = useState('');
 
   const { data: user } = useQuery('userService.getProfile', () => userService.getProfile(), {
     onSuccess: (data) => {
       Object.entries(data ?? {}).forEach(([key, value]) => {
         setValue(key, value);
       });
+      setImage(data?.avatar);
     },
   }) as { data: UserType };
 
-  const [image, setImage] = useState(user?.avatar);
   const { mutate: updateProfile, isLoading } = useMutation(userService.updateProfile, {
     onSuccess: (data) => {
       dispatch(signIn(data));
@@ -61,40 +57,26 @@ const ProfileUpdate = () => {
     })();
   };
 
-  // const handleChangeCover = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = event.target.files?.[0];
-  //   getBase64(file, setCover);
-
-  //   const formData = new FormData();
-  //   formData.append('image', file as Blob);
-
-  //   setCoverLoading(true);
-  //   fileService
-  //     .uploadFile(formData)
-  //     .then((url) => {
-  //       setValue('cover', url.data.data);
-  //       clearErrors('cover');
-  //     })
-  //     .finally(() => {
-  //       setCoverLoading(false);
-  //     });
-  // };
-
   const handleChangeFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    try {
+      const file = event.target.files?.[0];
+      getBase64(file, setImage);
 
-    const formData = new FormData();
-    formData.append('image', file as Blob);
+      const formData = new FormData();
+      formData.append('file', file as Blob);
 
-    setImageLoading(true);
-    const url = await fileService.uploadFile(formData);
-    await userService.updateProfile({ avatar: url.data.data }).then((data) => {
-      dispatch(signIn(data));
-      enqueueSnackbar('Update avatar successfully', { variant: 'success' });
-      queryClient.invalidateQueries('userService.getUserProfile');
-    });
-    setImage(url.data.data);
-    setImageLoading(false);
+      setImageLoading(true);
+      const url = await fileService.uploadFile(formData);
+      await userService.updateProfile({ avatar: url.pinataUrl ?? '' }).then((data) => {
+        dispatch(signIn(data));
+        enqueueSnackbar('Update avatar successfully', { variant: 'success' });
+        queryClient.invalidateQueries('userService.getUserProfile');
+      });
+      setImageLoading(false);
+    } catch (error) {
+      console.error(error);
+      setImageLoading(false);
+    }
   };
 
   return (
@@ -105,7 +87,7 @@ const ProfileUpdate = () => {
       <Paper className='p-6'>
         <div className='flex items-center gap-6 mb-6'>
           <div className='relative'>
-            <Avatar src={user?.avatar} sx={{ width: 160, height: 160 }} className='border-2 border-secondary-main' />
+            <Avatar src={image} sx={{ width: 160, height: 160 }} className='border-2 border-secondary-main' />
             <div className='absolute bottom-3 -right-3 flex'>
               <input hidden type='file' id='avatar' accept='image/*' onChange={handleChangeFile} />
               <label
@@ -123,26 +105,6 @@ const ProfileUpdate = () => {
             </Typography>
           </div>
         </div>
-
-        <Controller
-          name='cover'
-          defaultValue=''
-          control={control}
-          render={({ fieldState: { invalid } }) => (
-            <FormControl fullWidth className='mb-4'>
-              <Typography variant='subtitle1'>Cover</Typography>
-              <Typography color='textSecondary' gutterBottom>
-                This image will appear at the top of your profile page, 1600x400 recommended.
-              </Typography>
-              {/* <input hidden type='file' id='cover' accept='image/*' onChange={handleChangeCover} /> */}
-              <input hidden type='file' id='cover' accept='image/*' />
-              <UploadLabel
-                {...{ htmlFor: 'cover', variant: 'rounded', image: user?.cover }}
-                {...{ width: '100%', height: 180, loading: coverLoading, error: invalid }}
-              />
-            </FormControl>
-          )}
-        />
 
         <Controller
           name='name'
