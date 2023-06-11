@@ -1,44 +1,20 @@
-import {
-  BalanceOutlined,
-  CategoryOutlined,
-  DeviceThermostat,
-  Inventory2Outlined,
-  SetMealOutlined,
-} from '@mui/icons-material';
-import {
-  Avatar,
-  Button,
-  Chip,
-  Container,
-  Dialog,
-  Menu,
-  MenuItem,
-  Pagination,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-  debounce,
-} from '@mui/material';
+import { CategoryOutlined, Inventory2Outlined, SetMealOutlined } from '@mui/icons-material';
+import { Avatar, Button, Dialog, Menu, MenuItem, Pagination, TextField, Typography, debounce } from '@mui/material';
+import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { Spinner } from 'components';
 import { ProcessStatus, statusStep } from 'components/ConfirmStatus';
 import { useAnchor, useSearch } from 'hooks';
-import useTabs, { TabType } from 'hooks/useTabs';
-import { useSnackbar } from 'notistack';
 import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
-import { distributorService, fishFarmerService, fishProcessorService, fishSeedCompanyService } from 'services';
-import { FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
+import { distributorService } from 'services';
+import { RoleType } from 'types/Auth';
+import { FishProcessorDistributorOrderType } from 'types/Distributor';
 import { formatTime, formatTimeDate } from 'utils/common';
 import { ConfirmPopup } from './popups';
-import { RoleType } from 'types/Auth';
-import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
-import { FishProcessorDistributorOrderType } from 'types/Distributor';
-import { DesktopDatePicker } from '@mui/x-date-pickers';
 
 const FILTERS = [
   { label: 'Species name', orderBy: 'speciesName' },

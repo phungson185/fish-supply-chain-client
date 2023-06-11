@@ -1,51 +1,38 @@
-import {
-  BalanceOutlined,
-  CategoryOutlined,
-  DeviceThermostat,
-  Inventory2Outlined,
-  SetMealOutlined,
-} from '@mui/icons-material';
-import {
-  Avatar,
-  Button,
-  Chip,
-  Container,
-  Dialog,
-  Menu,
-  MenuItem,
-  Pagination,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-  debounce,
-} from '@mui/material';
+import { CategoryOutlined, Inventory2Outlined, SetMealOutlined } from '@mui/icons-material';
+import { Avatar, Button, Dialog, Menu, MenuItem, Pagination, TextField, Typography, debounce } from '@mui/material';
 import { Spinner } from 'components';
 import { ProcessStatus, statusStep } from 'components/ConfirmStatus';
 import { useAnchor, useSearch } from 'hooks';
-import useTabs, { TabType } from 'hooks/useTabs';
-import { useSnackbar } from 'notistack';
 import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
-import { retailerService, fishFarmerService, fishProcessorService } from 'services';
-import { FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
+import { retailerService } from 'services';
+import { RoleType } from 'types/Auth';
+import { DistributorRetailerOrderType } from 'types/Retailer';
 import { formatTime, formatTimeDate } from 'utils/common';
 import { ConfirmPopup } from './popups';
-import { RoleType } from 'types/Auth';
-import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
-import { FishProcessorDistributorOrderType } from 'types/Distributor';
-import { DistributorRetailerOrderType } from 'types/Retailer';
+import { DesktopDatePicker } from '@mui/x-date-pickers';
 
 const FILTERS = [
-  { label: 'Number of fish seeds ordered', orderBy: 'numberOfFishSeedsOrdered' },
+  { label: 'Species name', orderBy: 'speciesName' },
+  { label: 'Quantity of fish package ordered', orderBy: 'quantityOfFishPackageOrdered' },
+  { label: 'Date of processing', orderBy: 'dateOfProcessing' },
+  { label: 'Date of expiry', orderBy: 'dateOfExpiry' },
+  { label: 'Number of packets', orderBy: 'numberOfPackets' },
+  { label: 'Fillets in packet', orderBy: 'filletsInPacket' },
   {
     label: 'Updated time',
     orderBy: 'updatedAt',
   },
+];
+
+const DATE_FILTERS = [
+  { label: 'All', value: null },
+  { label: 'Date of processing', value: 'dateOfProcessing' },
+  { label: 'Date of expiry', value: 'dateOfExpiry' },
 ];
 
 const SORT_TYPES = [
@@ -60,8 +47,8 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({
     page,
-    receiver: role === RoleType.distributorRole ? id : undefined,
-    orderer: role === RoleType.retailerRole ? id : undefined,
+    seller: role === RoleType.distributorRole ? id : undefined,
+    buyer: role === RoleType.retailerRole ? id : undefined,
     status: status === ProcessStatus.All ? undefined : status,
   });
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
@@ -82,6 +69,13 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
   const [openConfirmPopup, setOpenConfirmPopup] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<DistributorRetailerOrderType>({} as DistributorRetailerOrderType);
 
+  const [fromDate, setFromDate] = useState(query.fromDate || null);
+  const [toDate, setToDate] = useState(query.toDate || null);
+  const [valueFromDate, setValueFromDate] = useState(null);
+  const [valueToDate, setValueToDate] = useState(null);
+  const [anchorDateFilter, openDateFilter, onOpenDateFilter, onCloseDateFilter] = useAnchor();
+  const [dateFilter, setDateFilter] = useState(query.dateFilter || null);
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceChangeParams = useCallback(
     debounce((values) => {
@@ -90,22 +84,27 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
     [],
   );
   useEffect(() => {
-    onSearchChange({ orderBy, desc, ...params });
-  }, [onSearchChange, orderBy, desc, params]);
+    onSearchChange({ orderBy, desc, dateFilter, fromDate, toDate, ...params });
+  }, [onSearchChange, orderBy, desc, dateFilter, fromDate, toDate, params]);
 
-  // useEffect(() => {
-  //   onTabChange({} as SyntheticEvent<Element, Event>, 'account');
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  const handleChangeFromDate = (value: any) => {
+    setValueFromDate(value);
+    setFromDate(value.ts);
+  };
+
+  const handleChangeToDate = (value: any) => {
+    setValueToDate(value);
+    setToDate(value.ts);
+  };
 
   return (
     <>
       <div className='flex items-center justify-between mb-5'>
         <TextField
-          placeholder='Search...'
+          label='Search'
           InputProps={{ className: 'bg-white text-black' }}
           value={search}
-          sx={{ width: '60%' }}
+          sx={{ width: '30%' }}
           onChange={(event) => {
             const { value } = event.target;
             setSearch(value);
@@ -115,8 +114,57 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
 
         <div className='flex justify-between gap-2'>
           <Button
-            variant='text'
-            color='inherit'
+            variant='outlined'
+            color='primary'
+            classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
+            startIcon={<CategoryOutlined />}
+            onClick={onOpenDateFilter}
+          >
+            {DATE_FILTERS.find((item) => item.value === dateFilter)?.label ?? DATE_FILTERS[0].label}
+          </Button>
+          <Menu
+            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            anchorEl={anchorDateFilter}
+            open={openDateFilter}
+            onClose={onCloseDateFilter}
+            onClick={onCloseDateFilter}
+          >
+            {DATE_FILTERS.map((item, index) => (
+              <MenuItem
+                key={index}
+                classes={{ selected: 'bg-info-light' }}
+                selected={item.value === dateFilter}
+                onClick={() => {
+                  setDateFilter(item.value);
+                }}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
+          </Menu>
+
+          <DesktopDatePicker
+            label='From date'
+            value={valueFromDate}
+            onChange={handleChangeFromDate}
+            renderInput={(params) => <TextField {...params} />}
+            inputFormat='dd/MM/yyyy'
+          />
+
+          <DesktopDatePicker
+            label='To date'
+            value={valueToDate}
+            onChange={handleChangeToDate}
+            renderInput={(params) => <TextField {...params} />}
+            inputFormat='dd/MM/yyyy'
+          />
+        </div>
+
+        <div className='flex justify-between gap-2'>
+          <Button
+            variant='outlined'
+            color='primary'
             classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
             startIcon={<CategoryOutlined />}
             onClick={onOpenFilter}
@@ -146,8 +194,8 @@ const OrdersTab = ({ status }: { status: ProcessStatus }) => {
           </Menu>
 
           <Button
-            variant='text'
-            color='inherit'
+            variant='outlined'
+            color='primary'
             classes={{ textInherit: 'bg-white hover:brightness-90 px-4' }}
             startIcon={<CategoryOutlined />}
             onClick={onOpenSort}
