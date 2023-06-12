@@ -42,9 +42,10 @@ import { DistributorRetailerOrderType } from 'types/Retailer';
 
 type PopupProps = PopupController & {
   item: DistributorRetailerOrderType;
+  refetch: () => void;
 };
 
-const ProductDetail = ({ item, onClose }: PopupProps) => {
+const ProductDetail = ({ item, refetch, onClose }: PopupProps) => {
   const { address } = useSelector(profileSelector);
   const [openUpdateQuantityPopup, setOpenUpdateQuantityPopup] = useState(false);
   const [quantity, setQuantity] = useState(0);
@@ -71,6 +72,9 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
 
       updateQuantityProduct({ orderId: item.id, quantity });
       setIsLoading(false);
+      setOpenUpdateQuantityPopup(false);
+      onClose();
+      refetch();
     } catch (error) {
       console.error(error);
       setIsLoading(false);
@@ -188,7 +192,7 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
               fullWidth
               type='number'
               variant='outlined'
-              value={item.numberOfPackets}
+              defaultValue={item.numberOfPackets}
               onChange={(e) => {
                 const value = e.target.value;
                 if (Number(value) >= 0) {

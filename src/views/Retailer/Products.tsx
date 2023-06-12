@@ -408,7 +408,7 @@ const Products = () => {
       )}
 
       <Dialog open={openProductDetailPop} fullWidth maxWidth='md'>
-        <ProductDetail onClose={() => setOpenProductDetailPop(false)} item={selectedFish} />
+        <ProductDetail refetch={refetchInventory} onClose={() => setOpenProductDetailPop(false)} item={selectedFish} />
       </Dialog>
 
       {/* <Dialog open={openOrderPopup} fullWidth maxWidth='xs'>

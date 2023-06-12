@@ -1075,15 +1075,6 @@ contract FishProcessing {
                 msg.sender,
             "Buyer not authorized."
         );
-        require(
-            keccak256(
-                abi.encodePacked(
-                    GetRetailerPurchaseOrderID[RetailerPurchaseOrderID]
-                        .RetailerPurchaseOrderStatus
-                )
-            ) == keccak256(abi.encodePacked(status.Pending)),
-            "The shipment has not arrived yet"
-        );
 
         GetRetailerPurchaseOrderID[RetailerPurchaseOrderID]
             .NumberOfFishPackagesOrdered = NumberOfFishPackage;

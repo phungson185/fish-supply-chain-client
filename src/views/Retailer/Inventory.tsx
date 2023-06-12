@@ -343,7 +343,7 @@ const Inventory = () => {
       )}
 
       <Dialog open={openOrderPopup} fullWidth maxWidth='md'>
-        <ProductDetail onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
+        <ProductDetail refetch={refetchInventory} onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
       </Dialog>
     </>
   );
