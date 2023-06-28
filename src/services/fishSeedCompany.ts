@@ -18,7 +18,7 @@ import { AbiItem } from 'web3-utils';
 import FarmedFish from '../contracts/abis/FarmedFish.json';
 import { client } from './axios';
 import { FishSeedPaginateType } from 'types/FishSeedCompany';
-import { web3 } from 'services';
+import { gasPriceWei, web3 } from 'services';
 
 const deployFarmedFishContract = async ({
   address,
@@ -55,6 +55,7 @@ const deployFarmedFishContract = async ({
     .send({
       from: address,
       gas: 4000000,
+      gasPrice: gasPriceWei,
     });
   return result;
 };
@@ -86,6 +87,7 @@ const updateFarmedfishContract = async (body: UpdateFarmedFishContractType) => {
     .send({
       from: FishSeedUploader,
       gas: 3500000,
+      gasPrice: gasPriceWei,
     });
   return result;
 };
