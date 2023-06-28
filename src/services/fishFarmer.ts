@@ -15,7 +15,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import FarmedFish from '../contracts/abis/FarmedFish.json';
 import { client } from './axios';
-import { web3 } from 'services';
+import { gasPriceWei, web3 } from 'services';
 
 // contract methods
 const placeFishSeedsPurchaseOrder = async (body: PlaceFishSeedsPurchaseOrderType) => {
@@ -26,6 +26,7 @@ const placeFishSeedsPurchaseOrder = async (body: PlaceFishSeedsPurchaseOrderType
     .send({
       from: FishSeedsPurchaser,
       gas: 3500000,
+      gasPrice: gasPriceWei,
     });
   return result;
 };
@@ -38,6 +39,7 @@ const confirmFishSeedsPurchaseOrder = async (body: ConfirmFishSeedsPurchaseOrder
     .send({
       from: sender,
       gas: 3500000,
+      gasPrice: gasPriceWei,
     });
   return result;
 };
@@ -48,6 +50,7 @@ const receiveFishSeedsOrder = async (body: ReceiveFishSeedsOrderType) => {
   const result = await farmedFishContract.methods.ReceiveFishSeedsOrder(FishSeedsPurchaseOrderID).send({
     from: sender,
     gas: 3500000,
+    gasPrice: gasPriceWei,
   });
   return result;
 };
@@ -75,6 +78,7 @@ const updateFarmedFishGrowthDetails = async (body: UpdateFarmedFishGrowthDetails
     .send({
       from: FarmedFishGrowthDetailsUploader,
       gas: 3500000,
+      gasPrice: gasPriceWei,
     });
   return result;
 };

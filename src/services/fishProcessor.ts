@@ -19,7 +19,7 @@ import FishProcessing from '../contracts/abis/FishProcessing.json';
 
 import { client } from './axios';
 import { ProcessingContractPaginateType, ProcessingContractParamsType } from 'types/FishProcessing';
-import { web3 } from 'services';
+import { gasPriceWei, web3 } from 'services';
 
 // contract methods
 const placeFarmedFishPurchaseOrder = async (body: PlaceFarmedFishPurchaseOrderType) => {
@@ -36,6 +36,7 @@ const placeFarmedFishPurchaseOrder = async (body: PlaceFarmedFishPurchaseOrderTy
     .send({
       from: FarmedFishPurchaser,
       gas: 3500000,
+      gasPrice: gasPriceWei,
     });
   return result;
 };
@@ -48,6 +49,7 @@ const confirmFarmedFishPurchaseOrder = async (body: ConfirmFarmedFishPurchaseOrd
     .send({
       from: sender,
       gas: 3500000,
+      gasPrice: gasPriceWei,
     });
   return result;
 };
@@ -58,6 +60,7 @@ const receiveFarmedFishOrder = async (body: ReceiveFarmedFishOrderType) => {
   const result = await farmedFishContract.methods.ReceiveFarmedFishOrder(FarmedFishPurchaseOrderID).send({
     from: sender,
     gas: 3500000,
+    gasPrice: gasPriceWei,
   });
   return result;
 };
@@ -94,6 +97,7 @@ const deployFishProcessingContract = async (body: ProcessingContractType) => {
     .send({
       from: sender,
       gas: 4000000,
+      gasPrice: gasPriceWei,
     });
 
   return result;
@@ -125,6 +129,7 @@ const updateFishProcessingContract = async (body: UpdateFishProcessingContractTy
     .send({
       from: sender,
       gas: 4000000,
+      gasPrice: gasPriceWei,
     });
 
   return result;

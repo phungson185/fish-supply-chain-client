@@ -14,7 +14,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import FishProcessing from '../contracts/abis/FishProcessing.json';
 import { client } from './axios';
-import { web3 } from 'services';
+import { gasPriceWei, web3 } from 'services';
 
 // contract methods
 const placeRetailerPurchaseOrder = async (body: PlaceRetailerPurchaseOrderType) => {
@@ -26,6 +26,7 @@ const placeRetailerPurchaseOrder = async (body: PlaceRetailerPurchaseOrderType) 
     .send({
       from: buyer,
       gas: 3500000,
+      gasPrice: gasPriceWei,
     });
   return result;
 };
@@ -39,6 +40,7 @@ const confirmRetailerPurchaseOrder = async (body: ConfirmRetailerPurchaseOrderTy
     .send({
       from: sender,
       gas: 3500000,
+      gasPrice: gasPriceWei,
     });
   return result;
 };
@@ -49,6 +51,7 @@ const receiveRetailerOrder = async (body: ReceiveRetailerOrderType) => {
   const result = await processingContract.methods.ReceiveRetailerOrder(RetailerPurchaseOrderID).send({
     from: sender,
     gas: 3500000,
+    gasPrice: gasPriceWei,
   });
   return result;
 };
@@ -61,6 +64,7 @@ const updateNumberOfProduct = async (body: UpdateNumberOfProductType) => {
     .send({
       from: sender,
       gas: 3500000,
+      gasPrice: gasPriceWei,
     });
   return result;
 };
