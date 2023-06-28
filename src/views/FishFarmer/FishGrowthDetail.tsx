@@ -92,7 +92,8 @@ const FishGrowthDetail = () => {
     onSearchChange({ ...params });
   }, [onSearchChange, params]);
 
-  const handleChangeOrderable = () => {
+  const handleChangeOrderable = (fishWeight?: number) => {
+    if (!fishWeight) return enqueueSnackbar('Please update fish weight', { variant: 'error' });
     if (role === RoleType.fishFarmerRole)
       updateGrowthDetail({ orderId: growth?.id, orderable: !growth?.orderable } as UpdateGrowthDetailType);
   };
@@ -126,7 +127,7 @@ const FishGrowthDetail = () => {
                         color='error'
                         deleteIcon={<Autorenew />}
                         className='text-white mb-2'
-                        onDelete={handleChangeOrderable}
+                        onDelete={() => handleChangeOrderable(growth.fishWeight)}
                       />
                     )}
                   </div>
