@@ -1,5 +1,5 @@
 import { AppContainer } from 'containers';
-import { PrivateLayout, PublicLayout } from 'layouts';
+import { PrivateLayout } from 'layouts';
 import { useEffect, useState } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';

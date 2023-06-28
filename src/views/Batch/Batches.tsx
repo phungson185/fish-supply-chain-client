@@ -184,7 +184,7 @@ const Batches = () => {
                   {(batchType === 0 || batchType === 1) && (
                     <>
                       <TableCell align='center'>
-                        {item[item?.lastChainPoint as keyof BatchType]?.geographicOrigin && (
+                        {item[item?.lastChainPoint as keyof BatchType]?.geographicOrigin !== undefined && (
                           <Chip
                             label={
                               fishSeedCompanyService.handleMapGeographicOrigin(
@@ -200,7 +200,7 @@ const Batches = () => {
                         )}
                       </TableCell>
                       <TableCell align='center'>
-                        {item[item?.lastChainPoint as keyof BatchType]?.geographicOrigin && (
+                        {item[item?.lastChainPoint as keyof BatchType]?.geographicOrigin !== undefined && (
                           <Chip
                             label={
                               fishSeedCompanyService.handleMapMethodOfReproduction(
