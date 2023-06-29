@@ -27,11 +27,11 @@ import {
 import { TableRowEmpty } from 'components';
 import { useSearch } from 'hooks';
 import { parse } from 'qs';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
-import { logService } from 'services';
+import { fishProcessorService, logService } from 'services';
 import { RoleType } from 'types/Auth';
 import { PopupController } from 'types/Common';
 import { FishProcessingType } from 'types/FishProcessing';
@@ -40,17 +40,20 @@ import { contractUrl, formatTime, formatTimeDate, pinataUrl, shorten } from 'uti
 import { UploadLabel } from 'views/Registration/components';
 import SelectStampPopup from './SelectStampPopup';
 import { useState } from 'react';
+import { useSnackbar } from 'notistack';
 
 type PopupProps = PopupController & {
   item: FishProcessingType;
+  refetch: () => void;
 };
 
-const ProductDetail = ({ item, onClose }: PopupProps) => {
+const ProductDetail = ({ item, onClose, refetch }: PopupProps) => {
   const { role } = useSelector(profileSelector);
   const location = useLocation();
   const { tab, page = 1, size = 5, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({ page, size });
   const [openSelectStampPopup, setOpenSelectStampPopup] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
   const {
     data: logs,
     isSuccess: getLogsSuccess,
@@ -63,6 +66,19 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
     } as LogParamsType),
   );
 
+  const { mutate: updateProcessingContract } = useMutation(fishProcessorService.updateProcessingContract, {
+    onSuccess: () => {
+      enqueueSnackbar('Update contract successfully', {
+        variant: 'success',
+      });
+      refetch();
+      onClose();
+    },
+    onError: (error: any) => {
+      enqueueSnackbar(error, { variant: 'error' });
+    },
+  });
+
   const { items = [], total, currentPage, pages: totalPage } = logs ?? {};
   return (
     <>
@@ -72,7 +88,17 @@ const ProductDetail = ({ item, onClose }: PopupProps) => {
           <Typography variant='h4'>Product information</Typography>
           {role === RoleType.fishProcessorRole && (
             <>
-              <Switch checked={item.listing} />
+              <Switch
+                checked={item.listing}
+                onChange={(e) => {
+                  updateProcessingContract({
+                    id: item.id,
+                    body: {
+                      listing: e.target.checked,
+                    },
+                  });
+                }}
+              />
               <div>Listing</div>
             </>
           )}

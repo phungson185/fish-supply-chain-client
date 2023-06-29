@@ -1,10 +1,12 @@
-import { useAnchor, useSearch } from 'hooks';
-import { parse } from 'qs';
-import { useQuery } from 'react-query';
-import { useLocation, useParams } from 'react-router-dom';
-import { fishProcessorService, fishSeedCompanyService } from 'services';
-import { ProfileInventoryType } from 'types/FishProcessor';
-import { useCallback, useEffect, useState } from 'react';
+import {
+  AccountBalanceWalletOutlined,
+  ApartmentOutlined,
+  CategoryOutlined,
+  EmailOutlined,
+  HomeOutlined,
+  Inventory2Outlined,
+  LocalPhoneOutlined,
+} from '@mui/icons-material';
 import {
   Avatar,
   Button,
@@ -23,24 +25,23 @@ import {
   Typography,
   debounce,
 } from '@mui/material';
-import {
-  AccountBalanceWalletOutlined,
-  ApartmentOutlined,
-  CategoryOutlined,
-  EmailOutlined,
-  HomeOutlined,
-  Inventory2Outlined,
-  LocalPhoneOutlined,
-} from '@mui/icons-material';
-import { contractUrl, formatTime, pinataUrl, shorten } from 'utils/common';
-import moment from 'moment';
-import { ProcessedFishOrderPopup } from 'views/Batch/components';
-import { FishProcessingType } from 'types/FishProcessing';
-import { useSelector } from 'react-redux';
-import { profileSelector } from 'reducers/profile';
-import { RoleType } from 'types/Auth';
-import ProductDetail from './popups/ProductDetail';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
+import { useAnchor, useSearch } from 'hooks';
+import moment from 'moment';
+import { parse } from 'qs';
+import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
+import { useSelector } from 'react-redux';
+import { useLocation, useParams } from 'react-router-dom';
+import { profileSelector } from 'reducers/profile';
+import { fishProcessorService, fishSeedCompanyService } from 'services';
+import { RoleType } from 'types/Auth';
+import { FishProcessingType } from 'types/FishProcessing';
+import { ProfileInventoryType } from 'types/FishProcessor';
+import { contractUrl, pinataUrl, shorten } from 'utils/common';
+import { ProcessedFishOrderPopup } from 'views/Batch/components';
+import ProductDetail from './popups/ProductDetail';
+import { ProcessStatus } from 'components/ConfirmStatus';
 
 const FILTERS = [
   { label: 'Product name', orderBy: 'processedSpeciesName' },
@@ -68,11 +69,12 @@ const Products = () => {
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({
     page,
-    size: 4,
+    size: 10,
     fishProcessor: param.fishProcessor,
     disable: false,
     isHavePackets: true,
     listing: true,
+    status: ProcessStatus.Received,
   });
 
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
@@ -329,9 +331,9 @@ const Products = () => {
 
       {items && items.length > 0 && (
         <Container className='bg-white p-5 rounded-b-3xl'>
-          <Grid container spacing={2} justifyContent={items.length % 4 === 0 ? 'center' : 'left'} className='mb-10'>
+          <Grid container spacing={2} justifyContent={'left'} className='mb-10'>
             {items.map((item, index) => (
-              <Grid item key={index}>
+              <Grid item key={index} xs={12 / 5}>
                 <Card sx={{ width: 272, height: '100%' }}>
                   <CardMedia
                     sx={{ height: 200 }}
@@ -437,7 +439,7 @@ const Products = () => {
       </Dialog>
 
       <Dialog open={openProductDetailPop} fullWidth maxWidth='xl'>
-        <ProductDetail onClose={() => setOpenProductDetailPop(false)} item={selectedFish} />
+        <ProductDetail refetch={refetchInventory} onClose={() => setOpenProductDetailPop(false)} item={selectedFish} />
       </Dialog>
     </>
   );

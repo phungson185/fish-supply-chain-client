@@ -202,7 +202,20 @@ const UpdateContractPopup = ({ item, refetch, onClose }: PopupProps) => {
             render={({ field: { value, onChange }, fieldState: { invalid, error } }) => (
               <FormGroup>
                 <FormControlLabel
-                  control={<Switch checked={value} onChange={(e) => setValue('listing', e.target.checked)} />}
+                  control={
+                    <Switch
+                      checked={value}
+                      onChange={(e) => {
+                        setValue('listing', e.target.checked);
+                        updateProcessingContract({
+                          id: item.id,
+                          body: {
+                            listing: e.target.checked,
+                          },
+                        });
+                      }}
+                    />
+                  }
                   label='Listing'
                 />
               </FormGroup>

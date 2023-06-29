@@ -32,6 +32,7 @@ import {
 import { Spinner, TableRowEmpty } from 'components';
 import { ProcessStatus } from 'components/ConfirmStatus';
 import { useAnchor, useSearch } from 'hooks';
+import { useSnackbar } from 'notistack';
 import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -40,8 +41,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { getRoute } from 'routes';
 import { fishProcessorService, fishSeedCompanyService } from 'services';
-import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { FishProcessingType } from 'types/FishProcessing';
+import { FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { formatTimeDate, pinataUrl } from 'utils/common';
 import CreateContractPopup from './popups/CreateContractPopup';
 import ProductDetail from './popups/ProductDetail';
@@ -97,7 +98,7 @@ const Fishes = () => {
   const [desc, setDesc] = useState(query.desc || SORT_TYPES[0].desc);
   const [search, setSearch] = useState(query.search || '');
   const [params, setParams] = useState({ search, page });
-
+  const { enqueueSnackbar } = useSnackbar();
   const {
     data: getProcessingContracts,
     isLoading: isLoadingProcessingContracts,
@@ -366,7 +367,7 @@ const Fishes = () => {
       </Dialog>
 
       <Dialog open={openProductDetailPopup} fullWidth maxWidth='lg'>
-        <ProductDetail item={selectedContract} onClose={() => setOpenProductDetailPopup(false)} />
+        <ProductDetail refetch={refetch} item={selectedContract} onClose={() => setOpenProductDetailPopup(false)} />
       </Dialog>
     </>
   );

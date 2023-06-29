@@ -108,8 +108,8 @@ const UpdateFishGrowthDetailPopup = ({ item, refetch, onClose }: PopupProps) => 
     fileService
       .uploadFile(formData)
       .then((url) => {
-        setValue('image', url.pinataUrl ?? '');
-        clearErrors('image');
+        setValue('Image', url.pinataUrl ?? '');
+        clearErrors('Image');
       })
       .finally(() => {
         setImageLoading(false);

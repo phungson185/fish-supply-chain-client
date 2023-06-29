@@ -60,8 +60,9 @@ const Inventory = () => {
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({
     page,
-    size: 4,
+    size: 10,
     buyer: id,
+    listing: false,
     status: ProcessStatus.Received,
   });
 
@@ -250,7 +251,7 @@ const Inventory = () => {
 
       {items && items.length > 0 && (
         <Container className='bg-white p-5 rounded'>
-          <Grid container spacing={2} justifyContent={items.length % 4 === 0 ? 'center' : 'left'} className='mb-10'>
+          <Grid container spacing={2} justifyContent={'left'} className='mb-10'>
             {items.map((item) => (
               <Grid item key={item.id}>
                 <Card sx={{ width: 272, height: '100%' }}>

@@ -120,7 +120,7 @@ const Summary = () => {
           </Paper>
           <Paper className='bg-white flex flex-col items-center p-5 rounded-2xl' style={{ width: '30%' }}>
             <div className='text-2xl mb-5'>Average fish weight</div>
-            <div className='text-5xl font-bold'>{summaryCommon.averageFishWeight}</div>
+            <div className='text-5xl font-bold'>{Math.round(summaryCommon.averageFishWeight * 100) / 100}</div>
           </Paper>
         </div>
       )}

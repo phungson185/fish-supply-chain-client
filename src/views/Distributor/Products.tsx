@@ -1,9 +1,12 @@
-import { useAnchor, useSearch } from 'hooks';
-import { parse } from 'qs';
-import { useQuery } from 'react-query';
-import { useLocation, useParams } from 'react-router-dom';
-import { distributorService, fishProcessorService, fishSeedCompanyService } from 'services';
-import { useCallback, useEffect, useState } from 'react';
+import {
+  AccountBalanceWalletOutlined,
+  ApartmentOutlined,
+  CategoryOutlined,
+  EmailOutlined,
+  HomeOutlined,
+  Inventory2Outlined,
+  LocalPhoneOutlined,
+} from '@mui/icons-material';
 import {
   Avatar,
   Button,
@@ -11,7 +14,6 @@ import {
   CardActions,
   CardContent,
   CardMedia,
-  Chip,
   Container,
   Dialog,
   Grid,
@@ -22,28 +24,23 @@ import {
   Typography,
   debounce,
 } from '@mui/material';
-import {
-  AccountBalanceWalletOutlined,
-  ApartmentOutlined,
-  CategoryOutlined,
-  EmailOutlined,
-  HomeOutlined,
-  Image,
-  Inventory2Outlined,
-  LocalPhoneOutlined,
-} from '@mui/icons-material';
-import { contractUrl, formatTime, pinataUrl, shorten } from 'utils/common';
+import { DesktopDatePicker } from '@mui/x-date-pickers';
+import { ProcessStatus } from 'components/ConfirmStatus';
+import { useAnchor, useSearch } from 'hooks';
 import moment from 'moment';
-import { FishOfDistributorOrderPopup, ProcessedFishOrderPopup } from 'views/Batch/components';
-import { FishProcessingType } from 'types/FishProcessing';
+import { useSnackbar } from 'notistack';
+import { parse } from 'qs';
+import { useCallback, useEffect, useState } from 'react';
+import { useMutation, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
+import { useLocation, useParams } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
+import { distributorService } from 'services';
 import { RoleType } from 'types/Auth';
 import { FishProcessorDistributorOrderType, ProfileInventoryType } from 'types/Distributor';
+import { contractUrl, pinataUrl, shorten } from 'utils/common';
+import { FishOfDistributorOrderPopup } from 'views/Batch/components';
 import ProductDetail from './popups/ProductDetail';
-import { ProcessStatus } from 'components/ConfirmStatus';
-import noOrderFound from 'assets/images/no-order-found.png';
-import { DesktopDatePicker } from '@mui/x-date-pickers';
 
 const FILTERS = [
   { label: 'Product name', orderBy: 'processedSpeciesName' },
@@ -71,7 +68,7 @@ const Products = () => {
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({
     page,
-    size: 4,
+    size: 10,
     status: ProcessStatus.Received,
     orderer: param.distributor,
     disable: false,
@@ -97,7 +94,7 @@ const Products = () => {
   const [anchorDateFilter, openDateFilter, onOpenDateFilter, onCloseDateFilter] = useAnchor();
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
-
+  const { enqueueSnackbar } = useSnackbar();
   const { data: profile, isSuccess: isSuccessProfile } = useQuery('distributorService.getProfileInventory', () =>
     distributorService.getProfileInventory({ id: param.id ?? id }),
   ) as {
@@ -136,6 +133,13 @@ const Products = () => {
     setValueToDate(value);
     setToDate(value.ts);
   };
+
+  const { mutate: updateFish } = useMutation(distributorService.updateOrder, {
+    onSuccess: () => {
+      enqueueSnackbar('Update sale status successfully', { variant: 'success' });
+      refetchInventory();
+    },
+  });
 
   if (!isSuccessProfile) return <></>;
   return (
@@ -332,9 +336,9 @@ const Products = () => {
 
       {items && items.length > 0 && (
         <Container className='bg-white p-5 rounded-b-3xl'>
-          <Grid container spacing={2} justifyContent={items.length % 4 === 0 ? 'center' : 'left'} className='mb-10'>
-            {items.map((item) => (
-              <Grid item key={item.id}>
+          <Grid container spacing={2} justifyContent={'left'} className='mb-10'>
+            {items.map((item, index) => (
+              <Grid item key={index} xs={12 / 5}>
                 <Card sx={{ width: 272, height: '100%' }}>
                   <CardMedia
                     onClick={() => {
@@ -394,6 +398,23 @@ const Products = () => {
                         Order
                       </Button>
                     )}
+                    {role === RoleType.distributorRole && (
+                      <Button
+                        size='small'
+                        className='whitespace-nowrap'
+                        variant='contained'
+                        disabled={item.disable || item.numberOfPackets === 0}
+                        onClick={() => {
+                          updateFish({
+                            orderId: item.id,
+                            listing: !item.listing,
+                          });
+                        }}
+                        color={item.listing ? 'error' : 'success'}
+                      >
+                        {item.listing ? 'Unlist for sale' : 'List for sale'}
+                      </Button>
+                    )}
                   </CardActions>
                 </Card>
               </Grid>
@@ -415,7 +436,7 @@ const Products = () => {
       )}
 
       <Dialog open={openProductDetailPop} fullWidth maxWidth='md'>
-        <ProductDetail onClose={() => setOpenProductDetailPop(false)} item={selectedFish} />
+        <ProductDetail refetch={refetchInventory} onClose={() => setOpenProductDetailPop(false)} item={selectedFish} />
       </Dialog>
 
       <Dialog open={openOrderPopup} fullWidth maxWidth='xs'>

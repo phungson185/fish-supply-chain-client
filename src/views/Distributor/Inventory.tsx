@@ -60,9 +60,10 @@ const Inventory = () => {
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({
     page,
-    size: 4,
+    size: 10,
     orderer: id,
     status: ProcessStatus.Received,
+    listing: false,
   });
 
   const [orderBy, setOrderBy] = useState(query.orderBy || FILTERS[0].orderBy);
@@ -252,9 +253,9 @@ const Inventory = () => {
 
       {items && items.length > 0 && (
         <Container className='bg-white p-5 rounded-b-3xl'>
-          <Grid container spacing={2} justifyContent={items.length % 4 === 0 ? 'center' : 'left'} className='mb-10'>
+          <Grid container spacing={2} justifyContent={'left'} className='mb-10'>
             {items.map((item) => (
-              <Grid item key={item.id}>
+              <Grid item key={item.id} xs={12 / 5}>
                 <Card sx={{ width: 272, height: '100%' }}>
                   <CardMedia
                     onClick={() => {
@@ -343,7 +344,7 @@ const Inventory = () => {
       )}
 
       <Dialog open={openOrderPopup} fullWidth maxWidth='md'>
-        <ProductDetail onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
+        <ProductDetail refetch={refetchInventory} onClose={() => setOpenOrderPopup(false)} item={selectedFish} />
       </Dialog>
     </>
   );

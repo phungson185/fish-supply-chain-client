@@ -81,13 +81,29 @@ const ProductDetail = ({ item, refetch, onClose }: PopupProps) => {
     }
   };
 
+  const { mutate: updateFish } = useMutation(retailerService.updateOrder, {
+    onSuccess: () => {
+      enqueueSnackbar('Update sale status successfully', { variant: 'success' });
+      refetch();
+      onClose();
+    },
+  });
+
   return (
     <>
       <DialogTitle>{item.speciesName}</DialogTitle>
       <DialogContent>
         <div className='flex flex-row gap-3 items-center justify-between mb-2'>
           <Typography variant='h4'>Product information</Typography>
-          <Switch checked={item.listing} />
+          <Switch
+            checked={item.listing}
+            onChange={(e) => {
+              updateFish({
+                orderId: item.id,
+                listing: e.target.checked,
+              });
+            }}
+          />
           <div>Listing</div>
           <div className='flex-1'></div>
           <div className=''></div>

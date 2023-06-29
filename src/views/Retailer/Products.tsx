@@ -29,7 +29,7 @@ import { useAnchor, useSearch } from 'hooks';
 import moment from 'moment';
 import { parse } from 'qs';
 import { useCallback, useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
@@ -38,6 +38,8 @@ import { DistributorRetailerOrderType, ProfileInventoryType } from 'types/Retail
 import { contractUrl, pinataUrl, shorten } from 'utils/common';
 import ProductDetail from './popups/ProductDetail';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
+import { RoleType } from 'types/Auth';
+import { useSnackbar } from 'notistack';
 
 const FILTERS = [
   { label: 'Product name', orderBy: 'processedSpeciesName' },
@@ -65,7 +67,7 @@ const Products = () => {
   const { tab, page = 1, ...query } = parse(location.search, { ignoreQueryPrefix: true });
   const [dataSearch, onSearchChange] = useSearch({
     page,
-    size: 4,
+    size: 10,
     buyer: param.retailer,
     disable: false,
     isHavePackets: true,
@@ -95,7 +97,7 @@ const Products = () => {
   const [anchorDateFilter, openDateFilter, onOpenDateFilter, onCloseDateFilter] = useAnchor();
   const [anchorFilter, openFilter, onOpenFilter, onCloseFilter] = useAnchor();
   const [anchorSort, openSort, onOpenSort, onCloseSort] = useAnchor();
-
+  const { enqueueSnackbar } = useSnackbar();
   const {
     data: inventory,
     isFetching: isFetchingInventory,
@@ -127,6 +129,13 @@ const Products = () => {
     setValueToDate(value);
     setToDate(value.ts);
   };
+
+  const { mutate: updateFish } = useMutation(retailerService.updateOrder, {
+    onSuccess: () => {
+      enqueueSnackbar('Update sale status successfully', { variant: 'success' });
+      refetchInventory();
+    },
+  });
 
   if (!isSuccessProfile) return <></>;
   return (
@@ -323,9 +332,9 @@ const Products = () => {
 
       {items && items.length > 0 && (
         <Container className='bg-white p-5 rounded'>
-          <Grid container spacing={2} justifyContent={items.length % 4 === 0 ? 'center' : 'left'} className='mb-10'>
-            {items.map((item) => (
-              <Grid item key={item.id}>
+          <Grid container spacing={2} justifyContent={'left'} className='mb-10'>
+            {items.map((item, index) => (
+              <Grid item key={index} xs={12 / 5}>
                 <Card sx={{ width: 272, height: '100%' }}>
                   <CardMedia
                     onClick={() => {
@@ -375,18 +384,23 @@ const Products = () => {
                       Contract
                     </Button>
                     <div className='flex-1'></div>
-                    {/* {role === RoleType.retailerRole && (
+                    {role === RoleType.retailerRole && (
                       <Button
                         size='small'
+                        className='whitespace-nowrap'
                         variant='contained'
+                        disabled={item.disable || item.numberOfPackets === 0}
                         onClick={() => {
-                          setSelectedFish(item);
-                          setOpenOrderPopup(true);
+                          updateFish({
+                            orderId: item.id,
+                            listing: !item.listing,
+                          });
                         }}
+                        color={item.listing ? 'error' : 'success'}
                       >
-                        Order
+                        {item.listing ? 'Unlist for sale' : 'List for sale'}
                       </Button>
-                    )} */}
+                    )}
                   </CardActions>
                 </Card>
               </Grid>
