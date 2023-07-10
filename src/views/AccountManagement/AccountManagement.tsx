@@ -1,9 +1,8 @@
-import { Assignment, CategoryOutlined } from '@mui/icons-material';
+import { CategoryOutlined } from '@mui/icons-material';
 import {
   Avatar,
   Button,
   Chip,
-  Dialog,
   Menu,
   MenuItem,
   Pagination,
@@ -27,7 +26,7 @@ import { useMutation, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
-import { fishSeedCompanyService, userService } from 'services';
+import { userService } from 'services';
 import { formatTime } from 'utils/common';
 
 const FILTERS = [

@@ -1,5 +1,5 @@
-import { Logout, Menu as MenuIcon } from '@mui/icons-material';
-import { AppBar, Button, Divider, Drawer, IconButton, MenuItem, Select, Toolbar, Tooltip } from '@mui/material';
+import { Menu as MenuIcon } from '@mui/icons-material';
+import { AppBar, Button, Divider, Drawer, IconButton, MenuItem, Select, Toolbar } from '@mui/material';
 import { AppBreadcrumb, AppMenu } from 'containers';
 import { useWindowSize } from 'hooks';
 import { useState } from 'react';

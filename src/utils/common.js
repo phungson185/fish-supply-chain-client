@@ -1,4 +1,3 @@
-import { web3 } from 'contracts';
 import { DateTime } from 'luxon';
 import moment from 'moment';
 

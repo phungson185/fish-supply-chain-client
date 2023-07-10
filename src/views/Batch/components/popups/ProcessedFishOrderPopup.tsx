@@ -1,6 +1,5 @@
 import { LoadingButton } from '@mui/lab';
 import { DialogActions, DialogContent, DialogTitle, InputAdornment, TextField, Typography } from '@mui/material';
-import moment from 'moment';
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -9,7 +8,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { distributorService, fishProcessorService } from 'services';
-import { BatchType } from 'types/Batch';
 import { PopupController } from 'types/Common';
 import { FishProcessingType } from 'types/FishProcessing';
 

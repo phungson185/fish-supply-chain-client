@@ -17,18 +17,17 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { DesktopDatePicker, DesktopDateTimePicker } from '@mui/x-date-pickers';
+import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
 import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { systemSelector } from 'reducers/system';
 import { fileService, fishProcessorService, logService } from 'services';
 import { PopupController } from 'types/Common';
-import { FishFarmerFishProcessorOrderPaginateType, FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
 import { useEffect, useState } from 'react';
 import { UploadLabel } from 'views/Registration/components';
 import { formatTime, getBase64 } from 'utils/common';

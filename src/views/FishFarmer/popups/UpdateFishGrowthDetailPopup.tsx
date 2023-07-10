@@ -9,22 +9,16 @@ import {
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from 'react-query';
+import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import { profileSelector } from 'reducers/profile';
 import { fileService, fishFarmerService } from 'services';
 import { PopupController } from 'types/Common';
-import {
-  FishSeedCompanyFishFarmerOrderPaginateType,
-  FishSeedCompanyFishFarmerOrderType,
-  UpdateGrowthDetailType,
-} from 'types/FishFarmer';
-import { useState } from 'react';
-import { UploadLabel } from 'views/Registration/components';
+import { FishSeedCompanyFishFarmerOrderType, UpdateGrowthDetailType } from 'types/FishFarmer';
 import { getBase64 } from 'utils/common';
-import { set } from 'date-fns';
+import { UploadLabel } from 'views/Registration/components';
 
 type PopupProps = PopupController & {
   item: FishSeedCompanyFishFarmerOrderType;

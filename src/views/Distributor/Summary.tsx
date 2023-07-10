@@ -1,10 +1,9 @@
-import { Container, MenuItem, Paper, Select } from '@mui/material';
+import { Container, Paper } from '@mui/material';
 import { Spinner } from 'components';
-import { is } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
 import Chart from 'react-apexcharts';
-import { distributorService, fishProcessorService } from 'services';
+import { useQuery } from 'react-query';
+import { distributorService } from 'services';
 
 const Summary = () => {
   const { data: summaryCommon, isFetching: isFetchingCommon } = useQuery(

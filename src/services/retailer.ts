@@ -10,7 +10,6 @@ import {
   UpdateNumberOfProductType,
   UpdateOrderType,
 } from 'types/Retailer';
-import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import FishProcessing from '../contracts/abis/FishProcessing.json';
 import { client } from './axios';

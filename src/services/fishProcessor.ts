@@ -12,7 +12,6 @@ import {
   UpdateFishProcessingContractType,
   UpdateProcessingContractType,
 } from 'types/FishProcessor';
-import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import FarmedFish from '../contracts/abis/FarmedFish.json';
 import FishProcessing from '../contracts/abis/FishProcessing.json';

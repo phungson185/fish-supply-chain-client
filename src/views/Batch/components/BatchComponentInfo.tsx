@@ -9,7 +9,6 @@ import {
 } from '@mui/icons-material';
 import { Avatar, Chip, Container, Grid, Paper, Typography } from '@mui/material';
 import { useWindowSize } from 'hooks';
-import moment from 'moment';
 import { fishSeedCompanyService } from 'services';
 import { RoleType } from 'types/Auth';
 import { formatTime, formatTimeDate } from 'utils/common';

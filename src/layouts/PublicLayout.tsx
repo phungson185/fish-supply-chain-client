@@ -1,15 +1,7 @@
-import { Button } from '@mui/material';
 import { ScrollButton } from 'components';
-import { AppHeader } from 'containers';
-import { useNotification, useWindowSize } from 'hooks';
-import { useQuery } from 'react-query';
-import { useDispatch, useSelector } from 'react-redux';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { profileSelector } from 'reducers/profile';
-import { saveSystem } from 'reducers/system';
-import { getRoute, publicRoute } from 'routes';
-import { systemService, walletService } from 'services';
-import { BatchDetail } from 'views/Batch';
+import { useNotification } from 'hooks';
+import { Route, Routes } from 'react-router-dom';
+import { publicRoute } from 'routes';
 
 const PublicLayout = () => {
   useNotification();

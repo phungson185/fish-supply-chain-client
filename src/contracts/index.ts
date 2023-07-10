@@ -1,4 +1,3 @@
-import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import Registration from './abis/Registration.json';
 import { web3 } from 'services';

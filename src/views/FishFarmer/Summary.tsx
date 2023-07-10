@@ -1,12 +1,9 @@
 import { Container, MenuItem, Paper, Select } from '@mui/material';
 import { Spinner } from 'components';
-import { is } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { fishFarmerService, fishSeedCompanyService } from 'services';
+import { fishFarmerService } from 'services';
 import { SummaryParamsType } from 'types/FishSeedCompany';
-
-import ApexCharts from 'apexcharts';
 
 import Chart from 'react-apexcharts';
 

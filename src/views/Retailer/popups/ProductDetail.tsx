@@ -1,35 +1,3 @@
-import { LoadingButton } from '@mui/lab';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  Switch,
-  TextField,
-  Typography,
-} from '@mui/material';
-import { DesktopDatePicker, DesktopDateTimePicker } from '@mui/x-date-pickers';
-import { DateTime } from 'luxon';
-import { useSnackbar } from 'notistack';
-import { Controller, useForm } from 'react-hook-form';
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from 'react-query';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { profileSelector } from 'reducers/profile';
-import { systemSelector } from 'reducers/system';
-import { fileService, fishProcessorService, retailerService } from 'services';
-import { PopupController } from 'types/Common';
-import { FishFarmerFishProcessorOrderPaginateType, FishFarmerFishProcessorOrderType } from 'types/FishProcessor';
-import { useEffect, useState } from 'react';
-import { UploadLabel } from 'views/Registration/components';
-import { contractUrl, formatTime, formatTimeDate, getBase64, pinataUrl, shorten } from 'utils/common';
-import TextEditor from 'components/TextEditor';
-import { FishProcessingType } from 'types/FishProcessing';
-import { FishProcessorDistributorOrderType } from 'types/Distributor';
 import {
   AccountBalanceWalletOutlined,
   ApartmentOutlined,
@@ -38,7 +6,27 @@ import {
   LocalPhoneOutlined,
   SetMealOutlined,
 } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { useSnackbar } from 'notistack';
+import { useState } from 'react';
+import { useMutation } from 'react-query';
+import { useSelector } from 'react-redux';
+import { profileSelector } from 'reducers/profile';
+import { retailerService } from 'services';
+import { PopupController } from 'types/Common';
 import { DistributorRetailerOrderType } from 'types/Retailer';
+import { contractUrl, formatTimeDate, pinataUrl, shorten } from 'utils/common';
+import { UploadLabel } from 'views/Registration/components';
 
 type PopupProps = PopupController & {
   item: DistributorRetailerOrderType;

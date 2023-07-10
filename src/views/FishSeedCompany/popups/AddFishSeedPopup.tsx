@@ -1,6 +1,5 @@
 import { LoadingButton } from '@mui/lab';
 import {
-  Button,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -14,17 +13,12 @@ import {
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation, useQuery } from 'react-query';
+import { QueryObserverResult, RefetchOptions, RefetchQueryFilters, useMutation } from 'react-query';
 import { fileService, fishSeedCompanyService } from 'services';
 import { PopupController } from 'types/Common';
-import {
-  FishSeedPaginateType,
-  FishSeedType,
-  GeographicOriginType,
-  MethodOfReproductionType,
-} from 'types/FishSeedCompany';
+import { FishSeedPaginateType, GeographicOriginType, MethodOfReproductionType } from 'types/FishSeedCompany';
 import { UploadLabel } from 'views/Registration/components';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { getBase64 } from 'utils/common';
 import TextEditor from 'components/TextEditor';
 import { Spinner } from 'components';

@@ -3,18 +3,14 @@ import { LoadingButton } from '@mui/lab';
 import { Avatar, CircularProgress, Container, FormControl, Paper, TextField, Typography } from '@mui/material';
 import TextEditor from 'components/TextEditor';
 import { useSnackbar } from 'notistack';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useMutation, useQuery } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
-import { useRoutes } from 'react-router-dom';
 import { profileSelector, signIn } from 'reducers/profile';
-import { getRoute } from 'routes';
 import { fileService, queryClient, userService } from 'services';
 import { UserType, UserUpdateType } from 'types/User';
 import { getBase64 } from 'utils/common';
-import { UploadLabel } from 'views/Registration/components';
-import { UserAvatar } from './components';
 
 const ProfileUpdate = () => {
   const dispatch = useDispatch();

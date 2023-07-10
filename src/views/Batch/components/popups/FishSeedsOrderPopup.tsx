@@ -2,13 +2,12 @@ import { LoadingButton } from '@mui/lab';
 import { DialogActions, DialogContent, DialogTitle, InputAdornment, TextField, Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
-import { Controller, set, useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { fishFarmerService, fishSeedCompanyService } from 'services';
-import { BatchType } from 'types/Batch';
 import { PopupController } from 'types/Common';
 import { FarmedFishType } from 'types/FishSeedCompany';
 

@@ -13,7 +13,6 @@ import {
   UpdateFarmedFishContractType,
   UpdateFarmedFishType,
 } from 'types/FishSeedCompany';
-import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import FarmedFish from '../contracts/abis/FarmedFish.json';
 import { client } from './axios';

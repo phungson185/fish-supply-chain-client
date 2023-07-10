@@ -8,7 +8,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { profileSelector } from 'reducers/profile';
 import { fishFarmerService, fishProcessorService } from 'services';
-import { BatchType } from 'types/Batch';
 import { PopupController } from 'types/Common';
 import { FishSeedCompanyFishFarmerOrderType, UpdateGrowthDetailType } from 'types/FishFarmer';
 
