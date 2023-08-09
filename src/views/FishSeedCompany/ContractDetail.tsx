@@ -22,7 +22,7 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';
 import { fishSeedCompanyService, logService } from 'services';
-import { formatTime, pinataUrl } from 'utils/common';
+import { contractUrl, formatTime, pinataUrl } from 'utils/common';
 import UpdateContractPopup from './popups/UpdateContractPopup';
 import { LogPaginateType } from 'types/Log';
 import { useSelector } from 'react-redux';
@@ -75,7 +75,13 @@ const ContractDetail = () => {
                     {contract?.speciesName}
                   </Typography>
                   <Typography variant='h6'>
-                    Contract address:&nbsp;<span className='text-blue-600'>{contract?.farmedFishContract}</span>
+                    Contract address:&nbsp;
+                    <span
+                      className='text-blue-600 cursor-pointer'
+                      onClick={() => window.open(contractUrl(contract?.farmedFishContract), '_blank')}
+                    >
+                      {contract?.farmedFishContract}
+                    </span>
                   </Typography>
                   <Typography variant='h6'>
                     Document: &nbsp;
