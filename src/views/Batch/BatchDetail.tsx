@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { batchService, fishSeedCompanyService } from 'services';
 import { RoleType } from 'types/Auth';
 import { BatchType } from 'types/Batch';
-import { formatTime, pinataUrl } from 'utils/common';
+import { contractUrl, formatTime, pinataUrl } from 'utils/common';
 import { BatchComponentInfo } from './components';
 import { formatTimeDate } from 'utils/common';
 import { useWindowSize } from 'hooks';
@@ -54,7 +54,19 @@ const BatchDetailPopup = () => {
                     <>
                       <Typography variant='h6'>
                         Contract address:&nbsp;
-                        <span className='text-blue-600 break-all'>
+                        <span
+                          className='text-blue-600 cursor-pointer break-all'
+                          onClick={() =>
+                            window.open(
+                              contractUrl(
+                                [RoleType.fishSeedCompanyRole, RoleType.fishFarmerRole].includes(contract?.owner?.role)
+                                  ? item.farmedFishId.farmedFishContract
+                                  : item.fishProcessingId?.processingContract,
+                              ),
+                              '_blank',
+                            )
+                          }
+                        >
                           {[RoleType.fishSeedCompanyRole, RoleType.fishFarmerRole].includes(contract?.owner?.role)
                             ? item.farmedFishId.farmedFishContract
                             : item.fishProcessingId?.processingContract}
