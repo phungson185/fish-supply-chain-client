@@ -73,7 +73,7 @@ const ProductDetail = ({ item, onClose, refetch }: PopupProps) => {
               {...{ htmlFor: 'cover', variant: 'rounded', image: item.image }}
               {...{ width: '100%', height: '100%', loading: false, error: false }}
             />
-            <div>Lot Code: {item.id}</div>
+            <div>Lot Code: {item.fishProcessingId.id}</div>
           </div>
           <div className='w-full max-w-[50%]'>
             <div className='pb-5 border-b-2 border-solid border-gray-200 w-fit mb-5'>

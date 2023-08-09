@@ -66,6 +66,7 @@ export type DistributorRetailerOrderType = BaseType & {
   listing: boolean;
   description: string;
   transactionHash: string;
+  qrCode?: string;
 };
 
 export type ConfirmOrderType = {

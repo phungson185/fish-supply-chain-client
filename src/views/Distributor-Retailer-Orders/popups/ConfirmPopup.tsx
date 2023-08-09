@@ -9,6 +9,7 @@ import {
 import { LoadingButton } from '@mui/lab';
 import {
   Avatar,
+  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -31,6 +32,7 @@ import { PopupController } from 'types/Common';
 import { LogParamsType, TransactionType } from 'types/Log';
 import { DistributorRetailerOrderType } from 'types/Retailer';
 import { formatTime, formatTimeDate, shorten } from 'utils/common';
+import SelectStampPopup from './SelectStampPopup';
 
 const steps = ['The request is being processed', 'The seller has accepted the request', 'The item has been received'];
 
@@ -41,6 +43,7 @@ type PopupProps = PopupController & {
 
 const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
   const [orderStatus, setOrderStatus] = useState(item.status);
+  const [openQRCodePopup, setOpenQRCodePopup] = useState(false);
   const { address, role } = useSelector(profileSelector);
   const { enqueueSnackbar } = useSnackbar();
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -230,9 +233,20 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
           </Grid>
           <Grid item xs={8}>
             <div className='pb-5 border-b-2 border-solid border-gray-200 w-fit mb-5'>
-              <Typography variant='h3' className='mb-5 '>
-                Shipping address
-              </Typography>
+              <div className='flex justify-between'>
+                <Typography variant='h3' className='mb-5'>
+                  Shipping address
+                </Typography>
+                {(item.status === ProcessStatus.Accepted || item.status === ProcessStatus.Received) &&
+                  role === RoleType.distributorRole && (
+                    <div
+                      className='underline text-blue-600 hover:text-blue-500 cursor-pointer'
+                      onClick={() => setOpenQRCodePopup(true)}
+                    >
+                      Click to select QR code stamp
+                    </div>
+                  )}
+              </div>
               <div className='flex items-center gap-2 mb-1'>
                 <AccountBalanceWalletOutlined className='' />
                 <div className=''>Wallet address: </div>
@@ -329,6 +343,10 @@ const ConfirmPopup = ({ item, refetch, onClose }: PopupProps) => {
           Cancel
         </LoadingButton>
       </DialogActions>
+
+      <Dialog open={openQRCodePopup} fullWidth maxWidth='lg'>
+        <SelectStampPopup item={item} onClose={() => setOpenQRCodePopup(false)} />
+      </Dialog>
     </>
   );
 };
