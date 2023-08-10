@@ -31,18 +31,18 @@ import { FishSeedCompanyFishFarmerOrderType } from 'types/FishFarmer';
 import { pinataUrl } from 'utils/common';
 
 const FILTERS = [
+  { label: 'Updated time', orderBy: 'updatedAt' },
   { label: 'Species name', orderBy: 'speciesName' },
   { label: 'Total number of fish', orderBy: 'totalNumberOfFish' },
   { label: 'Water temperature', orderBy: 'waterTemperature' },
   { label: 'Geographic origin', orderBy: 'geographicOrigin' },
   { label: 'Method of reproduction', orderBy: 'methodOfReproduction' },
   { label: 'Fish weight', orderBy: 'fishWeight' },
-  { label: 'Updated time', orderBy: 'updatedAt' },
 ];
 
 const SORT_TYPES = [
-  { label: 'Low to High', desc: 'false' },
   { label: 'High to Low', desc: 'true' },
+  { label: 'Low to High', desc: 'false' },
 ];
 
 const FishGrowths = () => {

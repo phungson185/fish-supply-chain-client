@@ -27,20 +27,20 @@ import { formatTime } from 'utils/common';
 import { ConfirmPopup } from './popups';
 
 const FILTERS = [
+  {
+    label: 'Updated time',
+    orderBy: 'updatedAt',
+  },
   { label: 'Species name', orderBy: 'speciesName' },
   { label: 'Geographic origin', orderBy: 'geographicOrigin' },
   { label: 'Method of reproduction', orderBy: 'methodOfReproduction' },
   { label: 'Water temperature', orderBy: 'waterTemperature' },
   { label: 'Number of fish seeds ordered', orderBy: 'numberOfFishSeedsOrdered' },
-  {
-    label: 'Updated time',
-    orderBy: 'updatedAt',
-  },
 ];
 
 const SORT_TYPES = [
-  { label: 'Low to High', desc: 'false' },
   { label: 'High to Low', desc: 'true' },
+  { label: 'Low to High', desc: 'false' },
 ];
 
 const OrdersTab = ({ status }: { status: ProcessStatus }) => {

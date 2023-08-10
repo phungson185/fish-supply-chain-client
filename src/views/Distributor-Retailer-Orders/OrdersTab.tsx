@@ -17,16 +17,16 @@ import { ConfirmPopup } from './popups';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 
 const FILTERS = [
+  {
+    label: 'Updated time',
+    orderBy: 'updatedAt',
+  },
   { label: 'Species name', orderBy: 'speciesName' },
   { label: 'Quantity of fish package ordered', orderBy: 'quantityOfFishPackageOrdered' },
   { label: 'Date of processing', orderBy: 'dateOfProcessing' },
   { label: 'Date of expiry', orderBy: 'dateOfExpiry' },
   { label: 'Number of packets', orderBy: 'numberOfPackets' },
   { label: 'Fillets in packet', orderBy: 'filletsInPacket' },
-  {
-    label: 'Updated time',
-    orderBy: 'updatedAt',
-  },
 ];
 
 const DATE_FILTERS = [
@@ -36,8 +36,8 @@ const DATE_FILTERS = [
 ];
 
 const SORT_TYPES = [
-  { label: 'Low to High', desc: 'false' },
   { label: 'High to Low', desc: 'true' },
+  { label: 'Low to High', desc: 'false' },
 ];
 
 const OrdersTab = ({ status }: { status: ProcessStatus }) => {

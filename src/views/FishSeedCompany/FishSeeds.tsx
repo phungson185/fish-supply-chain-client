@@ -32,17 +32,17 @@ import { formatTime, pinataUrl } from 'utils/common';
 import AddFishSeedPopup from './popups/AddFishSeedPopup';
 
 const FILTERS = [
+  { label: 'Update time', orderBy: 'updatedAt' },
   { label: 'Species name', orderBy: 'speciesName' },
   { label: 'Geographic origin', orderBy: 'geographicOrigin' },
   { label: 'Method of reproduction', orderBy: 'methodOfReproduction' },
   { label: 'Water temperature', orderBy: 'waterTemperature' },
   { label: 'Quantity', orderBy: 'quantity' },
-  { label: 'Update time', orderBy: 'updatedAt' },
 ];
 
 const SORT_TYPES = [
-  { label: 'Low to High', desc: 'false' },
   { label: 'High to Low', desc: 'true' },
+  { label: 'Low to High', desc: 'false' },
 ];
 
 const FishSeeds = () => {

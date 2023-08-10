@@ -30,15 +30,15 @@ import { userService } from 'services';
 import { formatTime } from 'utils/common';
 
 const FILTERS = [
+  { label: 'Updated time', orderBy: 'updatedAt' },
   { label: 'Company name', orderBy: 'name' },
   { label: 'Company address', orderBy: 'userAddress' },
   { label: 'Role', orderBy: 'role' },
-  { label: 'Updated time', orderBy: 'updatedAt' },
 ];
 
 const SORT_TYPES = [
-  { label: 'Low to High', desc: 'false' },
   { label: 'High to Low', desc: 'true' },
+  { label: 'Low to High', desc: 'false' },
 ];
 
 const AccountManagement = () => {

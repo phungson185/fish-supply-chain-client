@@ -27,19 +27,19 @@ import { formatTime } from 'utils/common';
 import { ConfirmPopup } from './popups';
 
 const FILTERS = [
-  { label: 'Species name', orderBy: 'speciesName' },
-  { label: 'Geographic origin', orderBy: 'geographicOrigin' },
-  { label: 'Method of reproduction', orderBy: 'methodOfReproduction' },
-  { label: 'Number of fish ordered', orderBy: 'numberOfFishOrdered' },
   {
     label: 'Updated time',
     orderBy: 'updatedAt',
   },
+  { label: 'Species name', orderBy: 'speciesName' },
+  { label: 'Geographic origin', orderBy: 'geographicOrigin' },
+  { label: 'Method of reproduction', orderBy: 'methodOfReproduction' },
+  { label: 'Number of fish ordered', orderBy: 'numberOfFishOrdered' },
 ];
 
 const SORT_TYPES = [
-  { label: 'Low to High', desc: 'false' },
   { label: 'High to Low', desc: 'true' },
+  { label: 'Low to High', desc: 'false' },
 ];
 
 const OrdersTab = ({ status }: { status: ProcessStatus }) => {
